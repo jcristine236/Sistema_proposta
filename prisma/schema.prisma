@@ -1,0 +1,233 @@
+// Banco de dados da plataforma de propostas.
+// Multiempresa: todo dado de negócio pertence a uma Empresa (empresaId).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Empresas (tenants) e usuários
+// ---------------------------------------------------------------------------
+
+model Empresa {
+  id               String   @id @default(cuid())
+  slug             String   @unique // caddi, kolp, fase
+  nome             String
+  razaoSocial      String?
+  site             String? // caddi.com.br
+  dominioPropostas String   @unique // propostas.caddi.com.br (links públicos)
+  /// Paleta, fontes e logos. Ver src/lib/tema.ts
+  tema             Json
+  rodape           String?
+  emailNotificacao String? // recebe avisos de abertura/aceite
+  ativo            Boolean  @default(true)
+  criadoEm         DateTime @default(now())
+  atualizadoEm     DateTime @updatedAt
+
+  membros   Membro[]
+  contatos  Contato[]
+  produtos  Produto[]
+  modelos   Modelo[]
+  propostas Proposta[]
+}
+
+model Usuario {
+  id         String   @id @default(cuid())
+  nome       String
+  email      String   @unique
+  senhaHash  String
+  /// Administrador da plataforma inteira (pensando no uso futuro como produto).
+  superAdmin Boolean  @default(false)
+  ativo      Boolean  @default(true)
+  criadoEm   DateTime @default(now())
+
+  membros   Membro[]
+  propostas Proposta[]
+}
+
+enum Papel {
+  ADMIN
+  VENDEDOR
+}
+
+/// Vínculo usuário x empresa. Um usuário pode atuar em várias empresas.
+model Membro {
+  id        String  @id @default(cuid())
+  usuarioId String
+  empresaId String
+  papel     Papel   @default(VENDEDOR)
+  usuario   Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  empresa   Empresa @relation(fields: [empresaId], references: [id], onDelete: Cascade)
+
+  @@unique([usuarioId, empresaId])
+}
+
+// ---------------------------------------------------------------------------
+// Cadastros
+// ---------------------------------------------------------------------------
+
+model Contato {
+  id           String   @id @default(cuid())
+  empresaId    String
+  /// Nome da empresa cliente (ex.: Grupo Mofarrej)
+  organizacao  String
+  responsavel  String?
+  email        String?
+  celular      String?
+  ativo        Boolean  @default(true)
+  criadoEm     DateTime @default(now())
+  empresa      Empresa  @relation(fields: [empresaId], references: [id], onDelete: Cascade)
+  propostas    Proposta[]
+
+  @@index([empresaId])
+}
+
+enum Recorrencia {
+  MENSAL
+  UNICO
+}
+
+model Produto {
+  id          String      @id @default(cuid())
+  empresaId   String
+  /// Agrupa os itens que aparecem num mesmo campo do formulário (ex.: planos-nuvem)
+  categoria   String
+  codigo      String?
+  nome        String
+  descricao   String?
+  preco       Decimal     @db.Decimal(12, 2)
+  recorrencia Recorrencia @default(MENSAL)
+  /// Atributos técnicos livres (ex.: { "vcpu": 16, "ram": 92, "disco": 1000 })
+  atributos   Json        @default("{}")
+  ordem       Int         @default(0)
+  ativo       Boolean     @default(true)
+  criadoEm    DateTime    @default(now())
+  empresa     Empresa     @relation(fields: [empresaId], references: [id], onDelete: Cascade)
+
+  @@index([empresaId, categoria])
+}
+
+// ---------------------------------------------------------------------------
+// Modelos de proposta (tipos de solução)
+// ---------------------------------------------------------------------------
+
+model Modelo {
+  id           String   @id @default(cuid())
+  empresaId    String
+  nome         String
+  descricao    String?
+  /// Identificador do tipo de solução (ex.: servidor-nuvem)
+  tipoSolucao  String
+  /// Campos do formulário de preenchimento. Ver src/lib/campos.ts
+  campos       Json
+  /// Seções (blocos) da proposta, em ordem. Ver src/lib/secoes.ts
+  secoes       Json
+  /// Regras de cálculo do investimento. Ver src/lib/precificacao.ts
+  precificacao Json
+  validadeDias Int      @default(15)
+  ativo        Boolean  @default(true)
+  criadoEm     DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+  empresa      Empresa  @relation(fields: [empresaId], references: [id], onDelete: Cascade)
+  propostas    Proposta[]
+
+  @@index([empresaId])
+}
+
+// ---------------------------------------------------------------------------
+// Propostas e rastreamento
+// ---------------------------------------------------------------------------
+
+enum StatusProposta {
+  RASCUNHO
+  PUBLICADA
+  ABERTA
+  ACEITA
+  RECUSADA
+  EXPIRADA
+}
+
+model Proposta {
+  id                 String         @id @default(cuid())
+  empresaId          String
+  modeloId           String
+  autorId            String
+  contatoId          String?
+  /// Parte final do link público: /p/{slug}
+  slug               String         @unique
+  titulo             String
+  clienteNome        String
+  /// Valores preenchidos no formulário
+  dados              Json
+  /// Cópia de campos/seções/precificação do modelo no momento do envio,
+  /// para que alterações futuras no modelo não mudem propostas já enviadas.
+  snapshot           Json
+  /// Resultado do cálculo (subtotal, desconto, total mensal, único...)
+  calculo            Json
+  valorMensal        Decimal?       @db.Decimal(12, 2)
+  valorUnico         Decimal?       @db.Decimal(12, 2)
+  validaAte          DateTime?
+  status             StatusProposta @default(PUBLICADA)
+  descontoAcimaLimite Boolean       @default(false)
+  publicadaEm        DateTime       @default(now())
+  primeiraAberturaEm DateTime?
+  decididaEm         DateTime?
+  decisaoNome        String?
+  motivoRecusa       String?
+  comentarioDecisao  String?
+  criadoEm           DateTime       @default(now())
+  atualizadoEm       DateTime       @updatedAt
+
+  empresa       Empresa        @relation(fields: [empresaId], references: [id], onDelete: Cascade)
+  modelo        Modelo         @relation(fields: [modeloId], references: [id])
+  autor         Usuario        @relation(fields: [autorId], references: [id])
+  contato       Contato?       @relation(fields: [contatoId], references: [id])
+  visualizacoes Visualizacao[]
+  eventos       Evento[]
+
+  @@index([empresaId, status])
+}
+
+/// Uma sessão de leitura de um leitor (viewerId fica salvo no navegador dele).
+model Visualizacao {
+  id              String       @id @default(cuid())
+  propostaId      String
+  viewerId        String
+  userAgent       String?
+  ip              String?
+  iniciadaEm      DateTime     @default(now())
+  ultimaAtividade DateTime     @default(now())
+  tempoTotalSeg   Int          @default(0)
+  proposta        Proposta     @relation(fields: [propostaId], references: [id], onDelete: Cascade)
+  secoes          TempoSecao[]
+
+  @@index([propostaId])
+}
+
+/// Tempo acumulado de leitura por seção, dentro de uma visualização.
+model TempoSecao {
+  id             String       @id @default(cuid())
+  visualizacaoId String
+  secao          String
+  segundos       Int          @default(0)
+  visualizacao   Visualizacao @relation(fields: [visualizacaoId], references: [id], onDelete: Cascade)
+
+  @@unique([visualizacaoId, secao])
+}
+
+/// Linha do tempo: CRIADA, ABERTA, ACEITA, RECUSADA, COMENTARIO...
+model Evento {
+  id         String   @id @default(cuid())
+  propostaId String
+  tipo       String
+  dados      Json?
+  criadoEm   DateTime @default(now())
+  proposta   Proposta @relation(fields: [propostaId], references: [id], onDelete: Cascade)
+
+  @@index([propostaId, criadoEm])
+}

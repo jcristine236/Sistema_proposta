@@ -1,0 +1,54 @@
+# Plataforma de propostas — produção na nuvem privada.
+# Uso:  cp deploy/.env.producao.example .env  (preencha)  &&  docker compose up -d --build
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: propostas
+      POSTGRES_USER: propostas
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?defina DB_PASSWORD no .env}
+    volumes:
+      - dados-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U propostas -d propostas"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  # Roda uma vez a cada implantação: aplica migrações do banco e dados iniciais
+  migrar:
+    build: { context: ., target: ferramentas }
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://propostas:${DB_PASSWORD}@db:5432/propostas?schema=public
+    depends_on:
+      db: { condition: service_healthy }
+    restart: "no"
+
+  app:
+    build: { context: ., target: runner }
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://propostas:${DB_PASSWORD}@db:5432/propostas?schema=public
+    depends_on:
+      migrar: { condition: service_completed_successfully }
+    expose: ["3000"]
+
+  # Proxy HTTPS com certificados automáticos (Let's Encrypt) para todos os domínios
+  proxy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports: ["80:80", "443:443"]
+    environment:
+      ACME_EMAIL: ${ACME_EMAIL:?defina ACME_EMAIL no .env}
+      PAINEL_DOMINIO: ${PAINEL_DOMINIO:?defina PAINEL_DOMINIO no .env}
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - dados-caddy:/data
+    depends_on: [app]
+
+volumes:
+  dados-db:
+  dados-caddy:
