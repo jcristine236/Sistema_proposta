@@ -1,6 +1,6 @@
 /* Visual das propostas públicas. Cores e fontes vêm do tema da empresa
    (variáveis --primary, --accent... definidas em src/lib/tema.ts). */
-.pp{--bg:#F6F7F9;--card:#fff;--line:#E3E6EB;--muted:#5B6578;font-family:var(--font-text);background:var(--bg);color:var(--primary);line-height:1.55;overflow-x:hidden}
+.pp{font-synthesis:none;--bg:#F6F7F9;--card:#fff;--line:#E3E6EB;--muted:#5B6578;font-family:var(--font-text);background:var(--bg);color:var(--primary);line-height:1.55;overflow-x:hidden}
 .pp, .pp *{box-sizing:border-box;margin:0;padding:0}
 .pp{scroll-behavior:smooth}
 .pp{font-family:var(--font-text);background:var(--bg);color:var(--primary);line-height:1.55}
@@ -437,6 +437,13 @@
 .pp .ring .arc{transition:none}}
 
 /* ===== Plataforma: ações do cliente, modais e avisos ===== */
+.pp .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:46px;padding:0 22px;border-radius:10px;border:0;background:var(--primary);color:#fff;font:600 14.5px var(--font-text);cursor:pointer;text-decoration:none}
+.pp .btn:hover{background:var(--primary-2)}
+.pp .btn.gold{background:var(--accent);color:var(--primary)}
+.pp .btn.gold:hover{background:color-mix(in srgb,var(--accent) 85%,#fff)}
+.pp .btn.ghost{background:#fff;color:var(--primary);border:1.5px solid var(--primary)}
+.pp .btn:disabled{opacity:.6;cursor:not-allowed}
+
 .pp .acoes{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
 .pp .cta .acoes .btn.ghost{background:transparent;color:#fff;border-color:rgba(255,255,255,.55);animation:none;height:50px}
 .pp .cta .link-recusa{margin-top:18px;background:none;border:0;color:var(--neutral);font:500 13.5px var(--font-text);text-decoration:underline;cursor:pointer}

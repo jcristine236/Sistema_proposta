@@ -19,6 +19,10 @@ export type Tema = {
   fonteTitulo: string;
   fonteTexto: string;
   fonteNumeros: string;
+  /** Pesos disponíveis de cada fonte no Google Fonts (ex.: "400" para fontes de peso único) */
+  pesosTitulo?: string;
+  pesosTexto?: string;
+  pesosNumeros?: string;
   /** Logo para fundos claros */
   logo: string;
   /** Logo para fundos escuros (opcional) */
@@ -62,5 +66,5 @@ export function variaveisCss(t: Tema): Record<string, string> {
 /** URL do Google Fonts com as três famílias do tema. */
 export function urlFontes(t: Tema): string {
   const fam = (f: string, pesos: string) => `family=${encodeURIComponent(f).replace(/%20/g, "+")}:wght@${pesos}`;
-  return `https://fonts.googleapis.com/css2?${fam(t.fonteTitulo, "500;600;700;800")}&${fam(t.fonteTexto, "400;500;600;700")}&${fam(t.fonteNumeros, "500;600")}&display=swap`;
+  return `https://fonts.googleapis.com/css2?${fam(t.fonteTitulo, t.pesosTitulo ?? "500;600;700;800")}&${fam(t.fonteTexto, t.pesosTexto ?? "400;500;600;700")}&${fam(t.fonteNumeros, t.pesosNumeros ?? "500;600")}&display=swap`;
 }
