@@ -1,0 +1,42 @@
+# Modo TESTE no seu computador (sem domínio e sem HTTPS).
+# Uso:  docker compose -f docker-compose.teste.yml up --build
+# Acesse http://localhost:3000  (login: admin@propostas.local / trocar-esta-senha)
+# NÃO use este arquivo em produção: as senhas abaixo são de teste.
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: propostas
+      POSTGRES_USER: propostas
+      POSTGRES_PASSWORD: teste
+    volumes:
+      - dados-teste:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U propostas -d propostas"]
+      interval: 3s
+      timeout: 5s
+      retries: 30
+
+  migrar:
+    build: { context: ., target: ferramentas }
+    environment: &env
+      DATABASE_URL: postgresql://propostas:teste@db:5432/propostas?schema=public
+      SESSION_SECRET: teste-local-nao-usar-em-producao-0123456789abcdef
+      PUBLIC_BASE_URL: http://localhost:3000
+      ADMIN_BASE_URL: http://localhost:3000
+      ALLOW_ANY_HOST: "true"
+      SEED_ADMIN_EMAIL: admin@propostas.local
+      SEED_ADMIN_PASSWORD: trocar-esta-senha
+    depends_on:
+      db: { condition: service_healthy }
+    restart: "no"
+
+  app:
+    build: { context: ., target: runner }
+    environment: *env
+    depends_on:
+      migrar: { condition: service_completed_successfully }
+    ports: ["3000:3000"]
+
+volumes:
+  dados-teste:

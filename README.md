@@ -11,6 +11,7 @@ com domínio, paleta, logos, catálogo e modelos próprios.
 - **Acompanhamento:** aberturas, leitores, tempo de leitura por seção, linha do tempo
   e avisos por e-mail.
 
+Testar no seu computador: **[TESTE.md](TESTE.md)**.
 Implantação na nuvem privada: **[deploy/README.md](deploy/README.md)**.
 Mapa funcional de referência: [docs/mapa-funcional.md](docs/mapa-funcional.md).
 

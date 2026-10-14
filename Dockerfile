@@ -1,8 +1,9 @@
 # Imagem da plataforma de propostas (Next.js + Prisma).
 # Etapas: deps -> build -> runner (enxuta) e "ferramentas" (migrações/seed).
 
-FROM node:22-bookworm-slim AS base
-RUN apt-get update && apt-get install -y --no-install-recommends openssl ca-certificates && rm -rf /var/lib/apt/lists/*
+# Imagem Debian completa: já traz OpenSSL (exigido pelo Prisma) e certificados,
+# então a montagem não depende de baixar pacotes do Debian.
+FROM node:22-bookworm AS base
 WORKDIR /app
 
 FROM base AS deps
