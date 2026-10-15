@@ -72,7 +72,7 @@ Preencha no `.env`:
 
 | Variável | O que colocar |
 |---|---|
-| `DB_PASSWORD` | senha forte do banco: `openssl rand -base64 24` |
+| `DB_PASSWORD` | senha forte do banco, só letras e números (vai dentro da URL de conexão): `openssl rand -hex 24` |
 | `SESSION_SECRET` | chave do login: `openssl rand -base64 48` |
 | `PAINEL_DOMINIO` / `ADMIN_BASE_URL` | domínio do painel (ex.: `painel.caddi.com.br`) |
 | `ACME_EMAIL` | e-mail que recebe avisos dos certificados |

@@ -42,7 +42,7 @@ a terceira lista os riscos conhecidos e aceitos.
 
 ## 2. Checklist da infraestrutura (antes de ir ao ar)
 
-- [ ] `.env` com `DB_PASSWORD` e `SESSION_SECRET` **gerados aleatoriamente** (`openssl rand -base64 48`), permissão `chmod 600 .env`
+- [ ] `.env` com `DB_PASSWORD` (`openssl rand -hex 24`) e `SESSION_SECRET` (`openssl rand -base64 48`) **gerados aleatoriamente**, permissão `chmod 600 .env`
 - [ ] `SEED_ADMIN_PASSWORD` forte (o seed recusa senha fraca em produção); trocar no primeiro login
 - [ ] `ALLOW_ANY_HOST=false`, `MODO_HTTP` **ausente**, `PUBLIC_BASE_URL` vazio
 - [ ] Firewall: liberar só 80/443 (e SSH restrito por IP/VPN); nada de 5432 ou 3000 expostos
