@@ -1,7 +1,4 @@
 -- CreateEnum
-CREATE TYPE "Papel" AS ENUM ('ADMIN', 'VENDEDOR');
-
--- CreateEnum
 CREATE TYPE "Recorrencia" AS ENUM ('MENSAL', 'UNICO');
 
 -- CreateEnum
@@ -17,7 +14,10 @@ CREATE TABLE "Empresa" (
     "dominioPropostas" TEXT NOT NULL,
     "tema" JSONB NOT NULL,
     "rodape" TEXT,
+    "prefixo" TEXT NOT NULL,
     "emailNotificacao" TEXT,
+    "whatsappNotificacao" TEXT,
+    "motivosRecusa" JSONB NOT NULL DEFAULT '[]',
     "ativo" BOOLEAN NOT NULL DEFAULT true,
     "criadoEm" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "atualizadoEm" TIMESTAMP(3) NOT NULL,
@@ -31,9 +31,18 @@ CREATE TABLE "Usuario" (
     "nome" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "senhaHash" TEXT NOT NULL,
+    "whatsapp" TEXT,
     "superAdmin" BOOLEAN NOT NULL DEFAULT false,
+    "todasEmpresas" BOOLEAN NOT NULL DEFAULT false,
+    "permissoes" JSONB NOT NULL DEFAULT '{}',
     "ativo" BOOLEAN NOT NULL DEFAULT true,
+    "trocarSenha" BOOLEAN NOT NULL DEFAULT false,
+    "versaoSessao" INTEGER NOT NULL DEFAULT 0,
+    "falhasLogin" INTEGER NOT NULL DEFAULT 0,
+    "bloqueadoAte" TIMESTAMP(3),
+    "ultimoAcesso" TIMESTAMP(3),
     "criadoEm" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "atualizadoEm" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "Usuario_pkey" PRIMARY KEY ("id")
 );
@@ -43,7 +52,6 @@ CREATE TABLE "Membro" (
     "id" TEXT NOT NULL,
     "usuarioId" TEXT NOT NULL,
     "empresaId" TEXT NOT NULL,
-    "papel" "Papel" NOT NULL DEFAULT 'VENDEDOR',
 
     CONSTRAINT "Membro_pkey" PRIMARY KEY ("id")
 );
@@ -53,6 +61,8 @@ CREATE TABLE "Contato" (
     "id" TEXT NOT NULL,
     "empresaId" TEXT NOT NULL,
     "organizacao" TEXT NOT NULL,
+    "razaoSocial" TEXT,
+    "cnpj" TEXT,
     "responsavel" TEXT,
     "email" TEXT,
     "celular" TEXT,
@@ -99,10 +109,46 @@ CREATE TABLE "Modelo" (
 );
 
 -- CreateTable
+CREATE TABLE "SecaoModelo" (
+    "id" TEXT NOT NULL,
+    "empresaId" TEXT NOT NULL,
+    "nome" TEXT NOT NULL,
+    "descricao" TEXT,
+    "secao" JSONB NOT NULL,
+    "criadoEm" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "atualizadoEm" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "SecaoModelo_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Upload" (
+    "id" TEXT NOT NULL,
+    "empresaId" TEXT NOT NULL,
+    "arquivo" TEXT NOT NULL,
+    "nome" TEXT NOT NULL,
+    "mime" TEXT NOT NULL,
+    "tamanho" INTEGER NOT NULL,
+    "criadoEm" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "Upload_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "ContadorProposta" (
+    "empresaId" TEXT NOT NULL,
+    "ano" INTEGER NOT NULL,
+    "ultimo" INTEGER NOT NULL DEFAULT 0,
+
+    CONSTRAINT "ContadorProposta_pkey" PRIMARY KEY ("empresaId","ano")
+);
+
+-- CreateTable
 CREATE TABLE "Proposta" (
     "id" TEXT NOT NULL,
     "empresaId" TEXT NOT NULL,
-    "modeloId" TEXT NOT NULL,
+    "codigo" TEXT NOT NULL,
+    "modeloId" TEXT,
     "autorId" TEXT NOT NULL,
     "contatoId" TEXT,
     "slug" TEXT NOT NULL,
@@ -122,6 +168,7 @@ CREATE TABLE "Proposta" (
     "decisaoNome" TEXT,
     "motivoRecusa" TEXT,
     "comentarioDecisao" TEXT,
+    "dadosContratacao" JSONB,
     "criadoEm" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "atualizadoEm" TIMESTAMP(3) NOT NULL,
 
@@ -163,11 +210,29 @@ CREATE TABLE "Evento" (
     CONSTRAINT "Evento_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "LogAuditoria" (
+    "id" TEXT NOT NULL,
+    "usuarioId" TEXT,
+    "empresaId" TEXT,
+    "acao" TEXT NOT NULL,
+    "entidade" TEXT,
+    "entidadeId" TEXT,
+    "descricao" TEXT,
+    "ip" TEXT,
+    "criadoEm" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "LogAuditoria_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "Empresa_slug_key" ON "Empresa"("slug");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Empresa_dominioPropostas_key" ON "Empresa"("dominioPropostas");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Empresa_prefixo_key" ON "Empresa"("prefixo");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Usuario_email_key" ON "Usuario"("email");
@@ -185,6 +250,18 @@ CREATE INDEX "Produto_empresaId_categoria_idx" ON "Produto"("empresaId", "catego
 CREATE INDEX "Modelo_empresaId_idx" ON "Modelo"("empresaId");
 
 -- CreateIndex
+CREATE INDEX "SecaoModelo_empresaId_idx" ON "SecaoModelo"("empresaId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Upload_arquivo_key" ON "Upload"("arquivo");
+
+-- CreateIndex
+CREATE INDEX "Upload_empresaId_idx" ON "Upload"("empresaId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Proposta_codigo_key" ON "Proposta"("codigo");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "Proposta_slug_key" ON "Proposta"("slug");
 
 -- CreateIndex
@@ -198,6 +275,12 @@ CREATE UNIQUE INDEX "TempoSecao_visualizacaoId_secao_key" ON "TempoSecao"("visua
 
 -- CreateIndex
 CREATE INDEX "Evento_propostaId_criadoEm_idx" ON "Evento"("propostaId", "criadoEm");
+
+-- CreateIndex
+CREATE INDEX "LogAuditoria_criadoEm_idx" ON "LogAuditoria"("criadoEm");
+
+-- CreateIndex
+CREATE INDEX "LogAuditoria_empresaId_criadoEm_idx" ON "LogAuditoria"("empresaId", "criadoEm");
 
 -- AddForeignKey
 ALTER TABLE "Membro" ADD CONSTRAINT "Membro_usuarioId_fkey" FOREIGN KEY ("usuarioId") REFERENCES "Usuario"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -215,10 +298,19 @@ ALTER TABLE "Produto" ADD CONSTRAINT "Produto_empresaId_fkey" FOREIGN KEY ("empr
 ALTER TABLE "Modelo" ADD CONSTRAINT "Modelo_empresaId_fkey" FOREIGN KEY ("empresaId") REFERENCES "Empresa"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "SecaoModelo" ADD CONSTRAINT "SecaoModelo_empresaId_fkey" FOREIGN KEY ("empresaId") REFERENCES "Empresa"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Upload" ADD CONSTRAINT "Upload_empresaId_fkey" FOREIGN KEY ("empresaId") REFERENCES "Empresa"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ContadorProposta" ADD CONSTRAINT "ContadorProposta_empresaId_fkey" FOREIGN KEY ("empresaId") REFERENCES "Empresa"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "Proposta" ADD CONSTRAINT "Proposta_empresaId_fkey" FOREIGN KEY ("empresaId") REFERENCES "Empresa"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Proposta" ADD CONSTRAINT "Proposta_modeloId_fkey" FOREIGN KEY ("modeloId") REFERENCES "Modelo"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Proposta" ADD CONSTRAINT "Proposta_modeloId_fkey" FOREIGN KEY ("modeloId") REFERENCES "Modelo"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Proposta" ADD CONSTRAINT "Proposta_autorId_fkey" FOREIGN KEY ("autorId") REFERENCES "Usuario"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -234,3 +326,6 @@ ALTER TABLE "TempoSecao" ADD CONSTRAINT "TempoSecao_visualizacaoId_fkey" FOREIGN
 
 -- AddForeignKey
 ALTER TABLE "Evento" ADD CONSTRAINT "Evento_propostaId_fkey" FOREIGN KEY ("propostaId") REFERENCES "Proposta"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "LogAuditoria" ADD CONSTRAINT "LogAuditoria_usuarioId_fkey" FOREIGN KEY ("usuarioId") REFERENCES "Usuario"("id") ON DELETE SET NULL ON UPDATE CASCADE;

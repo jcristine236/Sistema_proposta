@@ -78,8 +78,10 @@ Preencha no `.env`:
 | `ACME_EMAIL` | e-mail que recebe avisos dos certificados |
 | `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` | primeiro usuário administrador |
 | `SMTP_*` | servidor de e-mail para os avisos de abertura/aceite (recomendado) |
+| `WHATSAPP_PROVIDER` e variáveis do provedor | aviso de aceite por WhatsApp: `evolution` (Evolution API), `meta` (WhatsApp Cloud API com modelo aprovado) ou `webhook` (n8n/Make/Zapier) — ver `.env.example` |
 
-Mantenha `ALLOW_ANY_HOST=false` e `PUBLIC_BASE_URL` vazio em produção.
+Mantenha `ALLOW_ANY_HOST=false`, `PUBLIC_BASE_URL` vazio e **não** defina `MODO_HTTP` em produção.
+Antes de ir ao ar, siga o checklist de [SECURITY.md](../SECURITY.md).
 
 Se os domínios forem diferentes dos padrões, ajuste também `deploy/Caddyfile`.
 
@@ -94,11 +96,12 @@ docker compose logs -f proxy   # acompanhe a emissão dos certificados
 O serviço `migrar` roda sozinho a cada implantação: cria/atualiza as tabelas e
 cadastra as empresas, os planos da CADDI e os modelos iniciais (sem apagar dados).
 
-Acesse `https://painel.caddi.com.br`, entre com o usuário do `.env` e:
+Acesse `https://painel.caddi.com.br`, entre com o usuário do `.env` (o sistema pede uma senha nova) e:
 
-1. Em **Empresa e marca**, revise o domínio, a paleta e o e-mail de avisos de cada empresa
-   (troque de empresa no seletor do menu lateral).
-2. Crie uma proposta de teste e abra o link numa janela anônima.
+1. Em **Empresa e marca**, revise paleta, logos, e-mail e WhatsApp de avisos de cada empresa
+   (troque de empresa no seletor do menu lateral). Domínio e prefixo ficam em **Empresas**.
+2. Em **Usuários**, crie os acessos do time com o perfil adequado.
+3. Crie uma proposta de teste e abra o link numa janela anônima.
 
 ## 5. Atualizar para uma nova versão
 
@@ -113,11 +116,14 @@ cada uma guarda uma cópia do modelo e dos preços do momento em que foi gerada.
 
 ## 6. Backup
 
-O banco fica no volume `dados-db`. Backup diário sugerido (cron):
+O banco fica no volume `dados-db` e as imagens enviadas no volume `dados-uploads`.
+Backup diário sugerido (cron):
 
 ```bash
 docker compose exec -T db pg_dump -U propostas propostas | gzip > /backup/propostas-$(date +%F).sql.gz
+docker run --rm -v propostas_dados-uploads:/u -v /backup:/b alpine tar czf /b/uploads-$(date +%F).tgz -C /u .
 ```
+(o nome do volume é `<pasta>_dados-uploads`; confira com `docker volume ls`)
 
 Restaurar:
 
@@ -154,7 +160,7 @@ server {
 
 ## 8. Adicionar uma nova empresa no futuro
 
-1. Cadastre a empresa (por enquanto em `prisma/seed.ts`, depois pelo painel de superadmin).
+1. Cadastre a empresa em **Empresas** (superadministrador): nome, prefixo e domínio.
 2. Crie o registro DNS `propostas.<dominio>` na Hostgator.
 3. Inclua o domínio na lista de `deploy/Caddyfile`.
 4. `docker compose up -d --build`.

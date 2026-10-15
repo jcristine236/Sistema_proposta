@@ -8,15 +8,20 @@ import { EVENTOS, STATUS } from "@/lib/rotulos";
 import type { Calculo } from "@/lib/precificacao";
 import type { Secao } from "@/lib/secoes";
 import { CopiarLink } from "@/components/admin/CopiarLink";
+import { BLOCO } from "@/lib/blocos";
+import { BotaoConfirmar } from "@/components/admin/Confirmar";
+import { excluirProposta } from "../acoes";
+import { filtroPropostas } from "@/lib/auth";
 
 export default async function DetalheProposta({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const { empresa } = await exigirSessao();
+  const s = await exigirSessao("propostas");
+  const { empresa } = s;
   const p = await db.proposta.findFirst({
-    where: { id, empresaId: empresa.id },
+    where: { id, ...filtroPropostas(s) },
     include: {
       autor: { select: { nome: true } },
-      modelo: { select: { nome: true } },
+      modelo: { select: { id: true, nome: true, ativo: true } },
       eventos: { orderBy: { criadoEm: "desc" } },
       visualizacoes: { orderBy: { iniciadaEm: "desc" }, include: { secoes: true } },
     },
@@ -32,15 +37,26 @@ export default async function DetalheProposta({ params }: { params: Promise<{ id
   const tempoTotal = p.visualizacoes.reduce((s, v) => s + v.tempoTotalSeg, 0);
   const leitores = new Set(p.visualizacoes.map((v) => v.viewerId)).size;
   const comentarios = p.eventos.filter((e) => e.tipo === "COMENTARIO");
+  const dc = p.dadosContratacao as { razaoSocial: string; cnpj: string; nomeSocio: string; email: string; whatsapp: string } | null;
 
   return (
     <>
       <div className="topo">
         <div>
-          <h1>{p.clienteNome}</h1>
-          <p>{p.modelo.nome} · criada em {dataHoraBR(p.criadoEm)} por {p.autor.nome}</p>
+          <span className="chip mono">{p.codigo}</span>
+          <h1 style={{ marginTop: 8 }}>{p.clienteNome}</h1>
+          <p>{p.modelo?.nome ?? "Modelo excluído"} · criada em {dataHoraBR(p.criadoEm)} por {p.autor.nome}</p>
         </div>
-        <span className={`status ${p.status}`} style={{ fontSize: 14, padding: "6px 14px" }}>{STATUS[p.status]}</span>
+        <div className="acoes-linha">
+          <span className={`status ${p.status}`} style={{ fontSize: 14, padding: "6px 14px" }}>{STATUS[p.status]}</span>
+          {s.permite("propostas", "editar") && p.status !== "ACEITA" && <Link className="btn claro" href={`/admin/propostas/${p.id}/editar`}>Editar</Link>}
+          {s.permite("propostas", "criar") && p.modelo?.ativo && <Link className="btn claro" href={`/admin/propostas/nova/${p.modelo.id}?de=${p.id}`}>Duplicar</Link>}
+          {s.permite("propostas", "excluir") && (
+            <form action={excluirProposta.bind(null, p.id)}>
+              <BotaoConfirmar className="btn claro" mensagem={`Excluir a proposta ${p.codigo}? O link deixará de funcionar e o histórico será apagado.`}>Excluir</BotaoConfirmar>
+            </form>
+          )}
+        </div>
       </div>
 
       <div className="card link-box" style={{ marginTop: 0 }}>
@@ -68,6 +84,20 @@ export default async function DetalheProposta({ params }: { params: Promise<{ id
         </div>
       )}
 
+      {dc && (
+        <div className="card" style={{ marginTop: 16, borderColor: "var(--accent)" }}>
+          <h2>Dados para o contrato</h2>
+          <div className="grade g3">
+            <div><small className="muted">Razão social</small><div><b>{dc.razaoSocial}</b></div></div>
+            <div><small className="muted">CNPJ</small><div className="mono">{dc.cnpj}</div></div>
+            <div><small className="muted">Sócio responsável</small><div>{dc.nomeSocio}</div></div>
+            <div><small className="muted">E-mail</small><div>{dc.email}</div></div>
+            <div><small className="muted">WhatsApp</small><div>{dc.whatsapp}</div></div>
+            <div><small className="muted">Enviado em</small><div>{dataHoraBR(p.decididaEm)}</div></div>
+          </div>
+        </div>
+      )}
+
       <div className="grade g2" style={{ marginTop: 16 }}>
         <div className="card">
           <h2>Tempo de leitura por seção</h2>
@@ -79,7 +109,7 @@ export default async function DetalheProposta({ params }: { params: Promise<{ id
                 return (
                   <div key={s.id}>
                     <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13 }}>
-                      <span>{s.capitulo ?? s.id}</span><span className="mono muted">{duracao(t)}</span>
+                      <span>{s.capitulo || ("titulo" in s && typeof s.titulo === "string" && s.titulo ? s.titulo.replace(/\*\*|\{\{[^}]+\}\}/g, "").slice(0, 50) : BLOCO[s.tipo]?.nome ?? s.tipo)}</span><span className="mono muted">{duracao(t)}</span>
                     </div>
                     <div className="barra"><i style={{ width: `${(t / maxTempo) * 100}%` }} /></div>
                   </div>

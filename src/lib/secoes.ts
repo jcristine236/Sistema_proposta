@@ -14,7 +14,14 @@ export type SecaoBase = {
   numero?: string;
   /** Exibir só quando a condição for verdadeira (ex.: "observacoes", "!expirada") */
   mostrarSe?: string;
+  /** Fundo da seção (padrão = o desenho original do bloco) */
+  fundo?: Fundo;
+  /** Efeito de entrada ao rolar a página */
+  efeito?: Efeito;
 };
+
+export type Fundo = "padrao" | "branco" | "tinta" | "escuro";
+export type Efeito = "padrao" | "nenhum" | "subir" | "esquerda" | "direita" | "zoom" | "desfocar";
 
 export type SecaoCapa = SecaoBase & {
   tipo: "capa";
@@ -87,7 +94,7 @@ export type SecaoInvestimento = SecaoBase & {
 
 export type BlocoResultado =
   | { estilo: "lista"; titulo: string; itens: CardIcone[] }
-  | { estilo: "checks"; titulo: string; itens: string[]; nota?: string }
+  | { estilo: "checks"; titulo: string; itens: (string | { titulo: string })[]; nota?: string }
   | { estilo: "grade"; titulo: string; itens: CardIcone[] };
 
 export type SecaoResultados = SecaoBase & { tipo: "resultados"; titulo: string; blocos: BlocoResultado[] };
@@ -95,6 +102,55 @@ export type SecaoResultados = SecaoBase & { tipo: "resultados"; titulo: string; 
 export type SecaoCronograma = SecaoBase & { tipo: "cronograma"; titulo: string; etapas: CardIcone[] };
 
 export type SecaoTexto = SecaoBase & { tipo: "texto"; eyebrow?: string; titulo: string; paragrafos: string[] };
+
+export type SecaoTitulo = SecaoBase & {
+  tipo: "titulo";
+  eyebrow?: string;
+  titulo: string;
+  subtitulo?: string;
+  alinhamento?: "esquerda" | "centro";
+};
+
+export type SecaoImagem = SecaoBase & {
+  tipo: "imagem";
+  titulo?: string;
+  imagem: string;
+  legenda?: string;
+  largura?: "contida" | "total";
+};
+
+export type SecaoImagemTexto = SecaoBase & {
+  tipo: "imagemTexto";
+  eyebrow?: string;
+  titulo: string;
+  paragrafos: string[];
+  imagem: string;
+  lado: "esquerda" | "direita";
+  botaoTexto?: string;
+  botaoUrl?: string;
+};
+
+export type SecaoTabela = SecaoBase & {
+  tipo: "tabela";
+  titulo?: string;
+  subtitulo?: string;
+  tabela: { colunas: string[]; linhas: string[][] };
+  nota?: string;
+};
+
+export type SecaoPlanos = SecaoBase & {
+  tipo: "planos";
+  titulo: string;
+  subtitulo?: string;
+  planos: { nome: string; preco: string; periodo?: string; descricao?: string; itens: string[]; destaque?: boolean; selo?: string }[];
+  /** Destaca o plano cujo nome é igual ao escolhido neste campo (tipo produto) */
+  destacarCampo?: string;
+  nota?: string;
+};
+
+export type SecaoVideo = SecaoBase & { tipo: "video"; titulo?: string; texto?: string; url: string };
+
+export type SecaoFaq = SecaoBase & { tipo: "faq"; titulo: string; itens: { pergunta: string; resposta: string }[] };
 
 export type SecaoFechamento = SecaoBase & {
   tipo: "fechamento";
@@ -116,21 +172,15 @@ export type Secao =
   | SecaoResultados
   | SecaoCronograma
   | SecaoTexto
+  | SecaoTitulo
+  | SecaoImagem
+  | SecaoImagemTexto
+  | SecaoTabela
+  | SecaoPlanos
+  | SecaoVideo
+  | SecaoFaq
   | SecaoFechamento;
 
 export type TipoSecao = Secao["tipo"];
 
-export const TIPOS_SECAO: { tipo: TipoSecao; nome: string; descricao: string }[] = [
-  { tipo: "capa", nome: "Capa", descricao: "Logo, título, nome do cliente e selos (plano, validade)." },
-  { tipo: "abertura", nome: "Abertura", descricao: "Frase de impacto e três cartões com ícone." },
-  { tipo: "sobre", nome: "Quem somos", descricao: "Texto, números animados e valores com letras do nome." },
-  { tipo: "confianca", nome: "Confiança", descricao: "Texto, ilustração e selos/certificações em abas." },
-  { tipo: "marcas", nome: "Marcas/parceiros", descricao: "Faixa animada com nomes de parceiros." },
-  { tipo: "comparativo", nome: "Diferenciais", descricao: "Nós x mercado, item a item." },
-  { tipo: "especificacoes", nome: "Especificações", descricao: "Tabela técnica preenchida com os dados da proposta." },
-  { tipo: "investimento", nome: "Investimento", descricao: "Mensalidade, desconto, taxa única e observações." },
-  { tipo: "resultados", nome: "Resultados", descricao: "Listas de entregas, checks e grade de benefícios." },
-  { tipo: "cronograma", nome: "Cronograma", descricao: "Etapas numeradas com linha do tempo animada." },
-  { tipo: "texto", nome: "Texto livre", descricao: "Título e parágrafos." },
-  { tipo: "fechamento", nome: "Fechamento", descricao: "Chamada final com aceite, comentário e recusa." },
-];
+// Catálogo de blocos (nomes, campos editáveis e valores iniciais): src/lib/blocos.ts

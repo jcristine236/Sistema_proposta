@@ -3,7 +3,7 @@
 import "server-only";
 import nodemailer from "nodemailer";
 
-let transporte: nodemailer.Transporter | null = null;
+let transporte: ReturnType<typeof nodemailer.createTransport> | null = null;
 
 function obterTransporte() {
   if (!process.env.SMTP_HOST) return null;

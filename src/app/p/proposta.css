@@ -467,3 +467,57 @@
 /* Prévia no painel: conteúdo muda a cada digitação, então nada fica escondido */
 .pp.previa .rv{opacity:1;transform:none}
 .pp.previa .dots{display:none}
+
+/* ===== Efeitos de entrada escolhidos no editor ===== */
+.pp .rv{transition:opacity .85s cubic-bezier(.2,.7,.2,1),transform .85s cubic-bezier(.2,.7,.2,1),filter .85s ease;transition-delay:var(--d,0s)}
+.pp [data-efeito=nenhum] .rv{opacity:1!important;transform:none!important;filter:none!important;transition:none!important}
+.pp [data-efeito=subir] .rv:not(.in){transform:translateY(46px)}
+.pp [data-efeito=esquerda] .rv:not(.in){transform:translateX(-60px)}
+.pp [data-efeito=direita] .rv:not(.in){transform:translateX(60px)}
+.pp [data-efeito=zoom] .rv:not(.in){transform:scale(.86)}
+.pp [data-efeito=desfocar] .rv:not(.in){filter:blur(10px);transform:translateY(16px)}
+.pp.previa [data-efeito] .rv{opacity:1;transform:none;filter:none}
+
+/* ===== Novos blocos ===== */
+.pp .pf-logo{display:flex;justify-content:center;margin-bottom:10px}
+.pp .bloco-titulo{padding-top:64px;padding-bottom:40px}
+.pp .bloco-imagem figure{margin:24px 0 0;border-radius:20px;overflow:hidden;background:#fff;border:1.5px solid var(--line)}
+.pp .bloco-imagem img{display:block;width:100%;height:auto}
+.pp .bloco-imagem.total .inner{max-width:none}
+.pp .bloco-imagem figcaption{padding:12px 18px;font-size:13.5px;color:var(--muted)}
+.pp .img-vazia{display:grid;place-items:center;min-height:220px;background:var(--tint);color:var(--muted);font-size:14px;border-radius:18px;border:2px dashed var(--line)}
+.pp .it-grid{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
+.pp .it-grid.img-esq .it-img{order:-1}
+.pp .it-txt h2{font-size:clamp(28px,3.8vw,42px);margin:6px 0 12px}
+.pp .it-txt .chn{display:block;margin-bottom:6px}
+.pp .it-img img{width:100%;height:auto;display:block;border-radius:22px;box-shadow:0 30px 60px -32px color-mix(in srgb,var(--primary) 55%,transparent)}
+@media(max-width:860px){.pp .it-grid{grid-template-columns:1fr;gap:26px}.pp .it-grid.img-esq .it-img{order:0}}
+.pp .gtable thead th{background:var(--primary);color:#fff;font-size:13px;letter-spacing:.05em;text-transform:uppercase}
+.pp .gtable tbody tr:nth-child(even) td{background:#FAFBFD}
+.pp .gtable td{color:var(--primary)}
+.pp .planos{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;margin-top:34px;align-items:stretch}
+.pp .plano{position:relative;background:#fff;border:1.5px solid var(--line);border-radius:20px;padding:26px 22px}
+.pp .plano.on{border-color:var(--accent);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 22%,transparent)}
+.pp .plano-selo{position:absolute;top:-12px;left:22px;background:var(--accent);color:var(--primary);font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:4px 12px;border-radius:99px}
+.pp .plano h3{font-size:20px;margin-bottom:10px}
+.pp .plano-preco b{font:700 30px var(--font-title);color:var(--primary)}
+.pp .plano-preco span{margin-left:6px;color:var(--muted);font-size:13.5px}
+.pp .plano p{color:var(--muted);font-size:14px;margin:10px 0 0}
+.pp .plano ul{list-style:none;margin-top:16px;display:grid;gap:8px}
+.pp .plano li{display:flex;gap:9px;font-size:14px;align-items:flex-start}
+.pp .plano li .ic{color:#2E9E6B;font-size:18px;margin-top:1px}
+.pp .ch.navy .plano,.pp .ch.navy .faq details{color:var(--primary)}
+.pp .video{margin-top:26px;position:relative;padding-top:56.25%;border-radius:20px;overflow:hidden;background:#000}
+.pp .video iframe,.pp .video .img-vazia{position:absolute;inset:0;width:100%;height:100%;border:0}
+.pp .faq{display:grid;gap:10px;margin-top:30px}
+.pp .faq details{background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:16px 20px}
+.pp .faq summary{cursor:pointer;font:600 16px var(--font-title);list-style:none;display:flex;justify-content:space-between;gap:10px}
+.pp .faq summary::after{content:"+";color:var(--accent-ink);font-size:22px;line-height:1;transition:transform .3s}
+.pp .faq details[open] summary::after{transform:rotate(45deg)}
+.pp .faq details p{margin-top:10px;color:var(--muted);font-size:14.5px}
+.pp .ch.navy .it-txt .lead{color:#C9D0DD}
+.pp .pf-codigo{margin-top:6px;font:500 11.5px var(--font-num);letter-spacing:.08em;color:var(--neutral)}
+.pp .modal-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:480px){.pp .modal-2{grid-template-columns:1fr}}
+.pp .modal{max-height:92vh;overflow:auto}
+.pp .modal .modal-erro{color:#b42318;margin:10px 0 0;font-size:14px}

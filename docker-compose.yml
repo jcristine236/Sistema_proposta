@@ -35,6 +35,11 @@ services:
     depends_on:
       migrar: { condition: service_completed_successfully }
     expose: ["3000"]
+    volumes:
+      - dados-uploads:/app/uploads
+    read_only: true
+    tmpfs: ["/tmp", "/app/.next/cache"]
+    security_opt: ["no-new-privileges:true"]
 
   # Proxy HTTPS com certificados automáticos (Let's Encrypt) para todos os domínios
   proxy:
@@ -52,3 +57,4 @@ services:
 volumes:
   dados-db:
   dados-caddy:
+  dados-uploads:

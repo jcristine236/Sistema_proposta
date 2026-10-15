@@ -1,8 +1,8 @@
-node_modules/
-.next/
-out/
+*.tsbuildinfo
 .env
 .env.local
-*.tsbuildinfo
-next-env.d.ts
+.next/
 /uploads/
+next-env.d.ts
+node_modules/
+out/

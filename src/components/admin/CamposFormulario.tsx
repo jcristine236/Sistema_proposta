@@ -138,12 +138,12 @@ function UmCampo({ c, dados, alterar, catalogo, contatos, descontoPct }: Omit<Pr
               {itens.map((x) => (
                 <option key={x.codigo} value={x.codigo}>{x.nome}{x.descricao ? `: ${x.descricao}` : ""} · {brl(x.preco)}</option>
               ))}
-              {c.personalizado && <option value="personalizado">{c.personalizado.rotulo}</option>}
+              {c.personalizado?.rotulo && <option value="personalizado">{c.personalizado.rotulo}</option>}
             </select>
             {itens.length === 0 && <div className="ajuda">Nenhum item na categoria “{c.categoria}”. Cadastre em Produtos e planos.</div>}
             {ajuda}
           </div>
-          {personalizado && c.personalizado && p && (
+          {personalizado && c.personalizado?.rotulo && p && (
             <div className="caixa-destaque">
               <div className="titulo">Plano personalizado</div>
               <div className="linha2">
@@ -151,7 +151,7 @@ function UmCampo({ c, dados, alterar, catalogo, contatos, descontoPct }: Omit<Pr
                 <div className="campo"><label>Mensalidade base (R$)</label><input type="number" min={0} value={p.preco} onChange={(e) => setP({ preco: num(e.target.value) })} /></div>
               </div>
               <div className="linha2">
-                {c.personalizado.atributos.map((a) => (
+                {(c.personalizado.atributos ?? []).map((a) => (
                   <div key={a.id} className="campo">
                     <label>{a.rotulo}</label>
                     <input type="number" min={1} value={p.atributos[a.id] ?? 0} onChange={(e) => setP({ atributos: { ...p.atributos, [a.id]: num(e.target.value) } })} />

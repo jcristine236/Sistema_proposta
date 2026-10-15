@@ -16,6 +16,9 @@ máquina, sem domínio e sem servidor. Leva uns 10 minutos na primeira vez.
    (é preciso estar logada no GitHub).
 2. Extraia o zip numa pasta, por exemplo `C:\Meus Sites\Sistema_proposta`.
 
+> **Já testou a versão anterior?** Esta versão recria o banco. Antes de subir, rode uma vez:
+> `docker compose -f docker-compose.teste.yml down -v` (apaga só os dados de teste).
+
 ## 3. Subir
 
 1. Abra a pasta extraída no Explorador de Arquivos.
@@ -32,6 +35,7 @@ máquina, sem domínio e sem servidor. Leva uns 10 minutos na primeira vez.
 
    - E-mail: `admin@propostas.local`
    - Senha: `trocar-esta-senha`
+   - No primeiro acesso o sistema pede para **criar uma senha nova** (mínimo 10 caracteres, letras e números).
 
 Para parar: volte ao PowerShell e aperte `Ctrl + C`.
 Para subir de novo depois: repita o comando do passo 3 (as propostas criadas continuam lá).
@@ -41,48 +45,39 @@ Para apagar tudo e começar do zero: `docker compose -f docker-compose.teste.yml
 
 Marque o que funcionou e anote o que quiser mudar.
 
-**Painel e empresas**
-- [ ] Entrar com o usuário acima
-- [ ] Trocar entre CADDI, KOLP e FASE no seletor do menu lateral (as cores e o logo do painel mudam)
-- [ ] Ver o Painel com os indicadores
+**Acesso**
+- [ ] Entrar, trocar a senha obrigatória e chegar ao Painel
+- [ ] Trocar entre CADDI, KOLP e FASE no menu lateral (cores e logo mudam; logos ocupam o mesmo espaço)
 
-**Nova proposta CADDI (Servidor em nuvem)**
-- [ ] Em **Nova proposta**, preencher o cliente
-- [ ] Trocar o plano e ver o resumo financeiro mudar
-- [ ] Escolher **Personalizado** e editar preço, vCPUs, RAM e disco
-- [ ] Colocar mais de 5 dispositivos (R$ 30,00 por adicional)
-- [ ] Dar um desconto acima de 15% e ver o alerta de aprovação
-- [ ] Adicionar observações (só aparecem as que têm título e descrição)
-- [ ] Abrir a aba **Prévia** e conferir a proposta
-- [ ] **Gerar link** e copiar
+**Editor de modelos** (Modelos → Editar no "Servidor em nuvem")
+- [ ] Arrastar um bloco da coluna da esquerda para o meio (ex.: "Imagem + texto")
+- [ ] Clicar no bloco e editar título, texto e enviar uma imagem
+- [ ] Aba **Aparência**: trocar fundo e efeito ao rolar
+- [ ] Reordenar arrastando pela alça ⋮⋮ ou pelas setas
+- [ ] ★ numa seção (ex.: Condições comerciais) para salvar como favorita e renomear
+- [ ] Abas **Formulário** (campos do vendedor) e **Cálculo**; **Prévia** completa; **Salvar**
+- [ ] Modelos → **Novo modelo em branco**: montar com Planos, Tabela, Vídeo, FAQ e salvar
+- [ ] Aba **Seções modelo**: criar/renomear/excluir seções e usá-las em "Minhas seções" do editor
 
-**Como o cliente vê** (abra o link numa **janela anônima**: Ctrl + Shift + N)
-- [ ] Capa com o nome do cliente, plano e validade
-- [ ] Rolar a página até o fim (animações, abas de certificações, cronograma)
-- [ ] Testar no celular: no Chrome do computador, F12 e o ícone de celular
-- [ ] Clicar em **Tenho uma dúvida** e enviar um comentário
-- [ ] Clicar em **Quero seguir com esta proposta** e aceitar
+**Proposta**
+- [ ] Nova proposta: preencher, ver o resumo e a prévia, **gerar link** (aparece o número, ex.: CAD-2026-0002)
+- [ ] Abrir o link em **janela anônima** (Ctrl + Shift + N) e rolar até o fim
+- [ ] **Aceitar**: preencher razão social, CNPJ, sócio, e-mail e WhatsApp (teste um CNPJ inválido)
+- [ ] No painel: proposta "Aceita", **Dados para o contrato**, tempo de leitura por seção
+- [ ] **Duplicar**, **Editar** e **Excluir** propostas; buscar pelo número na lista
 
-> Precisa ser janela anônima: logada no painel, suas visitas não contam como leitura do cliente.
-
-**Acompanhamento** (de volta ao painel)
-- [ ] Em **Propostas**, abrir a proposta: status "Aceita", tempo de leitura por seção, comentário e linha do tempo
-- [ ] Criar outra proposta e **recusar** pelo link (escolhendo um motivo)
-
-**KOLP e FASE**
-- [ ] Criar uma proposta em cada uma (modelo genérico) e conferir cores, fontes e logos
-
-**Cadastros**
-- [ ] **Produtos e planos**: cadastrar um plano novo e vê-lo no formulário
-- [ ] **Clientes**: ver os clientes criados automaticamente
-- [ ] **Empresa e marca**: mudar uma cor, salvar e ver a proposta mudar
-- [ ] **Modelos**: ver os campos, as regras de cálculo e a prévia de cada modelo
+**Cadastros e acesso**
+- [ ] Produtos e Clientes: cadastrar, **editar** e **excluir**
+- [ ] Empresa e marca: cores, logos (envio de arquivo), e-mail/WhatsApp de avisos, motivos de recusa
+- [ ] Usuários: criar um vendedor só da KOLP com o perfil "Vendedor"; sair e entrar com ele
+      (menu reduzido, só a KOLP, sem acesso a Usuários)
+- [ ] Auditoria: ver os logins e alterações registrados
 
 ## O que não dá para testar localmente
 
 - **Domínios reais** (`propostas.caddi.com.br` etc.) e HTTPS: só no servidor.
-- **E-mails de aviso**: sem servidor de e-mail configurado, os avisos aparecem
-  apenas no PowerShell, como linhas `[aviso] ...`.
+- **E-mails e WhatsApp de aviso**: sem SMTP/WhatsApp configurados, os avisos aparecem
+  apenas no PowerShell, como linhas `[aviso] ...` e `[whatsapp] ...`.
 - **Abrir pelo celular de verdade**: o endereço `localhost` só existe no seu computador.
 
 ## Se algo der errado

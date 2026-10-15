@@ -4,7 +4,7 @@ import { db } from "@/lib/db";
 import { exigirSessao } from "@/lib/auth";
 
 export default async function EscolherModelo() {
-  const { empresa } = await exigirSessao();
+  const { empresa } = await exigirSessao("propostas", "criar");
   const modelos = await db.modelo.findMany({ where: { empresaId: empresa.id, ativo: true }, orderBy: { nome: "asc" } });
   if (modelos.length === 1) redirect(`/admin/propostas/nova/${modelos[0].id}`);
   return (

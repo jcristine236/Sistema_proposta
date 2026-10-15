@@ -8,12 +8,20 @@ com domínio, paleta, logos, catálogo e modelos próprios.
   prévia idêntica ao que o cliente vê e link pronto para enviar.
 - **Proposta pública** (`https://propostas.<empresa>/p/<link>`): página no visual da
   empresa, com aceite, recusa com motivo e comentários.
-- **Acompanhamento:** aberturas, leitores, tempo de leitura por seção, linha do tempo
-  e avisos por e-mail.
+- **Acompanhamento:** número de controle (ex.: CAD-2026-0001), aberturas, leitores,
+  tempo de leitura por seção, linha do tempo e avisos por e-mail e WhatsApp.
+- **Aceite com dados para contrato:** razão social, CNPJ, sócio, e-mail e WhatsApp.
+- **Editor visual de modelos:** arrastar e soltar blocos, efeitos, seções favoritas reaproveitáveis.
+- **Usuários e permissões:** por empresa e por módulo (ver/criar/editar/excluir), com auditoria.
 
 Testar no seu computador: **[TESTE.md](TESTE.md)**.
 Implantação na nuvem privada: **[deploy/README.md](deploy/README.md)**.
+Segurança (auditoria e checklist): **[SECURITY.md](SECURITY.md)**.
 Mapa funcional de referência: [docs/mapa-funcional.md](docs/mapa-funcional.md).
+
+**Continuar com o Claude:** a skill `.claude/skills/modelos-proposta` explica a estrutura
+para criar/importar modelos e novos blocos. Numa sessão do Claude Code neste repositório,
+peça por exemplo: *“use a skill modelos-proposta e importe este mockup como modelo da KOLP”*.
 
 ## Tecnologia
 
@@ -58,7 +66,7 @@ npm run db:seed               # empresas, planos, modelos e proposta de exemplo
 npm run dev                   # http://localhost:3000
 ```
 
-Login inicial: `admin@propostas.local` / `trocar-esta-senha` (definidos no `.env`).
+Login inicial: `admin@propostas.local` / `trocar-esta-senha` (definidos no `.env`; troca obrigatória no primeiro acesso).
 Proposta de exemplo: http://localhost:3000/p/grupo-mofarrej-exemplo
 
 ## Estrutura

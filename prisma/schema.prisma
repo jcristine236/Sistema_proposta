@@ -15,52 +15,69 @@ datasource db {
 // ---------------------------------------------------------------------------
 
 model Empresa {
-  id               String   @id @default(cuid())
-  slug             String   @unique // caddi, kolp, fase
-  nome             String
-  razaoSocial      String?
-  site             String? // caddi.com.br
-  dominioPropostas String   @unique // propostas.caddi.com.br (links públicos)
+  id                  String   @id @default(cuid())
+  slug                String   @unique // caddi, kolp, fase
+  nome                String
+  razaoSocial         String?
+  site                String? // caddi.com.br
+  dominioPropostas    String   @unique // propostas.caddi.com.br (links públicos)
   /// Paleta, fontes e logos. Ver src/lib/tema.ts
-  tema             Json
-  rodape           String?
-  emailNotificacao String? // recebe avisos de abertura/aceite
-  ativo            Boolean  @default(true)
-  criadoEm         DateTime @default(now())
-  atualizadoEm     DateTime @updatedAt
+  tema                Json
+  rodape              String?
+  /// Prefixo do número de controle das propostas (ex.: CAD -> CAD-2026-0001)
+  prefixo             String   @unique
+  emailNotificacao    String? // recebe avisos de abertura/aceite
+  /// WhatsApp que recebe os avisos (somente números, com DDI: 5511999999999)
+  whatsappNotificacao String?
+  /// Motivos que o cliente pode escolher ao recusar
+  motivosRecusa       Json     @default("[]")
+  ativo               Boolean  @default(true)
+  criadoEm            DateTime @default(now())
+  atualizadoEm        DateTime @updatedAt
 
-  membros   Membro[]
-  contatos  Contato[]
-  produtos  Produto[]
-  modelos   Modelo[]
-  propostas Proposta[]
+  membros    Membro[]
+  contatos   Contato[]
+  produtos   Produto[]
+  modelos    Modelo[]
+  secoes     SecaoModelo[]
+  propostas  Proposta[]
+  uploads    Upload[]
+  contadores ContadorProposta[]
 }
 
 model Usuario {
-  id         String   @id @default(cuid())
-  nome       String
-  email      String   @unique
-  senhaHash  String
-  /// Administrador da plataforma inteira (pensando no uso futuro como produto).
-  superAdmin Boolean  @default(false)
-  ativo      Boolean  @default(true)
-  criadoEm   DateTime @default(now())
+  id            String    @id @default(cuid())
+  nome          String
+  email         String    @unique
+  senhaHash     String
+  whatsapp      String?
+  /// Administrador da plataforma inteira: acessa tudo, gerencia empresas e usuários.
+  superAdmin    Boolean   @default(false)
+  /// true = acessa todas as empresas; false = só as vinculadas em Membro
+  todasEmpresas Boolean   @default(false)
+  /// Permissões por módulo e ação. Ver src/lib/permissoes.ts
+  permissoes    Json      @default("{}")
+  ativo         Boolean   @default(true)
+  /// Obriga a trocar a senha no próximo acesso
+  trocarSenha   Boolean   @default(false)
+  /// Incrementado ao trocar senha/desativar: invalida sessões abertas
+  versaoSessao  Int       @default(0)
+  falhasLogin   Int       @default(0)
+  bloqueadoAte  DateTime?
+  ultimoAcesso  DateTime?
+  criadoEm      DateTime  @default(now())
+  atualizadoEm  DateTime  @updatedAt
 
   membros   Membro[]
   propostas Proposta[]
+  auditoria LogAuditoria[]
 }
 
-enum Papel {
-  ADMIN
-  VENDEDOR
-}
-
-/// Vínculo usuário x empresa. Um usuário pode atuar em várias empresas.
+/// Vínculo usuário x empresa (quando o usuário não acessa todas as empresas).
 model Membro {
   id        String  @id @default(cuid())
   usuarioId String
   empresaId String
-  papel     Papel   @default(VENDEDOR)
   usuario   Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
   empresa   Empresa @relation(fields: [empresaId], references: [id], onDelete: Cascade)
 
@@ -72,17 +89,19 @@ model Membro {
 // ---------------------------------------------------------------------------
 
 model Contato {
-  id           String   @id @default(cuid())
-  empresaId    String
+  id          String     @id @default(cuid())
+  empresaId   String
   /// Nome da empresa cliente (ex.: Grupo Mofarrej)
-  organizacao  String
-  responsavel  String?
-  email        String?
-  celular      String?
-  ativo        Boolean  @default(true)
-  criadoEm     DateTime @default(now())
-  empresa      Empresa  @relation(fields: [empresaId], references: [id], onDelete: Cascade)
-  propostas    Proposta[]
+  organizacao String
+  razaoSocial String?
+  cnpj        String?
+  responsavel String?
+  email       String?
+  celular     String?
+  ativo       Boolean    @default(true)
+  criadoEm    DateTime   @default(now())
+  empresa     Empresa    @relation(fields: [empresaId], references: [id], onDelete: Cascade)
+  propostas   Proposta[]
 
   @@index([empresaId])
 }
@@ -117,7 +136,7 @@ model Produto {
 // ---------------------------------------------------------------------------
 
 model Modelo {
-  id           String   @id @default(cuid())
+  id           String     @id @default(cuid())
   empresaId    String
   nome         String
   descricao    String?
@@ -129,12 +148,41 @@ model Modelo {
   secoes       Json
   /// Regras de cálculo do investimento. Ver src/lib/precificacao.ts
   precificacao Json
-  validadeDias Int      @default(15)
-  ativo        Boolean  @default(true)
+  validadeDias Int        @default(15)
+  ativo        Boolean    @default(true)
+  criadoEm     DateTime   @default(now())
+  atualizadoEm DateTime   @updatedAt
+  empresa      Empresa    @relation(fields: [empresaId], references: [id], onDelete: Cascade)
+  propostas    Proposta[]
+
+  @@index([empresaId])
+}
+
+/// Seção salva para reaproveitar em vários modelos (ex.: "Condições comerciais").
+model SecaoModelo {
+  id           String   @id @default(cuid())
+  empresaId    String
+  nome         String
+  descricao    String?
+  /// Definição da seção (mesmo formato de um item de Modelo.secoes)
+  secao        Json
   criadoEm     DateTime @default(now())
   atualizadoEm DateTime @updatedAt
   empresa      Empresa  @relation(fields: [empresaId], references: [id], onDelete: Cascade)
-  propostas    Proposta[]
+
+  @@index([empresaId])
+}
+
+/// Imagens enviadas (logos e imagens das seções). Arquivo em UPLOAD_DIR.
+model Upload {
+  id        String   @id @default(cuid())
+  empresaId String
+  arquivo   String   @unique // nome aleatório no disco (ex.: 3f2a....webp)
+  nome      String // nome original
+  mime      String
+  tamanho   Int
+  criadoEm  DateTime @default(now())
+  empresa   Empresa  @relation(fields: [empresaId], references: [id], onDelete: Cascade)
 
   @@index([empresaId])
 }
@@ -152,41 +200,55 @@ enum StatusProposta {
   EXPIRADA
 }
 
+/// Sequência do número de controle por empresa e ano.
+model ContadorProposta {
+  empresaId String
+  ano       Int
+  ultimo    Int     @default(0)
+  empresa   Empresa @relation(fields: [empresaId], references: [id], onDelete: Cascade)
+
+  @@id([empresaId, ano])
+}
+
 model Proposta {
-  id                 String         @id @default(cuid())
-  empresaId          String
-  modeloId           String
-  autorId            String
-  contatoId          String?
+  id                  String         @id @default(cuid())
+  empresaId           String
+  /// Número de controle exibido (ex.: CAD-2026-0001)
+  codigo              String         @unique
+  modeloId            String?
+  autorId             String
+  contatoId           String?
   /// Parte final do link público: /p/{slug}
-  slug               String         @unique
-  titulo             String
-  clienteNome        String
+  slug                String         @unique
+  titulo              String
+  clienteNome         String
   /// Valores preenchidos no formulário
-  dados              Json
+  dados               Json
   /// Cópia de campos/seções/precificação do modelo no momento do envio,
   /// para que alterações futuras no modelo não mudem propostas já enviadas.
-  snapshot           Json
+  snapshot            Json
   /// Resultado do cálculo (subtotal, desconto, total mensal, único...)
-  calculo            Json
-  valorMensal        Decimal?       @db.Decimal(12, 2)
-  valorUnico         Decimal?       @db.Decimal(12, 2)
-  validaAte          DateTime?
-  status             StatusProposta @default(PUBLICADA)
-  descontoAcimaLimite Boolean       @default(false)
-  publicadaEm        DateTime       @default(now())
-  primeiraAberturaEm DateTime?
-  decididaEm         DateTime?
-  decisaoNome        String?
-  motivoRecusa       String?
-  comentarioDecisao  String?
-  criadoEm           DateTime       @default(now())
-  atualizadoEm       DateTime       @updatedAt
+  calculo             Json
+  valorMensal         Decimal?       @db.Decimal(12, 2)
+  valorUnico          Decimal?       @db.Decimal(12, 2)
+  validaAte           DateTime?
+  status              StatusProposta @default(PUBLICADA)
+  descontoAcimaLimite Boolean        @default(false)
+  publicadaEm         DateTime       @default(now())
+  primeiraAberturaEm  DateTime?
+  decididaEm          DateTime?
+  decisaoNome         String?
+  motivoRecusa        String?
+  comentarioDecisao   String?
+  /// Dados enviados pelo cliente no aceite (razão social, CNPJ, sócio, e-mail, WhatsApp)
+  dadosContratacao    Json?
+  criadoEm            DateTime       @default(now())
+  atualizadoEm        DateTime       @updatedAt
 
   empresa       Empresa        @relation(fields: [empresaId], references: [id], onDelete: Cascade)
-  modelo        Modelo         @relation(fields: [modeloId], references: [id])
+  modelo        Modelo?        @relation(fields: [modeloId], references: [id], onDelete: SetNull)
   autor         Usuario        @relation(fields: [autorId], references: [id])
-  contato       Contato?       @relation(fields: [contatoId], references: [id])
+  contato       Contato?       @relation(fields: [contatoId], references: [id], onDelete: SetNull)
   visualizacoes Visualizacao[]
   eventos       Evento[]
 
@@ -230,4 +292,21 @@ model Evento {
   proposta   Proposta @relation(fields: [propostaId], references: [id], onDelete: Cascade)
 
   @@index([propostaId, criadoEm])
+}
+
+/// Registro de ações administrativas e de acesso (quem fez o quê e quando).
+model LogAuditoria {
+  id         String   @id @default(cuid())
+  usuarioId  String?
+  empresaId  String?
+  acao       String // ex.: LOGIN, LOGIN_FALHOU, CRIAR, EDITAR, EXCLUIR
+  entidade   String? // ex.: Proposta, Modelo, Usuario
+  entidadeId String?
+  descricao  String?
+  ip         String?
+  criadoEm   DateTime @default(now())
+  usuario    Usuario? @relation(fields: [usuarioId], references: [id], onDelete: SetNull)
+
+  @@index([criadoEm])
+  @@index([empresaId, criadoEm])
 }

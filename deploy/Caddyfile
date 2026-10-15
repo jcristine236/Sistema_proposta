@@ -4,16 +4,25 @@
 	email {$ACME_EMAIL}
 }
 
+(seguranca) {
+	encode gzip
+	header -Server
+	request_body {
+		max_size 10MB
+	}
+}
+
 # Painel interno (login, propostas, modelos). Ex.: painel.caddi.com.br
 {$PAINEL_DOMINIO} {
-	encode gzip
+	import seguranca
 	reverse_proxy app:3000
 }
 
 # Links públicos das propostas: só a página da proposta e o que ela precisa.
+# O painel e o envio de imagens ficam bloqueados nestes domínios.
 propostas.caddi.com.br, propostas.kolp.com.br, propostas.fasesistemas.com.br {
-	encode gzip
-	@painel path /admin* /login*
+	import seguranca
+	@painel path /admin* /login* /api/uploads*
 	respond @painel 404
 	reverse_proxy app:3000
 }

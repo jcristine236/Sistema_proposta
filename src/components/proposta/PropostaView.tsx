@@ -13,6 +13,8 @@ import { brl } from "@/lib/formato";
 import { COMPONENTES } from "./Secoes";
 import { Icone } from "./icones";
 import { useRastreioLeitura } from "./rastreio";
+import { Logo } from "@/components/Logo";
+import { cnpjValido, emailValido, formatarCnpj, formatarTelefone, telefoneValido } from "@/lib/documentos";
 
 type Props = {
   secoes: Secao[];
@@ -25,13 +27,15 @@ type Props = {
   motivosRecusa?: string[];
   /** Nome que a página exibe no aviso de prévia */
   avisoPrevia?: string;
+  /** Número de controle exibido discretamente no rodapé */
+  codigo?: string;
 };
 
 type Modal = null | "aceitar" | "recusar" | "comentar" | "enviado";
 
 const MOTIVOS_PADRAO = ["Desisti do projeto", "Não enxerguei valor", "Preço acima do esperado", "Não foi aprovado pela diretoria", "Escolhi outro fornecedor", "Outro motivo"];
 
-export function PropostaView({ secoes, ctx, tema, modo, slug, decisao, motivosRecusa, avisoPrevia }: Props) {
+export function PropostaView({ secoes, ctx, tema, modo, slug, decisao, motivosRecusa, avisoPrevia, codigo }: Props) {
   const raiz = useRef<HTMLDivElement>(null);
   const [modal, setModal] = useState<Modal>(null);
   const [msgEnviado, setMsgEnviado] = useState("");
@@ -88,8 +92,9 @@ export function PropostaView({ secoes, ctx, tema, modo, slug, decisao, motivosRe
       })}
 
       <footer className="pf">
-        {tema.logo && <img src={tema.logo} alt={ctx.empresa.nome} />}
+        {tema.logo && <div className="pf-logo"><Logo src={tema.logo} alt={ctx.empresa.nome} altura={40} larguraMax={200} /></div>}
         {ctx.empresa.rodape ?? ctx.empresa.nome}
+        {codigo && <div className="pf-codigo">Proposta nº {codigo}</div>}
       </footer>
 
       {!estado && !ctx.expirada && (
@@ -118,7 +123,7 @@ export function PropostaView({ secoes, ctx, tema, modo, slug, decisao, motivosRe
           <div className="modal" style={{ textAlign: "center" }} onClick={(e) => e.stopPropagation()}>
             <div className="ok"><Icone nome="check" /></div>
             <h3>{msgEnviado}</h3>
-            <p>Quem enviou a proposta já foi avisado.</p>
+            <p>{msgEnviado.includes("aceita") ? "Recebemos seus dados. Nosso time entrará em contato para enviar o contrato." : "Quem enviou a proposta já foi avisado."}</p>
             <div className="rodape" style={{ justifyContent: "center" }}>
               <button className="btn" type="button" onClick={() => setModal(null)}>Fechar</button>
             </div>
@@ -140,32 +145,39 @@ function ModalDecisao({
   onFechar: () => void;
   onEnviado: (titulo: string, status?: "ACEITA" | "RECUSADA") => void;
 }) {
-  const [nome, setNome] = useState("");
-  const [email, setEmail] = useState("");
-  const [motivo, setMotivo] = useState("");
-  const [texto, setTexto] = useState("");
+  const [f, setF] = useState({ nome: "", email: "", motivo: "", texto: "", razaoSocial: "", cnpj: "", nomeSocio: "", whatsapp: "" });
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState("");
+  const set = (k: keyof typeof f) => (e: { target: { value: string } }) => setF((x) => ({ ...x, [k]: e.target.value }));
+  const aceitar = tipo === "aceitar";
 
   const titulos = { aceitar: "Aceitar a proposta", recusar: "Recusar a proposta", comentar: "Enviar uma dúvida ou comentário" };
 
   async function enviar() {
-    if (!nome.trim()) return setErro("Informe seu nome.");
-    if (tipo === "recusar" && !motivo) return setErro("Selecione um motivo.");
-    if (tipo === "comentar" && !texto.trim()) return setErro("Escreva sua mensagem.");
+    if (aceitar) {
+      if (!f.razaoSocial.trim()) return setErro("Informe a razão social.");
+      if (!cnpjValido(f.cnpj)) return setErro("CNPJ inválido.");
+      if (!f.nomeSocio.trim()) return setErro("Informe o nome do sócio responsável.");
+      if (!emailValido(f.email)) return setErro("E-mail inválido.");
+      if (!telefoneValido(f.whatsapp)) return setErro("WhatsApp inválido: informe DDD + número.");
+    } else {
+      if (!f.nome.trim()) return setErro("Informe seu nome.");
+      if (tipo === "recusar" && !f.motivo) return setErro("Selecione um motivo.");
+      if (tipo === "comentar" && !f.texto.trim()) return setErro("Escreva sua mensagem.");
+    }
     setEnviando(true);
     setErro("");
     const r = await fetch(`/api/propostas/${slug}/decisao`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ acao: tipo, nome, email, motivo, texto }),
+      body: JSON.stringify({ acao: tipo, ...f, nome: aceitar ? f.nomeSocio : f.nome }),
     }).catch(() => null);
     setEnviando(false);
     if (!r?.ok) {
       const j = await r?.json().catch(() => null);
       return setErro(j?.erro ?? "Não foi possível enviar. Tente novamente.");
     }
-    if (tipo === "aceitar") onEnviado("Que ótimo, proposta aceita!", "ACEITA");
+    if (aceitar) onEnviado("Que ótimo, proposta aceita!", "ACEITA");
     else if (tipo === "recusar") onEnviado("Recebemos sua resposta.", "RECUSADA");
     else onEnviado("Mensagem enviada!");
   }
@@ -174,32 +186,48 @@ function ModalDecisao({
     <div className="modal-fundo" onClick={onFechar}>
       <div className="modal" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
         <h3>{titulos[tipo]}</h3>
-        {tipo === "aceitar" && (
-          <p>
-            Investimento de <b>{brl(ctx.calc.totalMensal)}</b> por mês
-            {ctx.calc.totalUnico > 0 && <> + <b>{brl(ctx.calc.totalUnico)}</b> de implantação</>}.
-          </p>
+        {aceitar ? (
+          <>
+            <p>
+              Investimento de <b>{brl(ctx.calc.totalMensal)}</b> por mês
+              {ctx.calc.totalUnico > 0 && <> + <b>{brl(ctx.calc.totalUnico)}</b> de implantação</>}.
+              {" "}Preencha os dados para prepararmos o contrato.
+            </p>
+            <label>Razão social</label>
+            <input value={f.razaoSocial} onChange={set("razaoSocial")} autoComplete="organization" autoFocus />
+            <label>CNPJ</label>
+            <input value={f.cnpj} inputMode="numeric" placeholder="00.000.000/0000-00" onChange={(e) => setF((x) => ({ ...x, cnpj: formatarCnpj(e.target.value) }))} />
+            <label>Nome do sócio responsável</label>
+            <input value={f.nomeSocio} onChange={set("nomeSocio")} autoComplete="name" />
+            <div className="modal-2">
+              <div><label>E-mail</label><input type="email" value={f.email} onChange={set("email")} autoComplete="email" /></div>
+              <div><label>WhatsApp</label><input value={f.whatsapp} inputMode="tel" placeholder="(11) 91234-5678" onChange={(e) => setF((x) => ({ ...x, whatsapp: formatarTelefone(e.target.value) }))} autoComplete="tel" /></div>
+            </div>
+          </>
+        ) : (
+          <>
+            <label>Seu nome</label>
+            <input value={f.nome} onChange={set("nome")} autoFocus />
+            <label>Seu e-mail (opcional)</label>
+            <input type="email" value={f.email} onChange={set("email")} />
+          </>
         )}
-        <label>Seu nome</label>
-        <input value={nome} onChange={(e) => setNome(e.target.value)} autoFocus />
-        <label>Seu e-mail (opcional)</label>
-        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
         {tipo === "recusar" && (
           <>
             <label>Motivo</label>
-            <select value={motivo} onChange={(e) => setMotivo(e.target.value)}>
+            <select value={f.motivo} onChange={set("motivo")}>
               <option value="">Selecione</option>
               {motivos.map((m) => <option key={m}>{m}</option>)}
             </select>
           </>
         )}
         <label>{tipo === "comentar" ? "Mensagem" : "Comentário (opcional)"}</label>
-        <textarea value={texto} onChange={(e) => setTexto(e.target.value)} maxLength={2000} />
-        {erro && <p style={{ color: "#b42318", margin: "10px 0 0" }}>{erro}</p>}
+        <textarea value={f.texto} onChange={set("texto")} maxLength={2000} />
+        {erro && <p className="modal-erro" role="alert">{erro}</p>}
         <div className="rodape">
           <button className="btn ghost" type="button" onClick={onFechar}>Cancelar</button>
           <button className="btn gold" type="button" disabled={enviando} onClick={enviar}>
-            {enviando ? "Enviando..." : tipo === "aceitar" ? "Confirmar aceite" : "Enviar"}
+            {enviando ? "Enviando..." : aceitar ? "Confirmar aceite" : "Enviar"}
           </button>
         </div>
       </div>

@@ -13,7 +13,7 @@ import type { Tema } from "@/lib/tema";
 import { brl } from "@/lib/formato";
 import { PropostaView } from "@/components/proposta/PropostaView";
 import { CamposFormulario } from "./CamposFormulario";
-import { criarProposta } from "@/app/admin/propostas/acoes";
+import { criarProposta, editarProposta } from "@/app/admin/propostas/acoes";
 
 type Props = {
   modelo: { id: string; nome: string; campos: Campo[]; secoes: Secao[]; precificacao: Precificacao };
@@ -22,14 +22,18 @@ type Props = {
   empresa: EmpresaPublica;
   tema: Tema;
   dominio: string;
+  /** Edição de proposta existente */
+  editar?: { id: string; codigo: string };
+  /** Valores iniciais (edição ou duplicação) */
+  dadosIniciais?: Dados;
 };
 
-export function FormularioProposta({ modelo, catalogo, contatos, empresa, tema, dominio }: Props) {
-  const [dados, setDados] = useState<Dados>(() => valoresPadrao(modelo.campos));
+export function FormularioProposta({ modelo, catalogo, contatos, empresa, tema, dominio, editar, dadosIniciais }: Props) {
+  const [dados, setDados] = useState<Dados>(() => ({ ...valoresPadrao(modelo.campos), ...(dadosIniciais ?? {}) }));
   const [aba, setAba] = useState<"form" | "previa">("form");
   const [erros, setErros] = useState<string[]>([]);
   const [enviando, setEnviando] = useState(false);
-  const [gerada, setGerada] = useState<{ id: string; link: string } | null>(null);
+  const [gerada, setGerada] = useState<{ id: string; link: string; codigo: string } | null>(null);
   const [copiado, setCopiado] = useState(false);
 
   const ctx = useMemo(
@@ -47,7 +51,7 @@ export function FormularioProposta({ modelo, catalogo, contatos, empresa, tema, 
     setErros(e);
     if (e.length) return;
     setEnviando(true);
-    const r = await criarProposta(modelo.id, dados);
+    const r = editar ? await editarProposta(editar.id, dados) : await criarProposta(modelo.id, dados);
     setEnviando(false);
     if ("erros" in r) setErros(r.erros);
     else setGerada(r);
@@ -57,7 +61,7 @@ export function FormularioProposta({ modelo, catalogo, contatos, empresa, tema, 
     <>
       <div className="topo">
         <div>
-          <h1>Nova proposta · {modelo.nome}</h1>
+          <h1>{editar ? `Editar proposta ${editar.codigo}` : `Nova proposta · ${modelo.nome}`}</h1>
           <p>Preencha os dados, confira o resumo e gere o link. A aba “Prévia” mostra exatamente o que o cliente vai ver.</p>
         </div>
         <div className="abas">
@@ -77,11 +81,11 @@ export function FormularioProposta({ modelo, catalogo, contatos, empresa, tema, 
             <CamposFormulario campos={modelo.campos} dados={dados} alterar={alterar} catalogo={catalogo} contatos={contatos} descontoPct={c.desconto.pct} />
             {erros.length > 0 && <div className="alerta erro">{erros.map((e) => <div key={e}>{e}</div>)}</div>}
             <button className="btn destaque" type="button" onClick={gerar} disabled={enviando} style={{ marginTop: 6 }}>
-              {enviando ? "Gerando..." : "Gerar link da proposta"}
+              {enviando ? "Salvando..." : editar ? "Salvar alterações" : "Gerar link da proposta"}
             </button>
             {gerada && (
               <div className="link-box">
-                <strong>Link pronto para enviar:</strong>
+                <strong>{editar ? "Alterações salvas. O link continua o mesmo:" : `Proposta ${gerada.codigo} criada. Link pronto para enviar:`}</strong>
                 <code>{gerada.link}</code>
                 <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                   <button

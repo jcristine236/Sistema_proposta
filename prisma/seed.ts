@@ -21,6 +21,7 @@ const EMPRESAS: {
   site: string;
   dominioPropostas: string;
   rodape: string;
+  prefixo: string;
   tema: Tema;
 }[] = [
   {
@@ -29,6 +30,7 @@ const EMPRESAS: {
     razaoSocial: "CADDI Soluções Tecnológicas",
     site: "caddi.com.br",
     dominioPropostas: "propostas.caddi.com.br",
+    prefixo: "CAD",
     rodape: "CADDI Soluções Tecnológicas · Alphaville, Barueri/SP",
     tema: {
       primaria: "#0D1B3E",
@@ -38,21 +40,18 @@ const EMPRESAS: {
       destaqueTexto: "#9A7F2F",
       neutra: "#B0B8C1",
       tinta: "#EEF2FA",
-      fonteTitulo: "Space Grotesk",
-      fonteTexto: "Inter",
-      fonteNumeros: "JetBrains Mono",
       logo: "/empresas/caddi/logo.png",
       logoClaro: "/empresas/caddi/logo-claro.png",
     },
   },
   {
     // Manual da Marca KOLP: roxos #5C026E / #7605B7 e degradê magenta-laranja-amarelo.
-    // Títulos: Ethnocentric (fonte paga) -> Michroma, a alternativa gratuita mais próxima.
     slug: "kolp",
     nome: "KOLP",
     razaoSocial: "KOLP",
     site: "kolp.com.br",
     dominioPropostas: "propostas.kolp.com.br",
+    prefixo: "KLP",
     rodape: "KOLP · kolp.com.br",
     tema: {
       primaria: "#5C026E",
@@ -62,10 +61,6 @@ const EMPRESAS: {
       destaqueTexto: "#C2410C",
       neutra: "#CDB6DA",
       tinta: "#F7F0FA",
-      fonteTitulo: "Michroma",
-      pesosTitulo: "400",
-      fonteTexto: "Fira Sans",
-      fonteNumeros: "JetBrains Mono",
       logo: "/empresas/kolp/logo.png",
       logoClaro: "/empresas/kolp/logo-claro.png",
     },
@@ -73,12 +68,12 @@ const EMPRESAS: {
   {
     // Manual de Identidade Visual FASE v6.0: azul institucional #185FA5, azul dinâmico #378ADD,
     // roxo inovação #534AB7, lilás #7F77DD, fundo escuro #0B1829, fundo suave #E6F1FB.
-    // Títulos: Cormorant Garamond Bold; texto: Outfit.
     slug: "fase",
     nome: "FASE",
     razaoSocial: "Fase Sistemas",
     site: "fasesistemas.com.br",
     dominioPropostas: "propostas.fasesistemas.com.br",
+    prefixo: "FSE",
     rodape: "Fase Sistemas · soluções modulares · de A a Z",
     tema: {
       primaria: "#0B1829",
@@ -88,16 +83,13 @@ const EMPRESAS: {
       destaqueTexto: "#534AB7",
       neutra: "#9FB3CC",
       tinta: "#EEF5FC",
-      fonteTitulo: "Cormorant Garamond",
-      pesosTitulo: "500;600;700",
-      fonteTexto: "Outfit",
-      pesosTexto: "300;400;500;600;700",
-      fonteNumeros: "JetBrains Mono",
       logo: "/empresas/fase/logo.svg",
       logoClaro: "/empresas/fase/logo-claro.svg",
     },
   },
 ];
+
+const MOTIVOS = ["Desisti do projeto", "Não enxerguei valor", "Preço acima do esperado", "Não foi aprovado pela diretoria", "Escolhi outro fornecedor", "Outro motivo"];
 
 async function salvarModelo(empresaId: string, m: ReturnType<typeof modeloPadrao>) {
   const existente = await db.modelo.findFirst({ where: { empresaId, tipoSolucao: m.tipoSolucao, nome: m.nome } });
@@ -118,22 +110,27 @@ async function salvarModelo(empresaId: string, m: ReturnType<typeof modeloPadrao
 async function main() {
   const email = process.env.SEED_ADMIN_EMAIL ?? "admin@propostas.local";
   const senha = process.env.SEED_ADMIN_PASSWORD ?? "trocar-esta-senha";
+  const producao = process.env.ALLOW_ANY_HOST !== "true";
+  if (producao && (senha === "trocar-esta-senha" || senha.length < 12 || !/\d/.test(senha) || !/[a-z]/i.test(senha))) {
+    throw new Error("Em produção, defina SEED_ADMIN_PASSWORD no .env com 12+ caracteres, letras e números.");
+  }
   const admin = await db.usuario.upsert({
     where: { email },
     update: {},
-    create: { nome: "Administrador", email, senhaHash: await bcrypt.hash(senha, 10), superAdmin: true },
+    // Primeiro acesso obriga a trocar a senha
+    create: { nome: "Administrador", email, senhaHash: await bcrypt.hash(senha, 12), superAdmin: true, todasEmpresas: true, trocarSenha: true },
   });
 
   for (const e of EMPRESAS) {
     const empresa = await db.empresa.upsert({
       where: { slug: e.slug },
-      update: { nome: e.nome, razaoSocial: e.razaoSocial, site: e.site, dominioPropostas: e.dominioPropostas, rodape: e.rodape, tema: json(e.tema) },
-      create: { ...e, tema: json(e.tema) },
+      update: { nome: e.nome, razaoSocial: e.razaoSocial, site: e.site, dominioPropostas: e.dominioPropostas, rodape: e.rodape, prefixo: e.prefixo, tema: json(e.tema) },
+      create: { ...e, tema: json(e.tema), motivosRecusa: json(MOTIVOS) },
     });
     await db.membro.upsert({
       where: { usuarioId_empresaId: { usuarioId: admin.id, empresaId: empresa.id } },
       update: {},
-      create: { usuarioId: admin.id, empresaId: empresa.id, papel: "ADMIN" },
+      create: { usuarioId: admin.id, empresaId: empresa.id },
     });
 
     if (e.slug === "caddi") {
@@ -165,9 +162,16 @@ async function main() {
         };
         const catalogo = PLANOS_NUVEM.map((p) => ({ id: p.codigo, categoria: "planos-nuvem", ...p }));
         const calculo = calcular(modeloCaddiNuvem.precificacao, dados, catalogo);
+        const ano = new Date().getFullYear();
+        const cont = await db.contadorProposta.upsert({
+          where: { empresaId_ano: { empresaId: empresa.id, ano } },
+          update: { ultimo: { increment: 1 } },
+          create: { empresaId: empresa.id, ano, ultimo: 1 },
+        });
         const proposta = await db.proposta.create({
           data: {
             empresaId: empresa.id,
+            codigo: `${e.prefixo}-${ano}-${String(cont.ultimo).padStart(4, "0")}`,
             modeloId: modelo.id,
             autorId: admin.id,
             contatoId: contato.id,
@@ -175,14 +179,14 @@ async function main() {
             titulo: "Servidor em nuvem — Grupo Mofarrej",
             clienteNome: "Grupo Mofarrej",
             dados: json(dados),
-            snapshot: json({ campos: modeloCaddiNuvem.campos, secoes: modeloCaddiNuvem.secoes, precificacao: modeloCaddiNuvem.precificacao, catalogo }),
+            snapshot: json({ campos: modeloCaddiNuvem.campos, secoes: modeloCaddiNuvem.secoes, precificacao: modeloCaddiNuvem.precificacao, catalogo, modeloNome: modeloCaddiNuvem.nome }),
             calculo: json(calculo),
             valorMensal: calculo.totalMensal,
             valorUnico: calculo.totalUnico,
             validaAte: validade,
           },
         });
-        await db.evento.create({ data: { propostaId: proposta.id, tipo: "CRIADA", dados: json({ por: admin.nome }) } });
+        await db.evento.create({ data: { propostaId: proposta.id, tipo: "CRIADA", dados: json({ nome: admin.nome }) } });
       }
     } else {
       await salvarModelo(empresa.id, modeloPadrao({ nome: e.nome, site: e.site }));

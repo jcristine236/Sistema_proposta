@@ -4,7 +4,7 @@ import type { Campo, Dados } from "@/lib/campos";
 import { montarContexto } from "@/lib/contexto";
 import type { Precificacao, ProdutoCatalogo } from "@/lib/precificacao";
 import type { Secao } from "@/lib/secoes";
-import { temaDe, urlFontes } from "@/lib/tema";
+import { FONTES, temaDe } from "@/lib/tema";
 import { propostaPublica } from "@/lib/publico";
 import { PropostaView } from "@/components/proposta/PropostaView";
 import "../proposta.css";
@@ -42,8 +42,8 @@ export default async function PaginaProposta({ params }: { params: Promise<{ slu
 
   return (
     <>
-      <link rel="stylesheet" href={urlFontes(tema)} precedence="default" />
-      <PropostaView secoes={snap.secoes} ctx={ctx} tema={tema} modo="publico" slug={slug} decisao={decisao} />
+      <link rel="stylesheet" href={FONTES.url} precedence="default" />
+      <PropostaView secoes={snap.secoes} ctx={ctx} tema={tema} modo="publico" slug={slug} decisao={decisao} codigo={p.codigo} motivosRecusa={(p.empresa.motivosRecusa as string[]) ?? []} />
     </>
   );
 }

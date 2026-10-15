@@ -1,15 +1,24 @@
 import Link from "next/link";
 import { db } from "@/lib/db";
-import { exigirSessao } from "@/lib/auth";
+import { redirect } from "next/navigation";
+import { exigirSessao, filtroPropostas } from "@/lib/auth";
+import { MODULOS, type Modulo } from "@/lib/permissoes";
 import { brl, dataHoraBR, duracao } from "@/lib/formato";
 import { EVENTOS, STATUS } from "@/lib/rotulos";
 
 export default async function Painel() {
-  const { empresa } = await exigirSessao();
+  const s = await exigirSessao();
+  if (!s.permite("painel")) {
+    const rotas: Partial<Record<Modulo, string>> = { propostas: "/admin/propostas", modelos: "/admin/modelos", catalogo: "/admin/catalogo", clientes: "/admin/contatos", empresa: "/admin/empresa", usuarios: "/admin/usuarios", auditoria: "/admin/auditoria" };
+    const primeiro = (Object.keys(MODULOS) as Modulo[]).find((m) => rotas[m] && s.permite(m));
+    redirect(primeiro ? rotas[primeiro]! : "/admin/conta");
+  }
+  const { empresa } = s;
+  const filtro = filtroPropostas(s);
   const desde = new Date();
   desde.setDate(desde.getDate() - 90);
   const propostas = await db.proposta.findMany({
-    where: { empresaId: empresa.id, criadoEm: { gte: desde } },
+    where: { ...filtro, criadoEm: { gte: desde } },
     select: { id: true, status: true, valorMensal: true, primeiraAberturaEm: true, visualizacoes: { select: { tempoTotalSeg: true } } },
   });
   const enviadas = propostas.length;
@@ -19,13 +28,13 @@ export default async function Painel() {
   const soma = (l: typeof propostas) => l.reduce((s, p) => s + Number(p.valorMensal ?? 0), 0);
 
   const eventos = await db.evento.findMany({
-    where: { proposta: { empresaId: empresa.id }, tipo: { not: "CRIADA" } },
+    where: { proposta: filtro, tipo: { not: "CRIADA" } },
     orderBy: { criadoEm: "desc" },
     take: 12,
-    include: { proposta: { select: { id: true, clienteNome: true } } },
+    include: { proposta: { select: { id: true, clienteNome: true, codigo: true } } },
   });
   const pendentes = await db.proposta.findMany({
-    where: { empresaId: empresa.id, status: "PUBLICADA" },
+    where: { ...filtro, status: "PUBLICADA" },
     orderBy: { publicadaEm: "asc" },
     take: 6,
   });
@@ -48,7 +57,7 @@ export default async function Painel() {
           <h1>Painel · {empresa.nome}</h1>
           <p>Acompanhe abertura, leitura e fechamento das propostas.</p>
         </div>
-        <Link className="btn destaque" href="/admin/propostas/nova">+ Nova proposta</Link>
+        {s.permite("propostas", "criar") && <Link className="btn destaque" href="/admin/propostas/nova">+ Nova proposta</Link>}
       </div>
       <div className="grade g4">
         {kpis.map((k) => (
@@ -64,7 +73,7 @@ export default async function Painel() {
               <div key={e.id}>
                 <span className="muted">{dataHoraBR(e.criadoEm)}</span>
                 <span>
-                  {EVENTOS[e.tipo] ?? e.tipo} · <Link href={`/admin/propostas/${e.proposta.id}`}><b>{e.proposta.clienteNome}</b></Link>
+                  {EVENTOS[e.tipo] ?? e.tipo} · <Link href={`/admin/propostas/${e.proposta.id}`}><b>{e.proposta.clienteNome}</b> <span className="mono muted">{e.proposta.codigo}</span></Link>
                 </span>
               </div>
             ))}

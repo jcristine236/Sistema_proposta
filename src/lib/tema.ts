@@ -1,5 +1,5 @@
-// Identidade visual de cada empresa (Empresa.tema). Vira variáveis CSS na proposta
-// pública e na cor de destaque do painel.
+// Identidade visual de cada empresa (Empresa.tema): somente cores e logos.
+// Fontes e formato dos botões são padrão da plataforma, iguais para todas.
 
 export type Tema = {
   /** Cor principal (fundos escuros, títulos). CADDI: azul-marinho */
@@ -16,18 +16,13 @@ export type Tema = {
   neutra: string;
   /** Fundo alternado das seções */
   tinta: string;
-  fonteTitulo: string;
-  fonteTexto: string;
-  fonteNumeros: string;
-  /** Pesos disponíveis de cada fonte no Google Fonts (ex.: "400" para fontes de peso único) */
-  pesosTitulo?: string;
-  pesosTexto?: string;
-  pesosNumeros?: string;
   /** Logo para fundos claros */
   logo: string;
   /** Logo para fundos escuros (opcional) */
   logoClaro?: string;
 };
+
+export const CORES_TEMA = ["primaria", "primaria2", "destaque", "destaqueSuave", "destaqueTexto", "neutra", "tinta"] as const;
 
 export const TEMA_PADRAO: Tema = {
   primaria: "#0D1B3E",
@@ -37,17 +32,26 @@ export const TEMA_PADRAO: Tema = {
   destaqueTexto: "#9A7F2F",
   neutra: "#B0B8C1",
   tinta: "#EEF2FA",
-  fonteTitulo: "Space Grotesk",
-  fonteTexto: "Inter",
-  fonteNumeros: "JetBrains Mono",
   logo: "",
 };
 
+/** Fontes padrão da plataforma (as mesmas para todas as empresas). */
+export const FONTES = {
+  titulo: "Space Grotesk",
+  texto: "Inter",
+  numeros: "JetBrains Mono",
+  url: "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap",
+};
+
+const HEX = /^#[0-9a-f]{6}$/i;
+
 export function temaDe(json: unknown): Tema {
-  return { ...TEMA_PADRAO, ...((json as Partial<Tema>) ?? {}) };
+  const t = { ...TEMA_PADRAO, ...((json as Partial<Tema>) ?? {}) };
+  for (const k of CORES_TEMA) if (!HEX.test(t[k])) t[k] = TEMA_PADRAO[k];
+  return t;
 }
 
-/** Variáveis CSS aplicadas no elemento raiz da proposta. */
+/** Variáveis CSS aplicadas no elemento raiz da proposta e do painel. */
 export function variaveisCss(t: Tema): Record<string, string> {
   return {
     "--primary": t.primaria,
@@ -57,14 +61,8 @@ export function variaveisCss(t: Tema): Record<string, string> {
     "--accent-ink": t.destaqueTexto,
     "--neutral": t.neutra,
     "--tint": t.tinta,
-    "--font-title": `'${t.fonteTitulo}', system-ui, sans-serif`,
-    "--font-text": `'${t.fonteTexto}', system-ui, sans-serif`,
-    "--font-num": `'${t.fonteNumeros}', ui-monospace, monospace`,
+    "--font-title": `'${FONTES.titulo}', system-ui, sans-serif`,
+    "--font-text": `'${FONTES.texto}', system-ui, sans-serif`,
+    "--font-num": `'${FONTES.numeros}', ui-monospace, monospace`,
   };
-}
-
-/** URL do Google Fonts com as três famílias do tema. */
-export function urlFontes(t: Tema): string {
-  const fam = (f: string, pesos: string) => `family=${encodeURIComponent(f).replace(/%20/g, "+")}:wght@${pesos}`;
-  return `https://fonts.googleapis.com/css2?${fam(t.fonteTitulo, t.pesosTitulo ?? "500;600;700;800")}&${fam(t.fonteTexto, t.pesosTexto ?? "400;500;600;700")}&${fam(t.fonteNumeros, t.pesosNumeros ?? "500;600")}&display=swap`;
 }

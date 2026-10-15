@@ -6,6 +6,7 @@ import { COOKIE_SESSAO, lerToken } from "@/lib/sessao";
 import { hostPermitido } from "@/lib/publico";
 import { avisar } from "@/lib/avisos";
 import type { Secao } from "@/lib/secoes";
+import { dentroDoLimite, ipDaRequisicao } from "@/lib/limite";
 
 const Abrir = z.object({ acao: z.literal("abrir"), slug: z.string().max(80), viewerId: z.string().max(64) });
 const Tempo = z.object({
@@ -21,9 +22,12 @@ function host(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  if (!dentroDoLimite(`rastreio:${ipDaRequisicao(req)}`, 240, 10 * 60 * 1000)) return NextResponse.json({ erro: "limite" }, { status: 429 });
+  const bruto = await req.text();
+  if (bruto.length > 8000) return NextResponse.json({ erro: "corpo grande demais" }, { status: 413 });
   let corpo: unknown;
   try {
-    corpo = JSON.parse(await req.text());
+    corpo = JSON.parse(bruto);
   } catch {
     return NextResponse.json({ erro: "corpo inválido" }, { status: 400 });
   }
@@ -35,7 +39,7 @@ export async function POST(req: NextRequest) {
   if (abrir.success) {
     const p = await db.proposta.findUnique({
       where: { slug: abrir.data.slug },
-      include: { empresa: true, autor: { select: { nome: true, email: true } } },
+      include: { empresa: true, autor: { select: { nome: true, email: true, whatsapp: true } } },
     });
     if (!p || p.status === "RASCUNHO" || !hostPermitido(host(req), p.empresa.dominioPropostas)) {
       return NextResponse.json({ erro: "não encontrada" }, { status: 404 });
@@ -55,7 +59,7 @@ export async function POST(req: NextRequest) {
         data: { primeiraAberturaEm: new Date(), ...(p.status === "PUBLICADA" ? { status: "ABERTA" } : {}) },
       });
       await db.evento.create({ data: { propostaId: p.id, tipo: "ABERTA" } });
-      await avisar(p, `${p.clienteNome} abriu a proposta`, `${p.clienteNome} acabou de abrir a proposta enviada por ${p.autor.nome}.`);
+      await avisar(p, `${p.clienteNome} abriu a proposta`, `${p.clienteNome} acabou de abrir a proposta ${p.codigo} enviada por ${p.autor.nome}.`);
     } else if (leitorNovo) {
       await db.evento.create({ data: { propostaId: p.id, tipo: "REABERTA", dados: { nome: "novo leitor" } } });
     }

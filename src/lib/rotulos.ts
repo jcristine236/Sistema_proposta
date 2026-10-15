@@ -14,4 +14,5 @@ export const EVENTOS: Record<string, string> = {
   ACEITA: "Proposta aceita",
   RECUSADA: "Proposta recusada",
   COMENTARIO: "Novo comentário",
+  EDITADA: "Proposta editada",
 };
