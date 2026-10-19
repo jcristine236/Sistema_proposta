@@ -10,6 +10,7 @@ import type { Tema } from "../src/lib/tema";
 import { modeloCaddiNuvem, PLANOS_NUVEM } from "./modelos/caddi-servidor-nuvem";
 import { modeloCaddiGestaoTi } from "./modelos/caddi-gestao-ti";
 import { modeloCaddiConsultoria } from "./modelos/caddi-consultoria";
+import { modeloCaddiProjeto } from "./modelos/caddi-projeto";
 import { modeloCaddiSuporte } from "./modelos/caddi-suporte-gerenciado";
 import { modeloCaddiBackup } from "./modelos/caddi-backup-seguranca";
 import { modeloKolpSite } from "./modelos/kolp-site";
@@ -32,7 +33,7 @@ type PlanoSeed = { codigo: string; nome: string; preco: number; atributos: Recor
 // Modelos prontos por empresa (além do "Servidor em nuvem" da CADDI e dos
 // segmentos FASE, que têm catálogo de planos e são tratados à parte).
 const MODELOS_POR_EMPRESA: Record<string, ModeloDef[]> = {
-  caddi: [modeloCaddiGestaoTi, modeloCaddiConsultoria, modeloCaddiSuporte, modeloCaddiBackup],
+  caddi: [modeloCaddiGestaoTi, modeloCaddiConsultoria, modeloCaddiSuporte, modeloCaddiBackup, modeloCaddiProjeto],
   kolp: [modeloKolpSite, modeloKolpSaas, modeloKolpProjeto, modeloKolpSiteSaas],
 };
 

@@ -185,6 +185,18 @@ export const BLOCOS: DefBloco[] = [
     padrao: () => ({ tipo: "tabela", titulo: "Escopo", tabela: { colunas: ["Item", "Descrição", "Prazo"], linhas: [["Implantação", "Configuração inicial", "15 dias"]] } }),
   },
   {
+    tipo: "campoLista", nome: "Lista preenchível", categoria: "Conteúdo", icone: "check",
+    descricao: "Mostra, como lista de título + descrição, o conteúdo de um campo do tipo Lista (ex.: escopo, materiais) que o vendedor preenche na proposta.",
+    campos: [
+      { k: "titulo", rotulo: "Título", tipo: "texto" },
+      { k: "subtitulo", rotulo: "Subtítulo", tipo: "textoLongo" },
+      { k: "campo", rotulo: "Campo de lista a exibir", tipo: "campoForm", tiposCampo: ["lista"], ajuda: "Escolha um campo do formulário do tipo Lista." },
+      { k: "icone", rotulo: "Ícone de cada item", tipo: "icone" },
+      { k: "nota", rotulo: "Nota abaixo", tipo: "texto" },
+    ],
+    padrao: () => ({ tipo: "campoLista", titulo: "Escopo", campo: "", icone: "check" }),
+  },
+  {
     tipo: "especificacoes", nome: "Especificações técnicas", categoria: "Comercial", icone: "server",
     descricao: "Tabela de duas colunas preenchida com os dados da proposta.",
     campos: [

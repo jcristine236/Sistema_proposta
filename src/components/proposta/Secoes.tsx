@@ -5,6 +5,7 @@
 
 import { Fragment, useState, type CSSProperties, type ReactNode } from "react";
 import type { Contexto } from "@/lib/contexto";
+import type { ItemLista } from "@/lib/campos";
 import { preencher } from "@/lib/contexto";
 import { brl } from "@/lib/formato";
 import type * as S from "@/lib/secoes";
@@ -570,6 +571,28 @@ export function Faq({ s, ctx }: P<S.SecaoFaq>) {
   );
 }
 
+export function CampoLista({ s, ctx }: P<S.SecaoCampoLista>) {
+  const itens = (ctx[s.campo] as ItemLista[] | undefined) ?? [];
+  if (itens.length === 0) return null;
+  return (
+    <Secao s={s} classe="white">
+      <div className="inner">
+        <Cabecalho numero={s.numero} titulo={s.titulo} ctx={ctx} />
+        {s.subtitulo && <p className="lead rv"><Rico t={s.subtitulo} ctx={ctx} /></p>}
+        <div className="campolista">
+          {itens.map((it, i) => (
+            <div key={i} className="cl-row rv" style={d(i * 0.06)}>
+              <i><Icone nome={s.icone || "check"} /></i>
+              <div><b>{it.titulo}</b>{it.descricao && <p>{it.descricao}</p>}</div>
+            </div>
+          ))}
+        </div>
+        {s.nota && <p className="sm rv" style={{ marginTop: 14 }}>{preencher(s.nota, ctx)}</p>}
+      </div>
+    </Secao>
+  );
+}
+
 export const COMPONENTES: Record<S.TipoSecao, (p: P<never>) => ReactNode> = {
   capa: Capa as never,
   abertura: Abertura as never,
@@ -589,5 +612,6 @@ export const COMPONENTES: Record<S.TipoSecao, (p: P<never>) => ReactNode> = {
   planos: Planos as never,
   video: Video as never,
   faq: Faq as never,
+  campoLista: CampoLista as never,
   fechamento: Fechamento as never,
 };

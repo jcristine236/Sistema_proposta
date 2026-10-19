@@ -165,6 +165,18 @@ export type SecaoVideo = SecaoBase & { tipo: "video"; titulo?: string; texto?: s
 
 export type SecaoFaq = SecaoBase & { tipo: "faq"; titulo: string; itens: { pergunta: string; resposta: string }[] };
 
+/** Exibe, como lista de título + descrição, o conteúdo de um campo do formulário
+ *  do tipo "lista" (ex.: escopo, materiais). O vendedor preenche na proposta. */
+export type SecaoCampoLista = SecaoBase & {
+  tipo: "campoLista";
+  titulo: string;
+  subtitulo?: string;
+  /** id de um campo do tipo "lista" */
+  campo: string;
+  icone?: Icone;
+  nota?: string;
+};
+
 export type SecaoFechamento = SecaoBase & {
   tipo: "fechamento";
   titulo: string;
@@ -192,6 +204,7 @@ export type Secao =
   | SecaoPlanos
   | SecaoVideo
   | SecaoFaq
+  | SecaoCampoLista
   | SecaoFechamento;
 
 export type TipoSecao = Secao["tipo"];

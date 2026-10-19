@@ -507,6 +507,12 @@
 .pp .plano li{display:flex;gap:9px;font-size:14px;align-items:flex-start}
 .pp .plano li .ic{color:#2E9E6B;font-size:18px;margin-top:1px}
 .pp .plano-cta{display:inline-flex;margin-top:18px;width:100%;justify-content:center;scroll-behavior:smooth}
+.pp .campolista{display:grid;gap:14px;margin-top:30px}
+.pp .campolista .cl-row{display:flex;gap:14px;align-items:flex-start;background:#fff;border:1.5px solid var(--line);border-radius:16px;padding:18px 20px}
+.pp .campolista .cl-row>i{display:grid;place-items:center;width:38px;height:38px;border-radius:11px;background:var(--accent-soft);color:var(--accent-ink);flex:none}
+.pp .campolista .cl-row>i .ic{font-size:19px}
+.pp .campolista .cl-row b{display:block;font-size:16px;color:var(--primary)}
+.pp .campolista .cl-row p{margin-top:4px;color:var(--muted);font-size:14px;white-space:pre-line}
 .pp html,.pp body{scroll-behavior:smooth}
 .pp .ch.navy .plano,.pp .ch.navy .faq details{color:var(--primary)}
 .pp .video{margin-top:26px;position:relative;padding-top:56.25%;border-radius:20px;overflow:hidden;background:#000}

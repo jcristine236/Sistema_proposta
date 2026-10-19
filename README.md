@@ -45,7 +45,7 @@ Empresa ─┬─ Produtos (ex.: planos de servidor)
 
 - **Modelo**: cada tipo de solução tem seu formulário, cálculo e visual. Já vêm prontos
   (em `prisma/modelos/`, carregados pelo seed) — edite pelo editor visual ou duplique:
-  - **CADDI**: Servidor em nuvem, Gestão e Suporte de TI, Consultoria de TI dedicada, Suporte e TI gerenciada, Backup e segurança de dados.
+  - **CADDI**: Servidor em nuvem, Gestão e Suporte de TI, Consultoria de TI dedicada, Suporte e TI gerenciada, Backup e segurança de dados, Projeto (valor único, campos preenchíveis).
   - **KOLP**: Site e presença digital, Site por assinatura (SaaS, planos mensais), Plataforma SaaS, Projeto sob medida.
   - **FASE**: Fase Web, Fase Food, Fase Pet, Fase Agro, Fase Clínicas e Fase Agenda
     (ERP por planos mensais fixos, um por segmento) e Fase X (automação fiscal por volume de CNPJs).

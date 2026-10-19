@@ -71,7 +71,7 @@ export default async function DetalheProposta({ params }: { params: Promise<{ id
 
       <div className="grade g4" style={{ marginTop: 16 }}>
         <div className="card kpi"><small>Mensalidade</small><b>{brl(calc.totalMensal)}</b><span>{calc.desconto.valor > 0 ? `com desconto de ${brl(calc.desconto.valor)}` : "sem desconto"}</span></div>
-        <div className="card kpi"><small>Valor único</small><b>{brl(calc.totalUnico)}</b><span>implantação</span></div>
+        <div className="card kpi"><small>Valor único</small><b>{brl(calc.totalUnico)}</b><span>pagamento único</span></div>
         <div className="card kpi"><small>Leitura</small><b>{duracao(tempoTotal)}</b><span>{p.visualizacoes.length} acesso(s), {leitores} leitor(es)</span></div>
         <div className="card kpi"><small>Validade</small><b>{dataBR(p.validaAte)}</b><span>{p.primeiraAberturaEm ? `aberta em ${dataHoraBR(p.primeiraAberturaEm)}` : "ainda não aberta"}</span></div>
       </div>

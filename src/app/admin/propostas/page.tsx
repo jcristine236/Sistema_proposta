@@ -40,7 +40,7 @@ export default async function Propostas({ searchParams }: { searchParams: Promis
       </div>
       <div className="tabela-wrap">
         <table className="tabela">
-          <thead><tr><th>Nº</th><th>Cliente</th><th>Modelo</th><th>Mensal</th><th>Status</th><th>Leitura</th><th>Validade</th><th>Autor</th></tr></thead>
+          <thead><tr><th>Nº</th><th>Cliente</th><th>Modelo</th><th>Valor</th><th>Status</th><th>Leitura</th><th>Validade</th><th>Autor</th></tr></thead>
           <tbody>
             {propostas.map((p) => {
               const tempo = p.visualizacoes.reduce((t, v) => t + v.tempoTotalSeg, 0);
@@ -49,7 +49,7 @@ export default async function Propostas({ searchParams }: { searchParams: Promis
                   <td className="mono"><Link href={`/admin/propostas/${p.id}`}>{p.codigo}</Link></td>
                   <td><Link href={`/admin/propostas/${p.id}`}>{p.clienteNome}</Link></td>
                   <td className="muted">{p.modelo?.nome ?? "—"}</td>
-                  <td className="mono">{brl(Number(p.valorMensal ?? 0))}</td>
+                  <td className="mono">{Number(p.valorMensal) > 0 ? `${brl(Number(p.valorMensal))}/mês` : brl(Number(p.valorUnico ?? 0))}</td>
                   <td><span className={`status ${p.status}`}>{STATUS[p.status]}</span></td>
                   <td>{p.visualizacoes.length ? `${p.visualizacoes.length}× · ${duracao(tempo)}` : <span className="muted">não aberta</span>}</td>
                   <td>{dataBR(p.validaAte)}</td>
