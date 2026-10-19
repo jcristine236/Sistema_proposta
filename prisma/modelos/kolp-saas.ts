@@ -96,14 +96,6 @@ const secoes: Secao[] = [
       { valor: 99, sufixo: "%", rotulo: "de disponibilidade" },
       { valor: 8000, rotulo: "usuários nas nossas plataformas" },
     ],
-    valoresTitulo: "O que guia o nosso trabalho todos os dias",
-    letras: "KOLP",
-    valores: [
-      { palavra: "Clareza", texto: "Planos e cobranças transparentes, sem letras miúdas." },
-      { palavra: "Originalidade", texto: "Produtos pensados para o seu fluxo de trabalho." },
-      { palavra: "Liberdade", texto: "Sem fidelidade engessada: você fica porque vale a pena." },
-      { palavra: "Precisão", texto: "Plataforma estável, rápida e bem acabada." },
-    ],
   },
   {
     id: "planos",

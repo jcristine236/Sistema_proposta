@@ -47,7 +47,8 @@ export type SecaoSobre = SecaoBase & {
   valoresTitulo?: string;
   /** Uma letra grande por valor (ex.: "CADDI" -> C, A, D, D, I). Padrão: nome da empresa */
   letras?: string;
-  valores: { palavra: string; texto: string }[];
+  /** Bloco de "valores" com letras grandes (opcional). Hoje usado só pela CADDI. */
+  valores?: { palavra: string; texto: string }[];
 };
 
 export type SecaoConfianca = SecaoBase & {
@@ -142,7 +143,19 @@ export type SecaoPlanos = SecaoBase & {
   tipo: "planos";
   titulo: string;
   subtitulo?: string;
-  planos: { nome: string; preco: string; periodo?: string; descricao?: string; itens: string[]; destaque?: boolean; selo?: string }[];
+  planos: {
+    nome: string;
+    preco: string;
+    periodo?: string;
+    descricao?: string;
+    itens: string[];
+    destaque?: boolean;
+    selo?: string;
+    /** Botão que rola até outra seção (use o id de uma seção, ex.: "investimento"). */
+    ancora?: string;
+    /** Texto do botão de âncora (ex.: "Montar projeto exclusivo"). */
+    botao?: string;
+  }[];
   /** Destaca o plano cujo nome é igual ao escolhido neste campo (tipo produto) */
   destacarCampo?: string;
   nota?: string;

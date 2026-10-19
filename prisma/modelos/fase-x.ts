@@ -102,14 +102,6 @@ const secoes: Secao[] = [
       { valor: 24, sufixo: "/7", rotulo: "monitoramento da SEFAZ" },
       { valor: 99, sufixo: "%", rotulo: "de disponibilidade" },
     ],
-    valoresTitulo: "O que guia a Fase Sistemas",
-    letras: "FASE",
-    valores: [
-      { palavra: "Flexibilidade", texto: "O serviço cresce junto com a sua carteira de clientes." },
-      { palavra: "Acompanhamento", texto: "Configuração e gerenciamento feitos pela nossa equipe." },
-      { palavra: "Solidez", texto: "Dados fiscais tratados com sigilo, conforme a LGPD." },
-      { palavra: "Evolução", texto: "Adequações contínuas às mudanças da legislação fiscal." },
-    ],
   },
   {
     id: "recursos",

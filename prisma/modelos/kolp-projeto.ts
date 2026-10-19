@@ -84,14 +84,6 @@ const secoes: Secao[] = [
       { valor: 60, sufixo: "+", rotulo: "clientes atendidos" },
       { valor: 100, sufixo: "%", rotulo: "desenvolvido sob medida" },
     ],
-    valoresTitulo: "O que guia o nosso trabalho todos os dias",
-    letras: "KOLP",
-    valores: [
-      { palavra: "Clareza", texto: "Escopo e preço acordados antes da primeira linha de código." },
-      { palavra: "Originalidade", texto: "Soluções desenhadas para o seu problema, não genéricas." },
-      { palavra: "Liberdade", texto: "Entregamos o produto; a manutenção fica a seu critério." },
-      { palavra: "Precisão", texto: "Entregas testadas, bem acabadas e no prazo combinado." },
-    ],
   },
   {
     id: "escopo-entrega",

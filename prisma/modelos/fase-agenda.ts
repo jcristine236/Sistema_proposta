@@ -85,14 +85,6 @@ const secoes: Secao[] = [
       { valor: 3, rotulo: "planos para escolher" },
       { valor: 99, sufixo: "%", rotulo: "de disponibilidade" },
     ],
-    valoresTitulo: "O que guia a Fase Sistemas",
-    letras: "FASE",
-    valores: [
-      { palavra: "Flexibilidade", texto: "O sistema cresce junto com a sua operação." },
-      { palavra: "Acompanhamento", texto: "Suporte que entende o dia a dia do seu negócio." },
-      { palavra: "Solidez", texto: "Base fiscal e financeira confiável, sempre atualizada." },
-      { palavra: "Evolução", texto: "Novas funções e melhorias liberadas de forma contínua." },
-    ],
   },
   {
     id: "planos",

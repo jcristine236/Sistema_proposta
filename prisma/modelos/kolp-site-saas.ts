@@ -85,14 +85,6 @@ const secoes: Secao[] = [
       { valor: 3, rotulo: "planos para escolher" },
       { valor: 99, sufixo: "%", rotulo: "de disponibilidade" },
     ],
-    valoresTitulo: "O que guia a KOLP",
-    letras: "KOLP",
-    valores: [
-      { palavra: "Qualidade", texto: "Design e código bem feitos, do jeito certo." },
-      { palavra: "Organização", texto: "Processo claro, do briefing ao site no ar." },
-      { palavra: "Legado", texto: "Relação de longo prazo, cuidando do seu site." },
-      { palavra: "Performance", texto: "Site rápido, seguro e pronto para o Google." },
-    ],
   },
   {
     id: "planos",

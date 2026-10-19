@@ -144,16 +144,20 @@ export function Sobre({ s, ctx }: P<S.SecaoSobre>) {
             </div>
           ))}
         </div>
-        {s.valoresTitulo && <div className="eyebrow rv" style={{ margin: "6px 0 4px" }}>{s.valoresTitulo}</div>}
-        <div className="cword">
-          {s.valores.map((v, i) => (
-            <div key={i} className="cl rv" style={d(i * 0.12)}>
-              <div className="lt">{letras[i] ?? v.palavra[0]}</div>
-              <b>{v.palavra}</b>
-              <span>{v.texto}</span>
+        {s.valores && s.valores.length > 0 && (
+          <>
+            {s.valoresTitulo && <div className="eyebrow rv" style={{ margin: "6px 0 4px" }}>{s.valoresTitulo}</div>}
+            <div className="cword">
+              {s.valores.map((v, i) => (
+                <div key={i} className="cl rv" style={d(i * 0.12)}>
+                  <div className="lt">{letras[i] ?? v.palavra[0]}</div>
+                  <b>{v.palavra}</b>
+                  <span>{v.texto}</span>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+          </>
+        )}
       </div>
     </Secao>
   );
@@ -514,6 +518,11 @@ export function Planos({ s, ctx }: P<S.SecaoPlanos>) {
                 <div className="plano-preco"><b>{preencher(pl.preco, ctx)}</b>{pl.periodo && <span>{preencher(pl.periodo, ctx)}</span>}</div>
                 {pl.descricao && <p>{preencher(pl.descricao, ctx)}</p>}
                 <ul>{pl.itens.filter(Boolean).map((it, j) => <li key={j}><Icone nome="check" />{preencher(it, ctx)}</li>)}</ul>
+                {pl.ancora && (
+                  <a className="btn plano-cta" href={`#${pl.ancora.replace(/[^\w-]/g, "")}`}>
+                    {preencher(pl.botao || "Ver detalhes", ctx)}
+                  </a>
+                )}
               </div>
             );
           })}
