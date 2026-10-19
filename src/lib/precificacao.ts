@@ -61,7 +61,9 @@ export function resolverProduto(valor: ValorProduto | undefined, catalogo: Produ
     return { codigo: "personalizado", nome: p.nome?.trim() || "Personalizado", preco: num(p.preco), atributos: p.atributos ?? {} };
   }
   const p = catalogo.find((x) => x.codigo === valor.codigo);
-  return p ? { codigo: p.codigo, nome: p.nome, preco: p.preco, atributos: p.atributos } : undefined;
+  // num() garante número mesmo se o preço vier como Decimal do Prisma ou string
+  // (um Decimal somado vira texto e multiplicaria o valor).
+  return p ? { codigo: p.codigo, nome: p.nome, preco: num(p.preco), atributos: p.atributos } : undefined;
 }
 
 export function calcular(regras: Precificacao, dados: Dados, catalogo: ProdutoCatalogo[]): Calculo {

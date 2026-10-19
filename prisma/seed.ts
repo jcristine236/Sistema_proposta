@@ -14,6 +14,7 @@ import { modeloCaddiBackup } from "./modelos/caddi-backup-seguranca";
 import { modeloKolpSite } from "./modelos/kolp-site";
 import { modeloKolpSaas } from "./modelos/kolp-saas";
 import { modeloKolpProjeto } from "./modelos/kolp-projeto";
+import { modeloKolpSiteSaas, PLANOS_SITE_SAAS } from "./modelos/kolp-site-saas";
 import { modeloFaseWeb, PLANOS_WEB } from "./modelos/fase-web";
 import { modeloFaseFood, PLANOS_FOOD } from "./modelos/fase-food";
 import { modeloFasePet, PLANOS_PET } from "./modelos/fase-pet";
@@ -31,7 +32,12 @@ type PlanoSeed = { codigo: string; nome: string; preco: number; atributos: Recor
 // segmentos FASE, que têm catálogo de planos e são tratados à parte).
 const MODELOS_POR_EMPRESA: Record<string, ModeloDef[]> = {
   caddi: [modeloCaddiGestaoTi, modeloCaddiSuporte, modeloCaddiBackup],
-  kolp: [modeloKolpSite, modeloKolpSaas, modeloKolpProjeto],
+  kolp: [modeloKolpSite, modeloKolpSaas, modeloKolpProjeto, modeloKolpSiteSaas],
+};
+
+// Catálogos de planos de modelos (fora da FASE) que usam campo "produto".
+const CATALOGOS_POR_EMPRESA: Record<string, { categoria: string; planos: PlanoSeed[] }[]> = {
+  kolp: [{ categoria: "kolp-site-saas", planos: PLANOS_SITE_SAAS }],
 };
 
 // Segmentos do Fase ERP: cada um tem seu catálogo de planos (categoria própria)
@@ -244,6 +250,10 @@ async function main() {
       }
       await salvarModelo(empresa.id, modeloFaseX);
     } else {
+      // Catálogos de planos (ex.: KOLP "Site por assinatura").
+      for (const cat of CATALOGOS_POR_EMPRESA[e.slug] ?? []) {
+        await seedProdutos(empresa.id, cat.categoria, cat.planos);
+      }
       // Demais modelos prontos de cada empresa (ou o modelo genérico, se não houver).
       const extras = MODELOS_POR_EMPRESA[e.slug];
       if (extras) {
