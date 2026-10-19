@@ -1,7 +1,9 @@
-// Modelo CADDI — "Gestão de TI dedicada". Um time dedicado assume a gestão
-// completa da TI do cliente: planejamento, governança, roadmap, gestão de
-// fornecedores, segurança e suporte. Para alterar textos, ordem de seções ou
-// campos, edite este arquivo e rode o seed novamente.
+// Modelo CADDI — "Gestão e Suporte de TI". Espelha a proposta comercial real da
+// CADDI ("Solução Completa de Gestão e Suporte de Tecnologia da Informação"):
+// gestão de TI orientada à excelência operacional, organizada em três pilares
+// (Gestão, Suporte e Assessoria), com mensalidade fixa e sem taxa de implantação.
+// Para alterar textos, ordem de seções ou campos, edite este arquivo e rode o
+// seed novamente.
 
 import type { Campo } from "../../src/lib/campos";
 import type { Precificacao } from "../../src/lib/precificacao";
@@ -13,14 +15,14 @@ const campos: Campo[] = [
   {
     id: "escopo",
     tipo: "textoLongo",
-    rotulo: "Escopo da gestão",
+    rotulo: "Objetivo da gestão de TI",
     padrao:
-      "A CADDI assume a gestão completa da TI, com planejamento estratégico, governança, roadmap de tecnologia, gestão de fornecedores, políticas de segurança e suporte ao time. Reuniões periódicas de acompanhamento e um ponto focal dedicado para o seu negócio.",
-    ajuda: "Descreva o que entra na gestão dedicada. Este texto aparece na seção de escopo da proposta.",
+      "Prover uma gestão de TI orientada à excelência operacional, assegurando **disponibilidade, segurança, governança e desempenho** do ambiente tecnológico. Nosso objetivo é minimizar impactos operacionais, maximizar a produtividade e oferecer uma base tecnológica confiável para sustentar as operações e o crescimento da empresa.",
+    ajuda: "Descreve o objetivo da gestão de TI. Este texto aparece na seção de escopo da proposta.",
   },
-  { id: "mensalidade", tipo: "moeda", rotulo: "Mensalidade (R$)", padrao: 4500, passo: 50 },
-  { id: "usuarios", tipo: "numero", rotulo: "Usuários atendidos", min: 1, max: 999, padrao: 10, largura: "meia", ajuda: "10 inclusos. Adicionais: R$ 45,00 cada." },
-  { id: "onboarding", tipo: "moeda", rotulo: "Onboarding e diagnóstico (R$)", padrao: 1500, passo: 50, largura: "meia" },
+  { id: "servidores", tipo: "numero", rotulo: "Servidores gerenciados", min: 0, max: 999, padrao: 1, largura: "meia" },
+  { id: "estacoes", tipo: "numero", rotulo: "Estações gerenciadas", min: 1, max: 999, padrao: 6, largura: "meia", ajuda: "Inclui monitoramento e suporte." },
+  { id: "mensalidade", tipo: "moeda", rotulo: "Mensalidade (R$)", padrao: 550, passo: 50 },
   { id: "desconto", tipo: "desconto", rotulo: "Desconto", limitePct: 15 },
   { id: "validade", tipo: "data", rotulo: "Proposta válida até", padraoDias: 15 },
   {
@@ -37,20 +39,8 @@ const campos: Campo[] = [
 const precificacao: Precificacao = {
   recorrente: {
     base: { campo: "mensalidade" },
-    adicionais: [
-      {
-        campo: "usuarios",
-        inclusos: 10,
-        valorUnitario: 45,
-        rotuloSingular: "usuário adicional",
-        rotuloPlural: "usuários adicionais",
-        rotuloLinha: "Usuários atendidos",
-        unidade: ["usuário", "usuários"],
-      },
-    ],
   },
   desconto: { campo: "desconto", limitePct: 15 },
-  unicos: [{ campo: "onboarding", rotulo: "Onboarding e diagnóstico (único)" }],
 };
 
 const secoes: Secao[] = [
@@ -58,11 +48,11 @@ const secoes: Secao[] = [
     id: "capa",
     tipo: "capa",
     capitulo: "Início",
-    eyebrow: "Proposta comercial · Gestão de TI dedicada",
+    eyebrow: "Proposta comercial · Gestão e Suporte de TI",
     titulo: "Proposta\nComercial",
     tagline: "Mais de 11 anos de inovação e confiança",
     selos: [
-      { icone: "gear", texto: "Gestão de TI dedicada" },
+      { icone: "headset", texto: "Gestão e Suporte de TI" },
       { icone: "calendar", texto: "Válida até {{validade}}", estilo: "validade" },
     ],
   },
@@ -71,12 +61,12 @@ const secoes: Secao[] = [
     tipo: "abertura",
     capitulo: "Abertura",
     chamada: "O que faremos por **{{cliente}}**",
-    titulo: "Imagine ter um time de TI pensando no seu negócio todos os dias.",
+    titulo: "Imagine ter um ambiente de TI estável, seguro e acompanhado todos os dias.",
     destaque: "Isso é com a gente.",
     cards: [
-      { icone: "target", titulo: "Estratégia e roadmap", texto: "planejamento de tecnologia alinhado às metas do negócio" },
-      { icone: "shield", titulo: "Governança e segurança", texto: "políticas, controles e gestão de fornecedores" },
-      { icone: "headset", titulo: "Um time que entende de você", texto: "ponto focal dedicado e atendimento próximo" },
+      { icone: "shield", titulo: "Gestão orientada à excelência", texto: "disponibilidade, segurança, governança e desempenho" },
+      { icone: "headset", titulo: "Suporte sem burocracia", texto: "chamados remotos ilimitados e atendimento humanizado" },
+      { icone: "target", titulo: "Assessoria estratégica", texto: "avaliação da infraestrutura e apoio à decisão" },
     ],
   },
   {
@@ -86,8 +76,8 @@ const secoes: Secao[] = [
     numero: "01",
     titulo: "Quem é a CADDI?",
     paragrafos: [
-      "Desde 2015 cuidamos da infraestrutura de TI de empresas de diversos segmentos, acompanhando de perto a rotina de cada uma para que a tecnologia nunca seja um obstáculo.",
-      "Nosso propósito é ser o parceiro de tecnologia que sua empresa merece ter, com atendimento humanizado, infraestrutura confiável e um time que conhece de perto a operação de cada cliente.",
+      "A CADDI é especializada em **gestão de TI, infraestrutura de servidores em nuvem e suporte técnico** para empresas que precisam de um parceiro de tecnologia confiável, sem a necessidade de manter uma equipe interna de TI.",
+      "Atuamos com foco especial em **escritórios de contabilidade e empresas de serviços**, que dependem de sistemas estáveis e de um ambiente seguro para operar com tranquilidade.",
     ],
     numeros: [
       { valor: 2015, formato: "simples", rotulo: "cuidando de TI desde" },
@@ -108,129 +98,107 @@ const secoes: Secao[] = [
   {
     id: "escopo",
     tipo: "especificacoes",
-    capitulo: "A solução",
+    capitulo: "Escopo",
     numero: "02",
     eyebrow: "Proposta",
-    titulo: "Gestão de TI dedicada para o **{{cliente}}**",
-    subtitulo: "Um time que cuida da tecnologia por você",
+    titulo: "Escopo de cobertura",
+    subtitulo: "O ambiente que entra na gestão",
     texto: "{{escopo}}",
-    tituloTabela: "O que está incluso na gestão",
-    selo: "{{usuarios}} usuários atendidos",
-    nota: "Equipe dedicada + governança inclusas na mensalidade",
+    tituloTabela: "Recursos gerenciados",
+    selo: "{{servidores}} servidor(es) · {{estacoes}} estações",
+    nota: "Gestão, suporte e assessoria inclusos na mensalidade",
     linhas: [
-      { rotulo: "Planejamento estratégico de TI", valor: "Roadmap e metas trimestrais" },
-      { rotulo: "Governança e indicadores", valor: "Relatórios e reuniões de acompanhamento" },
-      { rotulo: "Gestão de fornecedores", valor: "Negociação e controle de contratos" },
-      { rotulo: "Segurança da informação", valor: "Políticas, controles e boas práticas" },
-      { rotulo: "Suporte ao time", valor: "{{usuarios}} usuários atendidos" },
-      { rotulo: "Ponto focal dedicado", valor: "Gestor de conta da CADDI" },
+      { rotulo: "Servidores gerenciados", valor: "{{servidores}}" },
+      { rotulo: "Estações gerenciadas", valor: "{{estacoes}}" },
+      { rotulo: "Monitoramento ativo", valor: "Dispositivos gerenciados, com alertas proativos" },
+      { rotulo: "Chamados via acesso remoto", valor: "Ilimitados" },
+    ],
+  },
+  {
+    id: "o-que-fazemos",
+    tipo: "resultados",
+    capitulo: "O que fazemos",
+    numero: "03",
+    titulo: "O que fazemos por você",
+    blocos: [
+      {
+        estilo: "checks",
+        titulo: "Gestão",
+        itens: [
+          "Gestão de acessos e permissões — criação, alteração e revogação de usuários conforme a necessidade da empresa",
+          "Gestão de senhas e políticas de segurança, reduzindo riscos de acesso indevido",
+          "Acompanhamento de rotinas de backup, com verificação de execução e integridade",
+          "Gestão de atualizações e patches de segurança em servidores",
+          "Controle de licenças de software, evitando vencimentos e irregularidades",
+          "Inventário de ativos de TI, atualizado e entregue periodicamente",
+          "Monitoramento ativo dos dispositivos gerenciados, com alertas antes que o problema afete a operação",
+          "Governança do ambiente, promovendo organização, segurança e continuidade dos serviços",
+        ],
+        nota: "Nossa atuação é organizada em três pilares, que juntos garantem um ambiente de TI estável, seguro e alinhado ao crescimento da sua empresa.",
+      },
+      {
+        estilo: "lista",
+        titulo: "Suporte",
+        itens: [
+          { icone: "headset", titulo: "Chamados remotos ilimitados", texto: "Atendimento via acesso remoto com ferramenta homologada e segura." },
+          { icone: "bolt", titulo: "Abertura sem burocracia", texto: "Você abre o chamado e nós resolvemos, sem etapas desnecessárias." },
+          { icone: "heart", titulo: "Atendimento humanizado", texto: "Sempre na linguagem do cliente, com relacionamento próximo." },
+          { icone: "shield", titulo: "Orientação em cibersegurança", texto: "Boas práticas para os usuários, reduzindo erros humanos." },
+        ],
+      },
+      {
+        estilo: "grade",
+        titulo: "Assessoria",
+        itens: [
+          { icone: "monitor", titulo: "Avaliação periódica", texto: "Identificamos riscos, gargalos e oportunidades de melhoria na infraestrutura." },
+          { icone: "lock", titulo: "Boas práticas", texto: "Orientação sobre segurança da informação." },
+          { icone: "refresh", titulo: "Upgrades e renovação", texto: "Recomendações estratégicas para equipamentos e otimização de custos." },
+          { icone: "target", titulo: "Apoio à decisão", texto: "Visão técnica alinhada antes de qualquer investimento em TI." },
+        ],
+      },
     ],
   },
   {
     id: "diferenciais",
     tipo: "comparativo",
     capitulo: "Diferenciais",
-    numero: "03",
-    titulo: "Diferenciais CADDI",
+    numero: "04",
+    titulo: "Diferenciais do nosso atendimento",
     rotuloMercado: "Mercado tradicional",
     itens: [
-      { icone: "target", titulo: "Visão de negócio", nosso: "Gestão alinhada às metas e prioridades da sua empresa", mercado: "TI reativa, apenas apaga incêndios" },
-      { icone: "users", titulo: "Time dedicado", nosso: "Ponto focal que conhece a sua operação de perto", mercado: "Atendimento genérico, sempre com pessoas diferentes" },
-      { icone: "gear", titulo: "Governança", nosso: "Processos, indicadores e roadmap de tecnologia", mercado: "Decisões sem planejamento nem acompanhamento" },
-      { icone: "shield", titulo: "Segurança", nosso: "Políticas e controles sempre ativos", mercado: "Segurança tratada como item opcional" },
-      { icone: "headset", titulo: "Suporte", nosso: "100% humano, com relacionamento próximo", mercado: "Central genérica, bots e filas" },
-      { icone: "pen", titulo: "Contrato", nosso: "Sem multa contratual", mercado: "Fidelidade obrigatória com multa" },
+      { icone: "clock", titulo: "SLA prioritário", nosso: "Atendimento rápido e personalizado, com SLA prioritário conforme a criticidade", mercado: "Fila única, sem prioridade por urgência" },
+      { icone: "users", titulo: "Equipe certificada", nosso: "Time técnico certificado e especializado", mercado: "Atendimento genérico, sem especialização" },
+      { icone: "heart", titulo: "Suporte humanizado", nosso: "Foco na experiência do usuário, falando a linguagem do cliente", mercado: "Central genérica, bots e filas" },
     ],
   },
   {
     id: "investimento",
     tipo: "investimento",
     capitulo: "Investimento",
-    numero: "04",
+    numero: "05",
     titulo: "Condições comerciais",
     recorrente: {
-      titulo: "Gestão de TI dedicada",
+      titulo: "Gestão e Suporte de TI",
       rotuloTotal: "Investimento mensal",
       rodapeTotal: "por mês, em reais, valor fixo",
       aviso: { icone: "shield", titulo: "Sem multa contratual.", texto: 'Nossa retenção é relacionamento e resultado, não contrato "engessado".' },
     },
-    unico: {
-      titulo: "Onboarding e diagnóstico",
-      intro: "O que compõe o início da parceria:",
-      rotulo: "Investimento único",
-      itens: [
-        { icone: "target", titulo: "Diagnóstico completo do ambiente", texto: "Mapeamos a estrutura atual, riscos e oportunidades para montar o roadmap." },
-        { icone: "flag", titulo: "Planejamento inicial", texto: "Definimos metas, prioridades e o plano dos primeiros ciclos de trabalho." },
-      ],
-    },
     observacoes: { titulo: "Observações" },
   },
   {
-    id: "resultados",
-    tipo: "resultados",
-    capitulo: "Resultados",
-    numero: "05",
-    titulo: "Resultados e projeções",
-    blocos: [
-      {
-        estilo: "lista",
-        titulo: "O que sua empresa passa a ter",
-        itens: [
-          { icone: "target", titulo: "TI alinhada ao negócio", texto: "Decisões de tecnologia guiadas pelas metas da empresa." },
-          { icone: "monitor", titulo: "Acompanhamento contínuo", texto: "Indicadores e reuniões periódicas de gestão." },
-          { icone: "headset", titulo: "Suporte técnico humanizado", texto: "Nossa equipe pronta para agir quando algo precisar de atenção." },
-        ],
-      },
-      {
-        estilo: "checks",
-        titulo: "Gestão que acompanha a mensalidade",
-        itens: [
-          "Planejamento estratégico e roadmap de tecnologia",
-          "Governança, indicadores e relatórios periódicos",
-          "Gestão de fornecedores e contratos de TI",
-          "Políticas de segurança da informação",
-        ],
-        nota: "Nosso grande diferencial é garantir que a tecnologia caminhe junto com o crescimento do seu negócio, com previsibilidade e segurança.",
-      },
-      {
-        estilo: "grade",
-        titulo: "Benefícios de uma gestão dedicada",
-        itens: [
-          { icone: "target", titulo: "Foco no negócio", texto: "Sua equipe se concentra no que importa." },
-          { icone: "users", titulo: "Time especializado", texto: "Acesso a especialistas sem contratar internamente." },
-          { icone: "bolt", titulo: "Mais agilidade", texto: "Decisões de TI mais rápidas e assertivas." },
-          { icone: "shield", titulo: "Mais segurança", texto: "Riscos mapeados e controles ativos." },
-          { icone: "money", titulo: "Previsibilidade", texto: "Valor fixo mensal, em reais." },
-        ],
-      },
-    ],
-  },
-  {
-    id: "cronograma",
-    tipo: "cronograma",
-    capitulo: "Cronograma",
+    id: "nao-incluso",
+    tipo: "texto",
+    capitulo: "Escopo",
     numero: "06",
-    titulo: "Como começa a parceria",
-    etapas: [
-      { icone: "pen", titulo: "Assinatura", texto: "O processo começa com a assinatura digital do contrato." },
-      { icone: "flag", titulo: "Kickoff", texto: "Realizamos o kickoff para alinhar expectativas e prioridades." },
-      { icone: "target", titulo: "Diagnóstico", texto: "Mapeamos o ambiente atual, riscos e oportunidades." },
-      { icone: "gear", titulo: "Roadmap", texto: "Montamos o plano de tecnologia e as metas dos próximos ciclos." },
-      { icone: "refresh", titulo: "Rotina de gestão", texto: "Iniciamos o acompanhamento contínuo com reuniões periódicas." },
-      { icone: "rocket", titulo: "Evolução", texto: "A TI evolui junto com o crescimento do seu negócio." },
-    ],
-  },
-  {
-    id: "faq",
-    tipo: "faq",
-    capitulo: "Dúvidas",
-    numero: "07",
-    titulo: "Perguntas frequentes",
-    itens: [
-      { pergunta: "Existe fidelidade ou multa?", resposta: "Não. Trabalhamos **sem multa contratual**. Nossa retenção é relacionamento e resultado." },
-      { pergunta: "Quantos usuários estão inclusos?", resposta: "A mensalidade inclui o atendimento de {{usuarios}} usuários. Usuários adicionais custam R$ 45,00 cada." },
-      { pergunta: "A CADDI substitui minha equipe interna?", resposta: "Podemos assumir a gestão completa ou atuar junto da sua equipe interna, conforme o escopo combinado." },
-      { pergunta: "Como funciona o acompanhamento?", resposta: "Você tem um ponto focal dedicado e reuniões periódicas de gestão, com indicadores e roadmap de tecnologia." },
+    eyebrow: "Itens não contemplados",
+    titulo: "O que não está incluso",
+    paragrafos: [
+      "Não estão inclusos neste orçamento, salvo quando expressamente especificados:",
+      "**Peças e componentes** — fornecimento ou substituição.",
+      "**Equipamentos e licenças** — aquisição de equipamentos, periféricos ou licenças de software.",
+      "**Treinamentos** — cursos, treinamentos ou capacitações de usuários.",
+      "**Visitas presenciais** — visitas técnicas, deslocamentos e despesas relacionadas.",
+      "Caso haja necessidade de qualquer um dos itens acima, será apresentada uma **proposta comercial complementar** para aprovação prévia do contratante.",
     ],
   },
   {
@@ -244,8 +212,8 @@ const secoes: Secao[] = [
 ];
 
 export const modeloCaddiGestaoTi: ModeloDef = {
-  nome: "Gestão de TI dedicada",
-  descricao: "Consultoria e gestão de TI dedicada: mensalidade, usuários atendidos, onboarding e desconto com limite de aprovação.",
+  nome: "Gestão e Suporte de TI",
+  descricao: "Solução completa de gestão e suporte de TI: gestão, suporte e assessoria em mensalidade fixa, com escopo de cobertura por servidores e estações e desconto com limite de aprovação.",
   tipoSolucao: "gestao-ti",
   validadeDias: 15,
   campos,

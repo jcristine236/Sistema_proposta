@@ -14,19 +14,36 @@ import { modeloCaddiBackup } from "./modelos/caddi-backup-seguranca";
 import { modeloKolpSite } from "./modelos/kolp-site";
 import { modeloKolpSaas } from "./modelos/kolp-saas";
 import { modeloKolpProjeto } from "./modelos/kolp-projeto";
-import { modeloFaseModular } from "./modelos/fase-modular";
-import { modeloFaseImplantacao } from "./modelos/fase-implantacao";
+import { modeloFaseWeb, PLANOS_WEB } from "./modelos/fase-web";
+import { modeloFaseFood, PLANOS_FOOD } from "./modelos/fase-food";
+import { modeloFasePet, PLANOS_PET } from "./modelos/fase-pet";
+import { modeloFaseAgro, PLANOS_AGRO } from "./modelos/fase-agro";
+import { modeloFaseClinicas, PLANOS_CLINICAS } from "./modelos/fase-clinicas";
+import { modeloFaseAgenda, PLANOS_AGENDA } from "./modelos/fase-agenda";
+import { modeloFaseX } from "./modelos/fase-x";
 import { modeloPadrao } from "./modelos/padrao";
 import type { ModeloDef } from "./modelos/tipo";
 import { calcular } from "../src/lib/precificacao";
 
-// Modelos prontos por empresa (além do "Servidor em nuvem" da CADDI, que vem com
-// catálogo de planos e proposta de exemplo e é tratado à parte).
+type PlanoSeed = { codigo: string; nome: string; preco: number; atributos: Record<string, number | string> };
+
+// Modelos prontos por empresa (além do "Servidor em nuvem" da CADDI e dos
+// segmentos FASE, que têm catálogo de planos e são tratados à parte).
 const MODELOS_POR_EMPRESA: Record<string, ModeloDef[]> = {
   caddi: [modeloCaddiGestaoTi, modeloCaddiSuporte, modeloCaddiBackup],
   kolp: [modeloKolpSite, modeloKolpSaas, modeloKolpProjeto],
-  fase: [modeloFaseModular, modeloFaseImplantacao],
 };
+
+// Segmentos do Fase ERP: cada um tem seu catálogo de planos (categoria própria)
+// e seu modelo. O "Fase X" (por volume) é registrado à parte, sem catálogo fixo.
+const FASE_SEGMENTOS: { categoria: string; planos: PlanoSeed[]; modelo: ModeloDef }[] = [
+  { categoria: "fase-web", planos: PLANOS_WEB, modelo: modeloFaseWeb },
+  { categoria: "fase-food", planos: PLANOS_FOOD, modelo: modeloFaseFood },
+  { categoria: "fase-pet", planos: PLANOS_PET, modelo: modeloFasePet },
+  { categoria: "fase-agro", planos: PLANOS_AGRO, modelo: modeloFaseAgro },
+  { categoria: "fase-clinicas", planos: PLANOS_CLINICAS, modelo: modeloFaseClinicas },
+  { categoria: "fase-agenda", planos: PLANOS_AGENDA, modelo: modeloFaseAgenda },
+];
 
 const db = new PrismaClient();
 const json = (v: unknown) => v as Prisma.InputJsonValue;
@@ -108,8 +125,20 @@ const EMPRESAS: {
 
 const MOTIVOS = ["Desisti do projeto", "Não enxerguei valor", "Preço acima do esperado", "Não foi aprovado pela diretoria", "Escolhi outro fornecedor", "Outro motivo"];
 
+// Cadastra/atualiza os planos de um segmento (identificados por categoria + código).
+async function seedProdutos(empresaId: string, categoria: string, planos: PlanoSeed[]) {
+  for (const [i, p] of planos.entries()) {
+    const existente = await db.produto.findFirst({ where: { empresaId, categoria, codigo: p.codigo } });
+    const data = { categoria, nome: p.nome, preco: p.preco, atributos: json(p.atributos), ordem: i, recorrencia: "MENSAL" as const, descricao: p.nome };
+    if (existente) await db.produto.update({ where: { id: existente.id }, data });
+    else await db.produto.create({ data: { ...data, codigo: p.codigo, empresaId } });
+  }
+}
+
 async function salvarModelo(empresaId: string, m: ModeloDef) {
-  const existente = await db.modelo.findFirst({ where: { empresaId, tipoSolucao: m.tipoSolucao, nome: m.nome } });
+  // Casa por tipoSolucao (único por empresa): renomear o modelo atualiza no lugar,
+  // sem criar duplicata.
+  const existente = await db.modelo.findFirst({ where: { empresaId, tipoSolucao: m.tipoSolucao } });
   const data = {
     nome: m.nome,
     descricao: m.descricao,
@@ -207,12 +236,21 @@ async function main() {
       }
     }
 
-    // Demais modelos prontos de cada empresa (ou o modelo genérico, se não houver).
-    const extras = MODELOS_POR_EMPRESA[e.slug];
-    if (extras) {
-      for (const m of extras) await salvarModelo(empresa.id, m);
+    // FASE: catálogo de planos por segmento + modelos de cada segmento + Fase X.
+    if (e.slug === "fase") {
+      for (const seg of FASE_SEGMENTOS) {
+        await seedProdutos(empresa.id, seg.categoria, seg.planos);
+        await salvarModelo(empresa.id, seg.modelo);
+      }
+      await salvarModelo(empresa.id, modeloFaseX);
     } else {
-      await salvarModelo(empresa.id, modeloPadrao({ nome: e.nome, site: e.site }));
+      // Demais modelos prontos de cada empresa (ou o modelo genérico, se não houver).
+      const extras = MODELOS_POR_EMPRESA[e.slug];
+      if (extras) {
+        for (const m of extras) await salvarModelo(empresa.id, m);
+      } else {
+        await salvarModelo(empresa.id, modeloPadrao({ nome: e.nome, site: e.site }));
+      }
     }
   }
 

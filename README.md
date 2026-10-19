@@ -47,10 +47,13 @@ Empresa ─┬─ Produtos (ex.: planos de servidor)
   (em `prisma/modelos/`, carregados pelo seed) — edite pelo editor visual ou duplique:
   - **CADDI**: Servidor em nuvem, Gestão de TI dedicada, Suporte e TI gerenciada, Backup e segurança de dados.
   - **KOLP**: Site e presença digital, Plataforma SaaS, Projeto sob medida.
-  - **FASE**: Sistema modular, Implantação e projeto.
+  - **FASE**: Fase Web, Fase Food, Fase Pet, Fase Agro, Fase Clínicas e Fase Agenda
+    (ERP por planos mensais fixos, um por segmento) e Fase X (automação fiscal por volume de CNPJs).
 
-  O `padrao.ts` é um modelo genérico de reserva para novas empresas. Números de "quem somos"
-  da KOLP e da FASE são exemplos — ajuste no editor.
+  Os modelos da FASE e o CADDI "Gestão e Suporte de TI" e "Site" da KOLP foram montados a partir
+  de propostas reais. Os planos da FASE (preços por segmento) são cadastrados pelo seed e escolhidos
+  na hora da proposta. O `padrao.ts` é um modelo genérico de reserva para novas empresas.
+  Números de "quem somos" são exemplos — ajuste no editor.
 - **Textos com variáveis**: `{{cliente}}`, `{{plano.nome}}`, `{{plano.vcpu}}`,
   `{{dispositivos}}`, `{{validade}}`, `{{calc.totalMensal|brl}}`, e `**negrito**`.
 - **Proposta congelada**: ao gerar o link, a proposta guarda uma cópia do modelo e
