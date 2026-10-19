@@ -4,8 +4,9 @@
 import type { Campo } from "../../src/lib/campos";
 import type { Precificacao } from "../../src/lib/precificacao";
 import type { Secao } from "../../src/lib/secoes";
+import type { ModeloDef } from "./tipo";
 
-export function modeloPadrao(empresa: { nome: string; site: string }) {
+export function modeloPadrao(empresa: { nome: string; site: string }): ModeloDef {
   const campos: Campo[] = [
     { id: "cliente", tipo: "contato", rotulo: "Nome do cliente", obrigatorio: true },
     { id: "projeto", tipo: "texto", rotulo: "Título do projeto", padrao: "Projeto de tecnologia", obrigatorio: true },

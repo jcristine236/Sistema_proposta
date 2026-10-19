@@ -8,8 +8,25 @@ import { PrismaClient, Prisma } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import type { Tema } from "../src/lib/tema";
 import { modeloCaddiNuvem, PLANOS_NUVEM } from "./modelos/caddi-servidor-nuvem";
+import { modeloCaddiGestaoTi } from "./modelos/caddi-gestao-ti";
+import { modeloCaddiSuporte } from "./modelos/caddi-suporte-gerenciado";
+import { modeloCaddiBackup } from "./modelos/caddi-backup-seguranca";
+import { modeloKolpSite } from "./modelos/kolp-site";
+import { modeloKolpSaas } from "./modelos/kolp-saas";
+import { modeloKolpProjeto } from "./modelos/kolp-projeto";
+import { modeloFaseModular } from "./modelos/fase-modular";
+import { modeloFaseImplantacao } from "./modelos/fase-implantacao";
 import { modeloPadrao } from "./modelos/padrao";
+import type { ModeloDef } from "./modelos/tipo";
 import { calcular } from "../src/lib/precificacao";
+
+// Modelos prontos por empresa (além do "Servidor em nuvem" da CADDI, que vem com
+// catálogo de planos e proposta de exemplo e é tratado à parte).
+const MODELOS_POR_EMPRESA: Record<string, ModeloDef[]> = {
+  caddi: [modeloCaddiGestaoTi, modeloCaddiSuporte, modeloCaddiBackup],
+  kolp: [modeloKolpSite, modeloKolpSaas, modeloKolpProjeto],
+  fase: [modeloFaseModular, modeloFaseImplantacao],
+};
 
 const db = new PrismaClient();
 const json = (v: unknown) => v as Prisma.InputJsonValue;
@@ -91,7 +108,7 @@ const EMPRESAS: {
 
 const MOTIVOS = ["Desisti do projeto", "Não enxerguei valor", "Preço acima do esperado", "Não foi aprovado pela diretoria", "Escolhi outro fornecedor", "Outro motivo"];
 
-async function salvarModelo(empresaId: string, m: ReturnType<typeof modeloPadrao>) {
+async function salvarModelo(empresaId: string, m: ModeloDef) {
   const existente = await db.modelo.findFirst({ where: { empresaId, tipoSolucao: m.tipoSolucao, nome: m.nome } });
   const data = {
     nome: m.nome,
@@ -141,7 +158,7 @@ async function main() {
         if (existente) await db.produto.update({ where: { id: existente.id }, data });
         else await db.produto.create({ data: { ...data, codigo: p.codigo, empresaId: empresa.id } });
       }
-      const modelo = await salvarModelo(empresa.id, modeloCaddiNuvem as ReturnType<typeof modeloPadrao>);
+      const modelo = await salvarModelo(empresa.id, modeloCaddiNuvem);
 
       // Proposta de exemplo para visualizar o link público
       const slug = "grupo-mofarrej-exemplo";
@@ -188,6 +205,12 @@ async function main() {
         });
         await db.evento.create({ data: { propostaId: proposta.id, tipo: "CRIADA", dados: json({ nome: admin.nome }) } });
       }
+    }
+
+    // Demais modelos prontos de cada empresa (ou o modelo genérico, se não houver).
+    const extras = MODELOS_POR_EMPRESA[e.slug];
+    if (extras) {
+      for (const m of extras) await salvarModelo(empresa.id, m);
     } else {
       await salvarModelo(empresa.id, modeloPadrao({ nome: e.nome, site: e.site }));
     }
