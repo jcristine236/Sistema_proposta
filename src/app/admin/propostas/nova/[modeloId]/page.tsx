@@ -4,7 +4,7 @@ import { exigirSessao, filtroPropostas } from "@/lib/auth";
 import { catalogoDaEmpresa } from "@/lib/catalogo";
 import { FONTES, temaDe } from "@/lib/tema";
 import type { Campo, Dados } from "@/lib/campos";
-import type { Precificacao } from "@/lib/precificacao";
+import { catalogoDoModelo, type Precificacao } from "@/lib/precificacao";
 import type { Secao } from "@/lib/secoes";
 import { FormularioProposta } from "@/components/admin/FormularioProposta";
 
@@ -32,7 +32,7 @@ export default async function NovaProposta({ params, searchParams }: { params: P
       <link rel="stylesheet" href={FONTES.url} precedence="default" />
       <FormularioProposta
         modelo={{ id: modelo.id, nome: modelo.nome, campos: modelo.campos as Campo[], secoes: modelo.secoes as Secao[], precificacao: modelo.precificacao as Precificacao }}
-        catalogo={catalogo}
+        catalogo={catalogoDoModelo(modelo.campos as Campo[], catalogo)}
         contatos={contatos}
         empresa={{ nome: s.empresa.razaoSocial ?? s.empresa.nome, site: s.empresa.site, rodape: s.empresa.rodape }}
         tema={temaDe(s.empresa.tema)}

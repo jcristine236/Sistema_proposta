@@ -118,6 +118,7 @@ export function validarPrecificacao(v: unknown, campos: Campo[]): { ok: Precific
         rotuloLinha: String(a.rotuloLinha ?? ""), unidade: [String(a.unidade?.[0] ?? ""), String(a.unidade?.[1] ?? "")],
       })),
     };
+    if (p.recorrente.extras?.campo && existe(p.recorrente.extras.campo)) limpo.recorrente.extras = { campo: p.recorrente.extras.campo };
   }
   if (p.desconto?.campo && existe(p.desconto.campo)) limpo.desconto = { campo: p.desconto.campo, limitePct: p.desconto.limitePct };
   limpo.unicos = (p.unicos ?? []).filter((u) => u.campo && existe(u.campo)).map((u) => ({ campo: u.campo, rotulo: String(u.rotulo ?? "") }));

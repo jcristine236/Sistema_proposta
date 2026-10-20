@@ -25,6 +25,7 @@ const campos: Campo[] = [
     padrao: "intermediario",
     obrigatorio: true,
   },
+  { id: "adicionais", tipo: "adicionais", rotulo: "Adicionais contratados", comQuantidade: true, rotuloQuantidade: "Usuários", max: 20, sugestoes: ["WhatsApp automático", "Boleto integrado", "PIX dinâmico", "Assinador Digital", "Lembrete de agendamento"], ajuda: "Adicione os opcionais e o valor de cada um. Para itens por usuário, informe o valor por usuário e a quantidade." },
   { id: "desconto", tipo: "desconto", rotulo: "Desconto", limitePct: 15 },
   { id: "validade", tipo: "data", rotulo: "Proposta válida até", padraoDias: 15 },
   {
@@ -39,7 +40,7 @@ const campos: Campo[] = [
 ];
 
 const precificacao: Precificacao = {
-  recorrente: { base: { campo: "plano" } },
+  recorrente: { base: { campo: "plano" }, extras: { campo: "adicionais" } },
   desconto: { campo: "desconto", limitePct: 15 },
 };
 

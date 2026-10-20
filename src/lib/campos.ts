@@ -45,6 +45,18 @@ export type CampoLista = Base & {
   rotuloDescricao?: string;
 };
 
+/** Adicionais precificados na hora: nome + valor; opcionalmente × quantidade (ex.: por usuário).
+ *  Somam no total recorrente (ver precificacao.recorrente.extras). */
+export type CampoAdicionais = Base & {
+  tipo: "adicionais";
+  max?: number;
+  /** true = cada adicional tem campo de quantidade (preço × quantidade). */
+  comQuantidade?: boolean;
+  rotuloQuantidade?: string;
+  /** Nomes sugeridos para adicionar rapidamente (ex.: iFood, Cardápio Digital). */
+  sugestoes?: string[];
+};
+
 export type Campo =
   | CampoContato
   | CampoTexto
@@ -56,7 +68,8 @@ export type Campo =
   | CampoCheckbox
   | CampoProduto
   | CampoDesconto
-  | CampoLista;
+  | CampoLista
+  | CampoAdicionais;
 
 export type TipoCampo = Campo["tipo"];
 
@@ -73,6 +86,7 @@ export const TIPOS_CAMPO: { tipo: TipoCampo; nome: string; descricao: string }[]
   { tipo: "produto", nome: "Produto/Plano", descricao: "Item do catálogo da empresa, com opção de plano personalizado." },
   { tipo: "desconto", nome: "Desconto", descricao: "Percentual ou valor fixo, com alerta acima do limite de aprovação." },
   { tipo: "lista", nome: "Lista de observações", descricao: "Pares título + descrição adicionados livremente." },
+  { tipo: "adicionais", nome: "Adicionais precificados", descricao: "Itens extras com nome e valor (e opcionalmente quantidade), somados ao total mensal." },
 ];
 
 // ---------------------------------------------------------------------------
@@ -86,6 +100,7 @@ export type ValorProduto = {
 };
 export type ValorDesconto = { tipo: "nenhum" | "pct" | "valor"; valor: number };
 export type ItemLista = { titulo: string; descricao: string };
+export type ItemAdicional = { nome: string; valor: number; quantidade?: number };
 
 export type Dados = Record<string, unknown>;
 
@@ -111,6 +126,7 @@ export function valoresPadrao(campos: Campo[]): Dados {
       case "produto": dados[c.id] = { codigo: c.padrao ?? "" } satisfies ValorProduto; break;
       case "desconto": dados[c.id] = { tipo: "nenhum", valor: 0 } satisfies ValorDesconto; break;
       case "lista": dados[c.id] = [{ titulo: "", descricao: "" }] satisfies ItemLista[]; break;
+      case "adicionais": dados[c.id] = [] satisfies ItemAdicional[]; break;
     }
   }
   return dados;

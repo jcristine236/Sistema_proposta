@@ -4,7 +4,7 @@ import { exigirSessao, filtroPropostas } from "@/lib/auth";
 import { catalogoDaEmpresa } from "@/lib/catalogo";
 import { FONTES, temaDe } from "@/lib/tema";
 import type { Campo, Dados } from "@/lib/campos";
-import type { Precificacao } from "@/lib/precificacao";
+import { catalogoDoModelo, type Precificacao } from "@/lib/precificacao";
 import type { Secao } from "@/lib/secoes";
 import { FormularioProposta } from "@/components/admin/FormularioProposta";
 
@@ -24,7 +24,7 @@ export default async function EditarProposta({ params }: { params: Promise<{ id:
       <link rel="stylesheet" href={FONTES.url} precedence="default" />
       <FormularioProposta
         modelo={{ id: p.modeloId ?? "", nome: snap.modeloNome ?? "Proposta", campos: snap.campos, secoes: snap.secoes, precificacao: snap.precificacao }}
-        catalogo={catalogo}
+        catalogo={catalogoDoModelo(snap.campos, catalogo)}
         contatos={contatos}
         empresa={{ nome: s.empresa.razaoSocial ?? s.empresa.nome, site: s.empresa.site, rodape: s.empresa.rodape }}
         tema={temaDe(s.empresa.tema)}

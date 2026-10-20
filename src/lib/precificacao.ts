@@ -1,7 +1,7 @@
 // Motor de cálculo do investimento. Função pura: roda igual no navegador
 // (resumo ao vivo no formulário) e no servidor (valor gravado na proposta).
 
-import type { Dados, ValorDesconto, ValorProduto } from "./campos";
+import type { Campo, Dados, ItemAdicional, ValorDesconto, ValorProduto } from "./campos";
 
 export type Precificacao = {
   recorrente?: {
@@ -19,6 +19,8 @@ export type Precificacao = {
       rotuloLinha: string;
       unidade: [string, string];
     }[];
+    /** Adicionais livres precificados na proposta (campo do tipo "adicionais") */
+    extras?: { campo: string };
   };
   desconto?: { campo: string; limitePct?: number };
   /** Valores cobrados uma única vez (ex.: implantação) */
@@ -41,6 +43,7 @@ export type ProdutoResolvido = { codigo: string; nome: string; preco: number; at
 export type Calculo = {
   base: { rotulo: string; valor: number; produto?: ProdutoResolvido };
   adicionais: { campo: string; quantidade: number; inclusos: number; extras: number; valorUnitario: number; rotulo: string; rotuloLinha: string; unidade: string; valor: number }[];
+  extras: { nome: string; quantidade: number; valorUnit: number; valor: number }[];
   subtotal: number;
   desconto: { tipo: ValorDesconto["tipo"]; informado: number; valor: number; pct: number; acimaLimite: boolean; limitePct?: number };
   totalMensal: number;
@@ -53,6 +56,14 @@ const num = (v: unknown) => {
   return Number.isFinite(n) && n > 0 ? n : 0;
 };
 const arred = (v: number) => Math.round(v * 100) / 100;
+
+/** Mantém no catálogo só os produtos das categorias usadas pelos campos "produto"
+ *  do modelo. Evita que planos de categorias diferentes com o mesmo código se
+ *  confundam (ex.: "intermediario" existe em vários segmentos da FASE). */
+export function catalogoDoModelo(campos: Campo[], catalogo: ProdutoCatalogo[]): ProdutoCatalogo[] {
+  const cats = new Set(campos.filter((c) => c.tipo === "produto").map((c) => (c as { categoria: string }).categoria));
+  return cats.size ? catalogo.filter((p) => cats.has(p.categoria)) : catalogo;
+}
 
 export function resolverProduto(valor: ValorProduto | undefined, catalogo: ProdutoCatalogo[]): ProdutoResolvido | undefined {
   if (!valor?.codigo) return undefined;
@@ -94,7 +105,16 @@ export function calcular(regras: Precificacao, dados: Dados, catalogo: ProdutoCa
     };
   });
 
-  const subtotal = arred(base.valor + adicionais.reduce((s, a) => s + a.valor, 0));
+  const listaExtras = (regras.recorrente?.extras ? (dados[regras.recorrente.extras.campo] as ItemAdicional[]) : undefined) ?? [];
+  const extras = listaExtras
+    .filter((e) => e && e.nome?.trim() && num(e.valor) > 0)
+    .map((e) => {
+      const quantidade = e.quantidade && e.quantidade > 0 ? Math.floor(num(e.quantidade)) : 1;
+      const valorUnit = num(e.valor);
+      return { nome: e.nome.trim(), quantidade, valorUnit, valor: arred(valorUnit * quantidade) };
+    });
+
+  const subtotal = arred(base.valor + adicionais.reduce((s, a) => s + a.valor, 0) + extras.reduce((s, e) => s + e.valor, 0));
 
   const d = (regras.desconto ? dados[regras.desconto.campo] : undefined) as ValorDesconto | undefined;
   const tipo = d?.tipo ?? "nenhum";
@@ -109,6 +129,7 @@ export function calcular(regras: Precificacao, dados: Dados, catalogo: ProdutoCa
   return {
     base,
     adicionais,
+    extras,
     subtotal,
     desconto: { tipo, informado, valor: valorDesc, pct, acimaLimite: limitePct !== undefined && pct > limitePct, limitePct },
     totalMensal: arred(subtotal - valorDesc),

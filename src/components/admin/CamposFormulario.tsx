@@ -2,7 +2,7 @@
 
 // Renderiza os campos de preenchimento definidos no modelo (src/lib/campos.ts).
 
-import type { Campo, Dados, ItemLista, ValorContato, ValorDesconto, ValorProduto } from "@/lib/campos";
+import type { Campo, Dados, ItemAdicional, ItemLista, ValorContato, ValorDesconto, ValorProduto } from "@/lib/campos";
 import type { ProdutoCatalogo } from "@/lib/precificacao";
 import { brl } from "@/lib/formato";
 
@@ -204,6 +204,39 @@ function UmCampo({ c, dados, alterar, catalogo, contatos, descontoPct }: Omit<Pr
             <button type="button" className="btn claro pequeno" onClick={() => set([...itens, { titulo: "", descricao: "" }])}>+ Adicionar campo</button>
           )}
           {ajuda}
+        </div>
+      );
+    }
+    case "adicionais": {
+      const itens = (v as ItemAdicional[]) ?? [];
+      const max = c.max ?? 20;
+      const comQtd = !!c.comQuantidade;
+      const set = (l: ItemAdicional[]) => alterar(c.id, l);
+      const total = itens.reduce((s, it) => s + (num(String(it.valor)) || 0) * (comQtd && it.quantidade ? it.quantidade : 1), 0);
+      return (
+        <div className="campo">
+          <label>{c.rotulo}</label>
+          {c.sugestoes && c.sugestoes.length > 0 && (
+            <div className="sugestoes">
+              {c.sugestoes.filter((s) => !itens.some((it) => it.nome === s)).map((s) => (
+                <button type="button" key={s} className="chip" onClick={() => itens.length < max && set([...itens, { nome: s, valor: 0, ...(comQtd ? { quantidade: 1 } : {}) }])}>+ {s}</button>
+              ))}
+            </div>
+          )}
+          {itens.map((it, i) => (
+            <div key={i} className="adicional-item">
+              <input placeholder="Adicional" maxLength={80} value={it.nome} onChange={(e) => set(itens.map((x, j) => (j === i ? { ...x, nome: e.target.value } : x)))} />
+              {comQtd && (
+                <input type="number" min={1} step={1} placeholder={c.rotuloQuantidade ?? "Qtd"} title={c.rotuloQuantidade ?? "Quantidade"} value={it.quantidade ?? 1} onChange={(e) => set(itens.map((x, j) => (j === i ? { ...x, quantidade: Math.max(1, Math.floor(num(e.target.value))) } : x)))} style={{ maxWidth: 80 }} />
+              )}
+              <input type="number" min={0} step={0.01} placeholder="Valor (R$)" value={it.valor || ""} onChange={(e) => set(itens.map((x, j) => (j === i ? { ...x, valor: num(e.target.value) } : x)))} style={{ maxWidth: 120 }} />
+              <button type="button" aria-label="Remover" onClick={() => set(itens.filter((_, j) => j !== i))}>×</button>
+            </div>
+          ))}
+          {itens.length < max && (
+            <button type="button" className="btn claro pequeno" onClick={() => set([...itens, { nome: "", valor: 0, ...(comQtd ? { quantidade: 1 } : {}) }])}>+ Adicionar adicional</button>
+          )}
+          <div className="ajuda">{itens.length > 0 ? `Soma dos adicionais: ${brl(total)} / mês.` : ""} {c.ajuda ?? ""}</div>
         </div>
       );
     }

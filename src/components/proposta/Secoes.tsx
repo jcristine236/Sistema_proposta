@@ -280,6 +280,12 @@ export function Investimento({ s, ctx }: P<S.SecaoInvestimento>) {
                 <b>{a.quantidade.toLocaleString("pt-BR")} {a.unidade}</b>
               </div>
             ))}
+            {c.extras.map((e, i) => (
+              <div key={`ex${i}`} className="pl">
+                <span>{e.nome}{e.quantidade > 1 ? ` (${e.quantidade}×)` : ""}</span>
+                <b>{brl(e.valor)}</b>
+              </div>
+            ))}
             {temDesc && (
               <div className="pl disc">
                 <span>{c.desconto.tipo === "pct" ? `Desconto de ${c.desconto.informado.toLocaleString("pt-BR")}%` : "Desconto"}</span>

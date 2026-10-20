@@ -89,6 +89,12 @@ button, input, select, textarea { font: inherit; }
 .lista-item { display: grid; grid-template-columns: 1fr 1.6fr 38px; gap: 8px; margin-bottom: 8px; }
 .lista-item input { height: 38px; border: 1.5px solid var(--line); border-radius: 9px; padding: 0 10px; min-width: 0; }
 .lista-item button { height: 38px; border: 1.5px solid var(--line); background: #fff; border-radius: 9px; cursor: pointer; color: var(--muted); font-size: 18px; }
+.adicional-item { display: flex; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+.adicional-item input { height: 38px; border: 1.5px solid var(--line); border-radius: 9px; padding: 0 10px; min-width: 0; flex: 1; }
+.adicional-item button { height: 38px; width: 38px; flex: none; border: 1.5px solid var(--line); background: #fff; border-radius: 9px; cursor: pointer; color: var(--muted); font-size: 18px; }
+.sugestoes { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.sugestoes .chip { border: 1.5px solid var(--line); background: #fff; border-radius: 99px; padding: 4px 11px; font-size: 13px; cursor: pointer; color: var(--muted); }
+.sugestoes .chip:hover { border-color: var(--accent); color: var(--text); }
 
 .resumo .l { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--line); color: var(--muted); }
 .resumo .l b { color: var(--text); font-family: "JetBrains Mono", ui-monospace, monospace; font-weight: 600; white-space: nowrap; }

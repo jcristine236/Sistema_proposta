@@ -9,7 +9,7 @@ import { exigirAcao, filtroPropostas, SemPermissao } from "@/lib/auth";
 import { auditar } from "@/lib/auditoria";
 import { catalogoDaEmpresa } from "@/lib/catalogo";
 import { validar, type Campo, type Dados, type ValorContato } from "@/lib/campos";
-import { calcular, type Precificacao } from "@/lib/precificacao";
+import { calcular, catalogoDoModelo, type Precificacao } from "@/lib/precificacao";
 import type { Secao } from "@/lib/secoes";
 import { slugify } from "@/lib/formato";
 import { linkPublico } from "@/lib/links";
@@ -61,7 +61,7 @@ export async function criarProposta(modeloId: string, dadosBrutos: Dados): Promi
   if (erros.length) return { erros };
 
   const r = await resolverContato(s.empresa.id, campos, dadosSeguros(campos, dadosBrutos));
-  const catalogo = await catalogoDaEmpresa(s.empresa.id);
+  const catalogo = catalogoDoModelo(campos, await catalogoDaEmpresa(s.empresa.id));
   const calculo = calcular(precificacao, r.dados, catalogo);
   const slug = `${slugify(r.clienteNome)}-${randomBytes(6).toString("hex")}`;
   const codigo = await proximoCodigo(s.empresa);
@@ -104,7 +104,7 @@ export async function editarProposta(id: string, dadosBrutos: Dados): Promise<Re
   const erros = validar(snap.campos, dadosBrutos);
   if (erros.length) return { erros };
   const r = await resolverContato(s.empresa.id, snap.campos, dadosSeguros(snap.campos, dadosBrutos));
-  const catalogo = await catalogoDaEmpresa(s.empresa.id);
+  const catalogo = catalogoDoModelo(snap.campos, await catalogoDaEmpresa(s.empresa.id));
   const calculo = calcular(snap.precificacao, r.dados, catalogo);
   const validaAte = validade(snap.campos, r.dados);
   // Ao editar, a proposta volta a valer (reabre se tinha expirado ou sido recusada)
