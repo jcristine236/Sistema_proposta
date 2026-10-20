@@ -69,11 +69,11 @@ const EMPRESAS: {
   {
     slug: "caddi",
     nome: "CADDI",
-    razaoSocial: "CADDI Soluções Tecnológicas",
+    razaoSocial: "CADDI Soluções Tecnológicas Ltda.",
     site: "caddi.com.br",
     dominioPropostas: "propostas.caddi.com.br",
     prefixo: "CAD",
-    rodape: "CADDI Soluções Tecnológicas · Alphaville, Barueri/SP",
+    rodape: "CADDI Soluções Tecnológicas Ltda. · Alameda Rio Negro, 503 — Sala 2005, Alphaville, Barueri/SP · (11) 2358-3919 · jessica@caddi.com.br",
     tema: {
       primaria: "#0D1B3E",
       primaria2: "#16295A",
@@ -94,7 +94,7 @@ const EMPRESAS: {
     site: "kolp.com.br",
     dominioPropostas: "propostas.kolp.com.br",
     prefixo: "KLP",
-    rodape: "KOLP · kolp.com.br",
+    rodape: "Kolp Aplicações e Datacenter · São Paulo/SP · kolp.com.br",
     tema: {
       primaria: "#5C026E",
       primaria2: "#7605B7",
@@ -116,7 +116,7 @@ const EMPRESAS: {
     site: "fasesistemas.com.br",
     dominioPropostas: "propostas.fasesistemas.com.br",
     prefixo: "FSE",
-    rodape: "Fase Sistemas · soluções modulares · de A a Z",
+    rodape: "Fase Sistemas (marca Kolp · CADDI Soluções Tecnológicas Ltda.) · Av. Paulista, 1471 — Conj. 511, Bela Vista, São Paulo/SP · (11) 92567-6137 · comercial@fasesistemas.com.br",
     tema: {
       primaria: "#0B1829",
       primaria2: "#185FA5",
