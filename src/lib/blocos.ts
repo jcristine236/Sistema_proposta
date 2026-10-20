@@ -222,7 +222,9 @@ export const BLOCOS: DefBloco[] = [
       { k: "planos", rotulo: "Planos", tipo: "lista", titulo: "nome", novo: { nome: "Plano", preco: "R$ 0,00", periodo: "/mês", itens: ["Item incluso"] },
         itens: [{ k: "nome", rotulo: "Nome", tipo: "texto" }, { k: "preco", rotulo: "Preço", tipo: "texto" }, { k: "periodo", rotulo: "Período", tipo: "texto" },
           { k: "descricao", rotulo: "Descrição", tipo: "textoLongo" }, { k: "itens", rotulo: "Itens inclusos", tipo: "listaTexto" },
-          { k: "destaque", rotulo: "Destacar", tipo: "bool" }, { k: "selo", rotulo: "Selo", tipo: "texto" }] },
+          { k: "destaque", rotulo: "Destacar", tipo: "bool" }, { k: "selo", rotulo: "Selo", tipo: "texto" },
+          { k: "ancora", rotulo: "Botão: rolar até a seção (id)", tipo: "texto", ajuda: "Opcional. Id de uma seção desta proposta, ex.: investimento." },
+          { k: "botao", rotulo: "Texto do botão", tipo: "texto" }] },
       { k: "nota", rotulo: "Nota", tipo: "texto" },
     ],
     padrao: () => ({ tipo: "planos", titulo: "Planos", planos: [

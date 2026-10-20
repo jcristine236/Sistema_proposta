@@ -4,6 +4,24 @@ Revisão feita antes da implantação na nuvem privada. A primeira parte descrev
 as proteções da aplicação; a segunda é o checklist da infraestrutura;
 a terceira lista os riscos conhecidos e aceitos.
 
+> **Reauditoria em 2026-10-20** (após os novos modelos, o bloco "Lista preenchível",
+> o botão de âncora nos planos e os ajustes do painel):
+> - **Sem SQL injection:** nenhuma consulta é montada à mão (zero `queryRaw`/`executeRaw`
+>   no código); todo acesso ao banco passa pelo Prisma, com parâmetros. Vale para o login,
+>   o aceite (`/api/propostas/[slug]/decisao`) e o resto da aplicação.
+> - **Sem HTML perigoso:** nenhum `dangerouslySetInnerHTML`/`innerHTML`/`eval`. Os textos
+>   e as listas preenchidas (escopo, materiais) são renderizados como texto escapado pelo React.
+> - **Âncora dos planos:** o link do botão é saneado para `#` + apenas letras, números e hífen
+>   (não aceita `javascript:` nem URL externa).
+> - **Cabeçalhos:** CSP com *nonce*, `X-Frame-Options: DENY`, `nosniff`, `Referrer-Policy`,
+>   `Permissions-Policy` e HSTS conferidos nas páginas públicas.
+> - **Aceite:** validação por *schema* (zod) com limites de tamanho, limite de 20 envios por IP
+>   a cada 10 min, e validação de CNPJ, e-mail e WhatsApp.
+> - **Mobile:** propostas validadas em telas de 360 px e 390 px (celular), sem rolagem
+>   horizontal; o formulário de aceite também é responsivo.
+> - **`npm audit`:** 5 alertas, todos em ferramentas usadas **só na compilação** (postcss dentro
+>   do Next 15 e `@prisma/config`/`deepmerge-ts`), sem contato com dados de usuário — ver item 3.
+
 ## 1. Proteções na aplicação
 
 ### Acesso e sessão
