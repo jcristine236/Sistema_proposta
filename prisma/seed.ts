@@ -24,6 +24,7 @@ import { modeloFaseAgro, PLANOS_AGRO } from "./modelos/fase-agro";
 import { modeloFaseClinicas, PLANOS_CLINICAS } from "./modelos/fase-clinicas";
 import { modeloFaseAgenda, PLANOS_AGENDA } from "./modelos/fase-agenda";
 import { modeloFaseX } from "./modelos/fase-x";
+import { modeloFaseBase } from "./modelos/fase-base";
 import { modeloPadrao } from "./modelos/padrao";
 import type { ModeloDef } from "./modelos/tipo";
 import { calcular } from "../src/lib/precificacao";
@@ -251,6 +252,7 @@ async function main() {
         await salvarModelo(empresa.id, seg.modelo);
       }
       await salvarModelo(empresa.id, modeloFaseX);
+      await salvarModelo(empresa.id, modeloFaseBase);
     } else {
       // Catálogos de planos (ex.: KOLP "Site por assinatura").
       for (const cat of CATALOGOS_POR_EMPRESA[e.slug] ?? []) {
