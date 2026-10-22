@@ -71,7 +71,6 @@ export const secoes: Secao[] = [
     id: "capa",
     tipo: "capa",
     capitulo: "Início",
-    eyebrow: "Proposta comercial · Servidor em nuvem",
     titulo: "Proposta\nComercial",
     tagline: "Mais de 11 anos de inovação e confiança",
     selos: [

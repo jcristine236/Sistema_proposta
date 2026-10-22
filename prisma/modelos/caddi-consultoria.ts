@@ -43,7 +43,6 @@ const secoes: Secao[] = [
     id: "capa",
     tipo: "capa",
     capitulo: "Início",
-    eyebrow: "Proposta comercial · Consultoria de TI dedicada",
     titulo: "Consultoria\nde TI dedicada",
     tagline: "Um profissional da CADDI acompanhando de perto a sua operação",
     selos: [

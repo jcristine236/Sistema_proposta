@@ -34,7 +34,6 @@ export const BLOCOS: DefBloco[] = [
     tipo: "capa", nome: "Capa", categoria: "Estrutura", icone: "home",
     descricao: "Abertura com logo, título, nome do cliente e selos.",
     campos: [
-      { k: "eyebrow", rotulo: "Linha acima do título", tipo: "texto" },
       { k: "titulo", rotulo: "Título (Enter quebra a linha)", tipo: "textoLongo" },
       { k: "tagline", rotulo: "Frase ao lado do logo", tipo: "texto" },
       {
@@ -46,7 +45,7 @@ export const BLOCOS: DefBloco[] = [
         ],
       },
     ],
-    padrao: () => ({ tipo: "capa", capitulo: "Início", eyebrow: "Proposta comercial", titulo: "Proposta\nComercial", selos: [{ icone: "calendar", texto: "Válida até {{validade}}", estilo: "validade" }] }),
+    padrao: () => ({ tipo: "capa", capitulo: "Início", titulo: "Proposta\nComercial", selos: [{ icone: "calendar", texto: "Válida até {{validade}}", estilo: "validade" }] }),
   },
   {
     tipo: "titulo", nome: "Título", categoria: "Estrutura", icone: "flag",

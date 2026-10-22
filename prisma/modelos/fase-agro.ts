@@ -50,7 +50,6 @@ const secoes: Secao[] = [
     id: "capa",
     tipo: "capa",
     capitulo: "Início",
-    eyebrow: "Proposta comercial · Fase Agro",
     titulo: "Fase Agro",
     tagline: "Gestão para produtor rural e agronegócio",
     selos: [

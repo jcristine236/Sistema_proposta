@@ -47,7 +47,6 @@ const secoes: Secao[] = [
     id: "capa",
     tipo: "capa",
     capitulo: "Início",
-    eyebrow: "Proposta comercial · Projeto sob medida",
     titulo: "Seu projeto,\nescopo fechado",
     tagline: "Software sob medida para **{{cliente}}**",
     selos: [

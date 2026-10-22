@@ -25,7 +25,6 @@ export type Efeito = "padrao" | "nenhum" | "subir" | "esquerda" | "direita" | "z
 
 export type SecaoCapa = SecaoBase & {
   tipo: "capa";
-  eyebrow: string;
   titulo: string; // aceita quebra de linha \n
   tagline?: string;
   selos: { icone: Icone; texto: string; estilo?: "destaque" | "validade" }[];

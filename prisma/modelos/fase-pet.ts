@@ -49,7 +49,6 @@ const secoes: Secao[] = [
     id: "capa",
     tipo: "capa",
     capitulo: "Início",
-    eyebrow: "Proposta comercial · Fase Pet",
     titulo: "Fase Pet",
     tagline: "Sistema para pet shops e clínicas veterinárias",
     selos: [

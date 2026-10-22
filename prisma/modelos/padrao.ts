@@ -33,7 +33,6 @@ export function modeloPadrao(empresa: { nome: string; site: string }): ModeloDef
     {
       id: "capa",
       tipo: "capa",
-      eyebrow: "Proposta comercial · {{projeto}}",
       titulo: "Proposta\nComercial",
       selos: [{ icone: "calendar", texto: "Válida até {{validade}}", estilo: "validade" }],
     },

@@ -65,7 +65,6 @@ const secoes: Secao[] = [
     id: "capa",
     tipo: "capa",
     capitulo: "Início",
-    eyebrow: "Proposta comercial · Fase X",
     titulo: "Fase X",
     tagline: "Automação de XMLs fiscais para escritórios contábeis",
     selos: [

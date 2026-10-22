@@ -49,7 +49,6 @@ const secoes: Secao[] = [
     id: "capa",
     tipo: "capa",
     capitulo: "Início",
-    eyebrow: "Proposta comercial · Fase Food",
     titulo: "Fase Food",
     tagline: "Sistema completo para restaurantes e delivery",
     selos: [

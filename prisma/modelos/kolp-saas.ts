@@ -59,7 +59,6 @@ const secoes: Secao[] = [
     id: "capa",
     tipo: "capa",
     capitulo: "Início",
-    eyebrow: "Proposta comercial · Plataforma SaaS",
     titulo: "Sua operação,\nem uma plataforma",
     tagline: "Tecnologia sob assinatura para **{{cliente}}**",
     selos: [

@@ -48,7 +48,6 @@ const secoes: Secao[] = [
     id: "capa",
     tipo: "capa",
     capitulo: "Início",
-    eyebrow: "Proposta comercial · Gestão e Suporte de TI",
     titulo: "Proposta\nComercial",
     tagline: "Mais de 11 anos de inovação e confiança",
     selos: [

@@ -56,7 +56,6 @@ const secoes: Secao[] = [
     id: "capa",
     tipo: "capa",
     capitulo: "Início",
-    eyebrow: "Proposta comercial · {{modulo}}",
     titulo: "{{modulo}}",
     tagline: "Uma solução Fase Sistemas para a sua operação",
     selos: [{ icone: "calendar", texto: "Válida até {{validade}}", estilo: "validade" }],

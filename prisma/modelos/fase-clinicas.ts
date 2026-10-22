@@ -51,7 +51,6 @@ const secoes: Secao[] = [
     id: "capa",
     tipo: "capa",
     capitulo: "Início",
-    eyebrow: "Proposta comercial · Fase Clínicas",
     titulo: "Fase Clínicas",
     tagline: "Sistema para clínicas médicas e consultórios",
     selos: [

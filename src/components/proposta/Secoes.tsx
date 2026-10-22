@@ -80,7 +80,6 @@ export function Capa({ s, ctx, logo }: P<S.SecaoCapa>) {
         {s.tagline && <span>{preencher(s.tagline, ctx)}</span>}
       </div>
       <div className="cover">
-        <div className="eyebrow">{preencher(s.eyebrow, ctx)}</div>
         <h1>
           {preencher(s.titulo, ctx).split("\n").map((l, i) => (
             <Fragment key={i}>{i > 0 && <br />}{l}</Fragment>

@@ -49,7 +49,6 @@ const secoes: Secao[] = [
     id: "capa",
     tipo: "capa",
     capitulo: "Início",
-    eyebrow: "Proposta comercial · Fase Agenda",
     titulo: "Fase Agenda",
     tagline: "Sistema para salões, barbearias e estúdios",
     selos: [
