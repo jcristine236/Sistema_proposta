@@ -28,6 +28,12 @@ services:
       MODO_HTTP: "true"
       SEED_ADMIN_EMAIL: admin@propostas.local
       SEED_ADMIN_PASSWORD: trocar-esta-senha
+      # D4Sign (opcional no teste): crie um arquivo .env na mesma pasta com
+      # D4SIGN_AMBIENTE=sandbox, D4SIGN_TOKEN_API=... etc. Vazio = desligado.
+      D4SIGN_AMBIENTE: ${D4SIGN_AMBIENTE:-sandbox}
+      D4SIGN_TOKEN_API: ${D4SIGN_TOKEN_API:-}
+      D4SIGN_CRYPT_KEY: ${D4SIGN_CRYPT_KEY:-}
+      D4SIGN_WEBHOOK_TOKEN: ${D4SIGN_WEBHOOK_TOKEN:-}
     depends_on:
       db: { condition: service_healthy }
     restart: "no"
