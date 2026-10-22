@@ -20,6 +20,7 @@ export default async function Empresa() {
   const { empresa } = s;
   const tema = temaDe(empresa.tema);
   const host = empresa.dominioPropostas;
+  const d4 = (empresa.d4sign ?? {}) as { cofre?: string; template?: string; signatarioNome?: string; signatarioEmail?: string; campos?: Record<string, string> };
   const podeEditar = s.permite("empresa", "editar");
   return (
     <>
@@ -56,6 +57,22 @@ export default async function Empresa() {
                 <div className="campo"><label>Logo para fundo escuro</label><InputImagem name="logoClaro" valorInicial={tema.logoClaro} fundo={tema.primaria} /></div>
               </div>
               <div className="ajuda" style={{ marginTop: -6, marginBottom: 14 }}>PNG/JPG/WebP com fundo transparente e sem margens. O tamanho é ajustado para todas as marcas ocuparem o mesmo espaço.</div>
+
+              <h2 style={{ marginTop: 10 }}>Contrato (D4Sign)</h2>
+              <div className="ajuda" style={{ marginTop: -6, marginBottom: 10 }}>Preencha para gerar o contrato na proposta aceita. As credenciais da conta (tokenAPI/cryptKey) ficam no servidor (.env).</div>
+              <div className="linha2">
+                <div className="campo"><label>UUID do cofre</label><input name="d4signCofre" defaultValue={d4.cofre ?? ""} placeholder="ex.: 00000000-0000-..." /></div>
+                <div className="campo"><label>UUID do modelo (template)</label><input name="d4signTemplate" defaultValue={d4.template ?? ""} placeholder="ex.: 11111111-1111-..." /></div>
+              </div>
+              <div className="linha2">
+                <div className="campo"><label>Signatário da empresa · nome</label><input name="d4signSignatarioNome" defaultValue={d4.signatarioNome ?? ""} placeholder="Quem assina pela empresa" /></div>
+                <div className="campo"><label>Signatário da empresa · e-mail</label><input name="d4signSignatarioEmail" type="email" defaultValue={d4.signatarioEmail ?? ""} placeholder="assinatura@empresa.com.br" /></div>
+              </div>
+              <div className="campo">
+                <label>Campos do modelo (opcional)</label>
+                <textarea name="d4signCampos" rows={5} defaultValue={Object.entries(d4.campos ?? {}).map(([k, v]) => `${k}: ${v}`).join("\n")} placeholder={"razaoSocial: razao_social\ncnpj: cnpj\nvalorMensal: mensalidade"} />
+                <div className="ajuda">Liga cada dado do sistema (razaoSocial, cnpj, nomeSocio, email, whatsapp, cliente, codigo, valorMensal, valorUnico, data) ao nome do campo no seu modelo do D4Sign. Um por linha: <b className="mono">nossoCampo: campoNoModelo</b>. Sem mapeamento, usamos o próprio nome.</div>
+              </div>
 
               <h2 style={{ marginTop: 10 }}>Motivos de recusa</h2>
               <div className="campo">

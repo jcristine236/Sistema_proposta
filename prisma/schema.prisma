@@ -29,6 +29,8 @@ model Empresa {
   emailNotificacao    String? // recebe avisos de abertura/aceite
   /// WhatsApp que recebe os avisos (somente números, com DDI: 5511999999999)
   whatsappNotificacao String?
+  /// Config do D4Sign: { cofre, template, signatarioNome, signatarioEmail, campos }
+  d4sign              Json?
   /// Motivos que o cliente pode escolher ao recusar
   motivosRecusa       Json     @default("[]")
   ativo               Boolean  @default(true)
@@ -242,6 +244,8 @@ model Proposta {
   comentarioDecisao   String?
   /// Dados enviados pelo cliente no aceite (razão social, CNPJ, sócio, e-mail, WhatsApp)
   dadosContratacao    Json?
+  /// Contrato no D4Sign: { uuid, status, enviadoEm, assinadoEm, signatarios }
+  contrato            Json?
   criadoEm            DateTime       @default(now())
   atualizadoEm        DateTime       @updatedAt
 

@@ -10,6 +10,8 @@ import type { Secao } from "@/lib/secoes";
 import { CopiarLink } from "@/components/admin/CopiarLink";
 import { BLOCO } from "@/lib/blocos";
 import { BotaoConfirmar } from "@/components/admin/Confirmar";
+import { BotaoContrato } from "@/components/admin/BotaoContrato";
+import { d4signPronto, d4signAmbiente, type D4SignConfig, type ContratoProposta } from "@/lib/d4sign";
 import { excluirProposta } from "../acoes";
 import { filtroPropostas } from "@/lib/auth";
 
@@ -22,6 +24,7 @@ export default async function DetalheProposta({ params }: { params: Promise<{ id
     include: {
       autor: { select: { nome: true } },
       modelo: { select: { id: true, nome: true, ativo: true } },
+      empresa: { select: { d4sign: true } },
       eventos: { orderBy: { criadoEm: "desc" } },
       visualizacoes: { orderBy: { iniciadaEm: "desc" }, include: { secoes: true } },
     },
@@ -38,6 +41,10 @@ export default async function DetalheProposta({ params }: { params: Promise<{ id
   const leitores = new Set(p.visualizacoes.map((v) => v.viewerId)).size;
   const comentarios = p.eventos.filter((e) => e.tipo === "COMENTARIO");
   const dc = p.dadosContratacao as { razaoSocial: string; cnpj: string; nomeSocio: string; email: string; whatsapp: string } | null;
+  const cfgD4 = (p.empresa.d4sign ?? null) as D4SignConfig | null;
+  const prontoD4 = d4signPronto(cfgD4);
+  const contrato = (p.contrato ?? null) as ContratoProposta | null;
+  const statusContrato: Record<string, string> = { ENVIADO: "Enviado para assinatura", ASSINADO: "Assinado", CANCELADO: "Cancelado" };
 
   return (
     <>
@@ -95,6 +102,28 @@ export default async function DetalheProposta({ params }: { params: Promise<{ id
             <div><small className="muted">WhatsApp</small><div>{dc.whatsapp}</div></div>
             <div><small className="muted">Enviado em</small><div>{dataHoraBR(p.decididaEm)}</div></div>
           </div>
+        </div>
+      )}
+
+      {dc && (
+        <div className="card" style={{ marginTop: 16 }}>
+          <h2>Contrato (D4Sign)</h2>
+          {contrato?.uuid ? (
+            <div className="grade g3">
+              <div><small className="muted">Status</small><div><b>{statusContrato[contrato.status] ?? contrato.status}</b></div></div>
+              <div><small className="muted">Enviado em</small><div>{dataHoraBR(contrato.enviadoEm)}</div></div>
+              {contrato.assinadoEm && <div><small className="muted">Assinado em</small><div>{dataHoraBR(contrato.assinadoEm)}</div></div>}
+              <div><small className="muted">Signatários</small><div>{(contrato.signatarios ?? []).join(", ")}</div></div>
+              <div><small className="muted">Documento</small><div className="mono">{contrato.uuid}</div></div>
+            </div>
+          ) : prontoD4 ? (
+            <>
+              <p className="muted" style={{ marginBottom: 12 }}>Cria o contrato no D4Sign ({d4signAmbiente()}) a partir do modelo da empresa, com os dados acima, e envia para assinatura do cliente e da empresa.</p>
+              {s.permite("propostas", "editar") ? <BotaoContrato id={p.id} /> : <div className="vazio">Você não tem permissão para gerar o contrato.</div>}
+            </>
+          ) : (
+            <div className="vazio">Para gerar o contrato por aqui, configure o D4Sign em <b>Empresa e marca</b> (cofre, modelo e signatário) e as credenciais no servidor.</div>
+          )}
         </div>
       )}
 

@@ -130,6 +130,24 @@ export async function salvarEmpresa(_: Estado, f: FormData): Promise<Estado> {
     const email = txt(f, "emailNotificacao", 160);
     if (email && !emailValido(email)) return { erro: "E-mail de avisos inválido." };
     const motivos = txt(f, "motivosRecusa", 3000).split("\n").map((m) => m.trim().slice(0, 100)).filter(Boolean).slice(0, 20);
+
+    // Config do D4Sign (assinatura de contrato)
+    const d4signEmail = txt(f, "d4signSignatarioEmail", 160);
+    if (d4signEmail && !emailValido(d4signEmail)) return { erro: "E-mail do signatário da empresa (D4Sign) inválido." };
+    const campos: Record<string, string> = {};
+    for (const linha of txt(f, "d4signCampos", 2000).split("\n")) {
+      const m = linha.match(/^\s*([\w.]+)\s*[:=]\s*(.+?)\s*$/);
+      if (m) campos[m[1]] = m[2].slice(0, 80);
+    }
+    const d4sign = {
+      cofre: txt(f, "d4signCofre", 80) || undefined,
+      template: txt(f, "d4signTemplate", 80) || undefined,
+      signatarioNome: txt(f, "d4signSignatarioNome", 120) || undefined,
+      signatarioEmail: d4signEmail || undefined,
+      ...(Object.keys(campos).length ? { campos } : {}),
+    };
+    const temD4 = d4sign.cofre || d4sign.template || d4sign.signatarioEmail || d4sign.signatarioNome;
+
     await db.empresa.update({
       where: { id: s.empresa.id },
       data: {
@@ -140,6 +158,7 @@ export async function salvarEmpresa(_: Estado, f: FormData): Promise<Estado> {
         whatsappNotificacao: txt(f, "whatsappNotificacao", 20).replace(/\D/g, "") || null,
         motivosRecusa: motivos as Prisma.InputJsonValue,
         tema: tema as Prisma.InputJsonValue,
+        d4sign: (temD4 ? d4sign : Prisma.JsonNull) as Prisma.InputJsonValue,
       },
     });
     await auditar({ usuarioId: s.usuario.id, empresaId: s.empresa.id, acao: "EDITAR", entidade: "Empresa", entidadeId: s.empresa.id, descricao: "marca e avisos" });

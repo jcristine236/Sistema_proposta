@@ -14,6 +14,7 @@ import type { Secao } from "@/lib/secoes";
 import { slugify } from "@/lib/formato";
 import { linkPublico } from "@/lib/links";
 import { proximoCodigo } from "@/lib/numeracao";
+import { gerarContrato, d4signPronto, type ContratoProposta, type D4SignConfig } from "@/lib/d4sign";
 
 const json = (v: unknown) => v as Prisma.InputJsonValue;
 type Retorno = { id: string; link: string; codigo: string } | { erros: string[] };
@@ -143,4 +144,37 @@ export async function excluirProposta(id: string) {
   await auditar({ usuarioId: s.usuario.id, empresaId: s.empresa.id, acao: "EXCLUIR", entidade: "Proposta", entidadeId: id, descricao: `${p.codigo} ${p.clienteNome}` });
   revalidatePath("/admin/propostas");
   redirect("/admin/propostas");
+}
+
+/** Gera o contrato no D4Sign a partir de uma proposta aceita (disparo manual). */
+export async function gerarContratoProposta(id: string): Promise<{ ok: true; status: string } | { erro: string }> {
+  let s;
+  try { s = await exigirAcao("propostas", "editar"); } catch (e) { if (e instanceof SemPermissao) return { erro: e.message }; throw e; }
+  const p = await db.proposta.findFirst({ where: { id, ...filtroPropostas(s) }, include: { empresa: true } });
+  if (!p) return { erro: "Proposta não encontrada." };
+  if (p.status !== "ACEITA") return { erro: "O contrato só pode ser gerado depois que o cliente aceitar a proposta." };
+  const cfg = (p.empresa.d4sign ?? null) as D4SignConfig | null;
+  if (!d4signPronto(cfg)) return { erro: "O D4Sign ainda não está configurado para esta empresa (veja Empresa e marca)." };
+  const jaTem = p.contrato as ContratoProposta | null;
+  if (jaTem?.uuid && jaTem.status !== "CANCELADO") return { erro: "Esta proposta já tem contrato no D4Sign." };
+
+  try {
+    const contrato = await gerarContrato(
+      { nome: p.empresa.nome, d4sign: cfg },
+      {
+        codigo: p.codigo,
+        titulo: p.titulo,
+        clienteNome: p.clienteNome,
+        valorMensal: p.valorMensal ? Number(p.valorMensal) : null,
+        valorUnico: p.valorUnico ? Number(p.valorUnico) : null,
+        dadosContratacao: (p.dadosContratacao ?? null) as { razaoSocial?: string; cnpj?: string; nomeSocio?: string; email?: string; whatsapp?: string } | null,
+      },
+    );
+    await db.proposta.update({ where: { id }, data: { contrato: json(contrato), eventos: { create: { tipo: "CONTRATO_ENVIADO", dados: json({ nome: s.usuario.nome, uuid: contrato.uuid }) } } } });
+    await auditar({ usuarioId: s.usuario.id, empresaId: s.empresa.id, acao: "CONTRATO", entidade: "Proposta", entidadeId: id, descricao: `${p.codigo} → D4Sign ${contrato.uuid}` });
+    revalidatePath(`/admin/propostas/${id}`);
+    return { ok: true, status: contrato.status };
+  } catch (e) {
+    return { erro: e instanceof Error ? e.message : "Falha ao gerar o contrato no D4Sign." };
+  }
 }
