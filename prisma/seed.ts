@@ -221,7 +221,8 @@ async function main() {
         const cont = await db.contadorProposta.upsert({
           where: { empresaId_ano: { empresaId: empresa.id, ano } },
           update: { ultimo: { increment: 1 } },
-          create: { empresaId: empresa.id, ano, ultimo: 1 },
+          // Numeração começa em 1001 (ver PRIMEIRO_NUMERO em src/lib/numeracao.ts).
+          create: { empresaId: empresa.id, ano, ultimo: 1001 },
         });
         const proposta = await db.proposta.create({
           data: {
