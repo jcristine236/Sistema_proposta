@@ -54,18 +54,6 @@ if(hp&&!matchMedia('(prefers-reduced-motion: reduce)').matches){
   });
 })();
 
-/* Lista de serviços: painel de foto fixo ao lado troca conforme o serviço em foco */
-(function(){
-  var box=document.querySelector('[data-preview]');if(!box)return;
-  var links=box.querySelectorAll('a[data-i]'),imgs=box.querySelectorAll('.sr-frame img'),
-      capN=box.querySelector('.sr-cap-n'),capT=box.querySelector('.sr-cap-t'),cur=0,total=links.length;
-  function set(i){if(i===cur)return;cur=i;
-    for(var j=0;j<total;j++){links[j].classList.toggle('active',j===i);imgs[j].classList.toggle('on',j===i);}
-    capN.textContent=(i<9?'0':'')+(i+1)+' / '+(total<10?'0':'')+total;
-    capT.textContent=links[i].querySelector('.sr-t').textContent;}
-  function pick(e){var a=e.target.closest('a[data-i]');if(a)set(+a.dataset.i);}
-  box.addEventListener('mouseover',pick);box.addEventListener('focusin',pick);
-})();
 /* Fotos: uma "cortina" na cor da marca recolhe quando a foto aparece na tela */
 (function(){
   var ph=document.querySelectorAll('.photo.has-img');if(!ph.length||!('IntersectionObserver' in window))return;
