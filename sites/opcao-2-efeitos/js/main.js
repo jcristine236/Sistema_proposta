@@ -3,10 +3,6 @@
 var reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 document.querySelectorAll('[data-year]').forEach(function(e){e.textContent=new Date().getFullYear();});
 
-// loader
-window.addEventListener('load',function(){setTimeout(function(){document.body.classList.add('loaded');},reduce?0:650);});
-setTimeout(function(){document.body.classList.add('loaded');},2500);
-
 // menu mobile
 var t=document.querySelector('.nav-toggle'),n=document.querySelector('.nav');
 t&&t.addEventListener('click',function(){var o=document.body.classList.toggle('menu-open');t.setAttribute('aria-expanded',o);});

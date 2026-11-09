@@ -32,13 +32,6 @@ tabs.forEach(function(b,i){b.addEventListener('click',function(){sel(b.getAttrib
   b.addEventListener('keydown',function(e){var k=e.key==='ArrowRight'||e.key==='ArrowDown'?1:e.key==='ArrowLeft'||e.key==='ArrowUp'?-1:0;if(k){e.preventDefault();sel(tabs[(i+k+tabs.length)%tabs.length].getAttribute('aria-controls'),true);}});});
 if(tabs.length&&location.hash){var id=location.hash.slice(1);if(document.getElementById('t-'+id)){sel(id);setTimeout(function(){document.querySelector('.tabs').scrollIntoView({block:'start'});},50);}}
 
-// leve movimento do bento ao mover o mouse
-var bento=document.querySelector('.bento');
-if(bento&&!reduce&&matchMedia('(hover:hover)').matches){
-  bento.addEventListener('mousemove',function(e){var r=bento.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;
-    bento.querySelectorAll('.b').forEach(function(b,i){var f=(i%2?6:-6);b.style.translate=(x*f)+'px '+(y*f)+'px';});});
-  bento.addEventListener('mouseleave',function(){bento.querySelectorAll('.b').forEach(function(b){b.style.translate='';});});
-}
 })();
 
 /* Formulário de orçamento: monta a mensagem e abre o WhatsApp da Refrimaia.
