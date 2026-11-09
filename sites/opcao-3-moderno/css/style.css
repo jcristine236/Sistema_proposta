@@ -243,3 +243,8 @@ a.cl:hover{background:rgba(255,255,255,.12)}
   .logo img{height:38px}
   .clients span{font-size:1.3rem}
 }
+
+/* fotos reais/ilustrativas: troque os arquivos em img/fotos mantendo o nome */
+.photo.has-img{padding:0;background:#0b3a63}
+.photo.has-img::before{display:none}
+.photo.has-img img{position:relative;width:100%;height:100%;object-fit:cover;display:block}

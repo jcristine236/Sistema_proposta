@@ -16,15 +16,14 @@ Abra o `index.html` de qualquer pasta no navegador.
 ## Como editar
 - **Cores:** variáveis no topo de `css/style.css` (`:root`).
 - **Textos:** direto nos arquivos `.html` de cada pasta.
-- **Fotos:** os blocos com "Foto: …" são espaços reservados (`<div class="photo">`). Coloque a imagem em `img/` e troque o bloco por
-  `<img src="img/nome-da-foto.jpg" alt="descrição" style="width:100%;height:100%;object-fit:cover;border-radius:inherit">`.
+- **Fotos:** as imagens em `img/fotos/` são **ilustrativas, geradas por IA** (Canva). Para trocar por fotos reais, basta substituir o arquivo mantendo o mesmo nome (ex.: `img/fotos/chiller.jpg`). Cada opção tem sua própria cópia.
 - **Formulário:** hoje envia pelo WhatsApp (sem servidor). Para receber por e-mail, troque a função no fim de `js/main.js` por um envio para PHP/Formspree etc.
 
 ## Pontos para confirmar com a cliente
 1. **Nomes de clientes** (Cargill, Ball, Rossetti, Italbronze, Bauducco, Arteb): o formulário não deixa claro se há autorização para citá-los. Se não houver, remova ou troque por segmentos.
 2. **Endereço:** a ficha pede para exibir "SP". Usamos "Rua Francisco Aires, 299 – Macedo · Grande São Paulo – SP". O mapa aponta para o endereço real em Guarulhos.
 3. **"26 anos de experiência"** foi atribuído ao responsável técnico (a empresa foi fundada em 2019).
-4. **Fotos reais:** equipamentos, equipe em campo, frota, sede e foto do Eng. Dalmo.
+4. **Fotos reais:** as atuais são ilustrativas (IA). A da seção do Eng. Dalmo mostra um engenheiro de costas e deve ser trocada pela foto real dele.
 5. Logo em **PNG/SVG em alta resolução**. O atual (`img/logo.png`) foi ampliado de um arquivo pequeno e teve o fundo removido.
 
 ## Referências de mercado (pesquisa)

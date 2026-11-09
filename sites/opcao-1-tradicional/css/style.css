@@ -210,3 +210,9 @@ a.info-card:hover{border-color:var(--cyan);box-shadow:var(--shadow)}
   .form{padding:1.5rem}
   .stat strong{font-size:1.9rem;white-space:nowrap}
 }
+
+/* fotos reais/ilustrativas: troque os arquivos em img/fotos mantendo o nome */
+.photo.has-img{padding:0;background:#0b3a63}
+.photo.has-img::before{display:none}
+.photo.has-img img{position:relative;width:100%;height:100%;object-fit:cover;display:block}
+.page-hero{background:linear-gradient(90deg,rgba(8,42,73,.95) 35%,rgba(11,58,99,.75)),url(../img/fotos/equipe.jpg) center/cover no-repeat}
