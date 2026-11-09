@@ -6,7 +6,7 @@ Cada pasta é um **projeto independente** (HTML + CSS + JS puros, sem build). Po
 |---|---|---|
 | `opcao-1-tradicional/` | Tradicional, claro, corporativo | Barra superior com contatos, topo com foto de fundo, cards de serviços, faixa de números, PMOC em destaque, setores, marcas. Animação discreta de entrada. |
 | `opcao-2-efeitos/` | Escuro, tecnológico, com mais efeitos | Partículas de "ar frio" que reagem ao mouse, palavra rotativa no título, títulos revelados palavra a palavra, contadores animados, cards com inclinação 3D e brilho, botões magnéticos, parallax, marquee de clientes/marcas, linha do tempo que se desenha ao rolar, barra de progresso de leitura. |
-| `opcao-3-moderno/` | Claro, minimalista, moderno | Menu flutuante em pílula, grade *bento* no hero, carrossel horizontal arrastável de serviços, serviços em abas, formulário com seleção de tipo de cliente, rodapé arredondado, revelação com desfoque. |
+| `opcao-3-moderno/` | Claro, minimalista, moderno | Menu flutuante em pílula, topo com foto larga e números, carrossel horizontal arrastável de serviços, serviços em abas, formulário com seleção de tipo de cliente, rodapé arredondado, revelação com desfoque. |
 
 Todas têm: **Home, Sobre, Serviços, Contato**, botão flutuante de WhatsApp, formulário de orçamento (abre o WhatsApp com a mensagem pronta), mapa, FAQ, SEO básico (títulos, descrições e schema `HVACBusiness`) e layout responsivo. Também respeitam a configuração do sistema que reduz animações.
 
