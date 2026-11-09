@@ -1,0 +1,15 @@
+{
+  "name": "refrimaia-sites-build",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Gera as versões de produção (minificadas) das 3 opções de site da Refrimaia para hospedagem na HostGator.",
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs"
+  },
+  "devDependencies": {
+    "clean-css": "5.3.3",
+    "html-minifier-terser": "7.2.0",
+    "terser": "5.36.0"
+  }
+}

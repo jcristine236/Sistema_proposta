@@ -36,3 +36,17 @@ Concorrentes e referências do setor em SP (Refrisat em Guarulhos, Tempoar, Home
 serviços técnicos em destaque (chiller, PMOC, retrofit), prova de responsabilidade técnica (CREA/ART), atendimento emergencial e contato rápido por WhatsApp.
 A maioria tem sites simples ou aparece só em diretórios. Por isso, um site com posicionamento técnico, PMOC em destaque e foco em indústria é um diferencial claro para a Refrimaia.
 O site de referência indicado pela cliente (afriotherm.com.br) não abriu durante a pesquisa.
+
+## Publicação (HostGator)
+Os arquivos de produção são gerados pela pasta `build/`:
+
+```
+cd build
+npm install
+npm run build
+```
+
+Saída: `build/dist/<opção>/` (HTML, CSS e JS minificados, com `.htaccess`, `robots.txt` e `sitemap.xml`) e `build/zips/refrimaia-<opção>.zip`.
+Para outro domínio, gere com `SITE_URL=https://seudominio.com.br npm run build`.
+
+No cPanel da HostGator: Gerenciador de Arquivos, pasta `public_html`, botão Carregar, envie o .zip da opção escolhida, clique com o botão direito e escolha Extrair. Os arquivos ficam direto na pasta, sem subpasta.
