@@ -1,4 +1,4 @@
-/* REFRIMAIA – Opção 2 · Efeitos */
+/* REFRIMAIA: Opção 2 · Efeitos */
 (function(){
 var reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 document.querySelectorAll('[data-year]').forEach(function(e){e.textContent=new Date().getFullYear();});
@@ -83,7 +83,7 @@ document.querySelectorAll('canvas.air').forEach(function(cv){
   var f=document.querySelector('[data-orcamento]'); if(!f) return;
   f.addEventListener('submit',function(e){
     e.preventDefault();
-    var d=new FormData(f), linhas=['*Solicitação de orçamento – site*'];
+    var d=new FormData(f), linhas=['*Solicitação de orçamento: site*'];
     d.forEach(function(v,k){ if(String(v).trim()) linhas.push('*'+k+':* '+v); });
     var ok=f.querySelector('.form-ok'); if(ok){ok.hidden=false;}
     window.open('https://wa.me/5511940054773?text='+encodeURIComponent(linhas.join('\n')),'_blank');

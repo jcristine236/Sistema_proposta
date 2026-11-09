@@ -1,5 +1,5 @@
 /* ==========================================================
-   REFRIMAIA – Opção 1 · Tradicional
+   REFRIMAIA: Opção 1 · Tradicional
    Cores da marca: ajuste aqui para refletir em todo o site
    ========================================================== */
 :root{
@@ -64,7 +64,7 @@ p+p{margin-top:1rem}
 .hero-checks{list-style:none;display:flex;gap:1.5rem;flex-wrap:wrap;font-size:.92rem;color:#d6e4f0}
 .hero-checks li{display:flex;align-items:center;gap:.4rem}.hero-checks .ic{color:var(--cyan)}
 
-/* placeholder de foto – substitua por <img src="img/..."> */
+/* placeholder de foto: substitua por <img src="img/..."> */
 .photo{position:relative;aspect-ratio:4/3;border-radius:var(--radius);overflow:hidden;background:linear-gradient(135deg,#1a5582,#0b3a63);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.8rem;color:rgba(255,255,255,.75);text-align:center;padding:1rem;font-size:.85rem}
 .photo.tall{aspect-ratio:4/4.3}.photo.portrait{aspect-ratio:3/4}
 .photo-ic{width:72px;height:72px;stroke-width:1.1;color:var(--cyan);position:relative}
@@ -158,7 +158,7 @@ a.info-card:hover{border-color:var(--cyan);box-shadow:var(--shadow)}
 .faq-item{border-bottom:1px solid var(--line);padding:1.2rem 0}
 .faq-item summary{font-family:var(--ff-h);font-weight:600;color:var(--navy);cursor:pointer;list-style:none;display:flex;justify-content:space-between}
 .faq-item summary::after{content:"+";color:var(--cyan-d);font-size:1.4rem;line-height:1}
-.faq-item[open] summary::after{content:"–"}
+.faq-item[open] summary::after{content:"-"}
 .faq-item p{margin-top:.7rem;color:var(--muted)}
 
 /* rodapé */

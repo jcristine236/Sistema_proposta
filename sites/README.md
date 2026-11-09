@@ -1,4 +1,4 @@
-# Refrimaia – 3 opções de site institucional
+# Refrimaia, 3 opções de site institucional
 
 Cada pasta é um **projeto independente** (HTML + CSS + JS puros, sem build). Pode editar, copiar ou publicar uma sem afetar as outras.
 
@@ -26,7 +26,7 @@ A visualização online bloqueia mapas incorporados, então usamos o bloco "Como
 
 ## Pontos para confirmar com a cliente
 1. **Nomes de clientes** (Cargill, Ball, Rossetti, Italbronze, Bauducco, Arteb): o formulário não deixa claro se há autorização para citá-los. Se não houver, remova ou troque por segmentos.
-2. **Endereço:** a ficha pede para exibir "SP". Usamos "Rua Francisco Aires, 299 – Macedo · Grande São Paulo – SP". O mapa aponta para o endereço real em Guarulhos.
+2. **Endereço:** a ficha pede para exibir "SP". Usamos "Rua Francisco Aires, 299, Macedo · Grande São Paulo, SP". O mapa aponta para o endereço real em Guarulhos.
 3. **Responsável técnico:** a pedido da cliente, o nome do engenheiro foi removido. O site cita apenas "responsável técnico registrado no CREA". O número "26 anos" saiu e deu lugar a "12 veículos na frota própria".
 4. **Fotos reais:** as atuais são ilustrativas (IA). A da seção de segurança mostra um engenheiro de costas, sem rosto identificável.
 5. Logo em **PNG/SVG em alta resolução**. O atual (`img/logo.png`) foi ampliado de um arquivo pequeno e teve o fundo removido.
