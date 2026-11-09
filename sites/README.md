@@ -10,7 +10,7 @@ Cada pasta é um **projeto independente** (HTML + CSS + JS puros, sem build). Po
 
 Todas têm: **Home, Sobre, Serviços, Contato**, botão flutuante de WhatsApp, formulário de orçamento (abre o WhatsApp com a mensagem pronta), mapa, FAQ, SEO básico (títulos, descrições e schema `HVACBusiness`) e layout responsivo. Também respeitam a configuração do sistema que reduz animações.
 
-**Detalhes exclusivos:** etiquetas de seção em fonte técnica (mono), lista de serviços numerada com prévia de foto que acompanha o cursor (opções 1 e 2), fotos que entram com efeito de cortina, legenda técnica "água gelada 7 °C" no topo, termômetro que "resfria" de 32 °C até o setpoint de 7 °C conforme a rolagem (opção 2) e cards que revelam a foto do serviço ao passar o mouse (opção 3).
+**Detalhes exclusivos:** etiquetas de seção em fonte técnica (mono), lista de serviços numerada com painel de foto fixo ao lado que troca conforme o serviço sob o mouse (opções 1 e 2), fotos reveladas por uma cortina na cor da marca, legenda técnica "água gelada 7 °C" no topo, mostrador de temperatura no cabeçalho que "resfria" de 32 °C até o setpoint de 7 °C conforme a rolagem (opção 2) e cards que revelam a foto do serviço ao passar o mouse (opção 3).
 
 ## Como visualizar
 Abra o `index.html` de qualquer pasta no navegador.

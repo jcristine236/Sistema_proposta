@@ -12,7 +12,7 @@ var h=document.querySelector('.header'),pb=document.querySelector('.progress'),p
 var th=document.querySelector('.thermo'),tv=th&&th.querySelector('.thermo-v'),tb=th&&th.querySelector('.thermo-bar b');
 function onScroll(){var y=window.scrollY,max=document.documentElement.scrollHeight-innerHeight;
   h.classList.toggle('scrolled',y>30);var pr=max>0?y/max:0;pb.style.transform='scaleX('+pr+')';
-  if(tv){tv.textContent=(32-25*pr).toFixed(1);tb.style.transform='scaleY('+(1-pr*.78)+')';th.classList.toggle('cold',pr>.6);}
+  if(tv){tv.textContent=(32-25*pr).toFixed(1);tb.style.transform='scaleX('+(1-pr*.78)+')';th.classList.toggle('cold',pr>.6);}
   if(!reduce)px.forEach(function(el){var r=el.getBoundingClientRect(),c=r.top+r.height/2-innerHeight/2;var v=Math.max(-60,Math.min(60,-c*parseFloat(el.dataset.speed||.1)));el.style.transform='translateY('+v+'px)';});
   var tl=document.querySelector('.timeline');if(tl){var r=tl.getBoundingClientRect(),p=Math.min(1,Math.max(0,(innerHeight*.6-r.top)/r.height));tl.querySelector('.tl-line i').style.transform='scaleY('+p+')';}
 }
@@ -90,22 +90,22 @@ document.querySelectorAll('canvas.air').forEach(function(cv){
   });
 })();
 
-/* Prévia de foto que acompanha o cursor na lista de serviços */
+/* Lista de serviços: painel de foto fixo ao lado troca conforme o serviço em foco */
 (function(){
-  var box=document.querySelector('[data-preview]');
-  if(!box||!matchMedia('(hover:hover) and (pointer:fine)').matches)return;
-  var img=box.querySelector('.sr-prev'),x=0,y=0,cx=0,cy=0,raf=0;
-  box.addEventListener('mouseover',function(e){var a=e.target.closest('a[data-img]');if(!a)return;
-    if(img.getAttribute('src')!==a.dataset.img)img.src=a.dataset.img;box.classList.add('show');});
-  box.addEventListener('mouseleave',function(){box.classList.remove('show');});
-  box.addEventListener('mousemove',function(e){x=e.clientX;y=e.clientY;if(!raf)raf=requestAnimationFrame(loop);});
-  function loop(){cx+=(x-cx)*.16;cy+=(y-cy)*.16;img.style.transform='translate3d('+(cx+28)+'px,'+(cy-110)+'px,0) rotate('+((x-cx)*.04)+'deg)';
-    raf=(Math.abs(x-cx)+Math.abs(y-cy)>.4)?requestAnimationFrame(loop):0;}
+  var box=document.querySelector('[data-preview]');if(!box)return;
+  var links=box.querySelectorAll('a[data-i]'),imgs=box.querySelectorAll('.sr-frame img'),
+      capN=box.querySelector('.sr-cap-n'),capT=box.querySelector('.sr-cap-t'),cur=0,total=links.length;
+  function set(i){if(i===cur)return;cur=i;
+    for(var j=0;j<total;j++){links[j].classList.toggle('active',j===i);imgs[j].classList.toggle('on',j===i);}
+    capN.textContent=(i<9?'0':'')+(i+1)+' / '+(total<10?'0':'')+total;
+    capT.textContent=links[i].querySelector('.sr-t').textContent;}
+  function pick(e){var a=e.target.closest('a[data-i]');if(a)set(+a.dataset.i);}
+  box.addEventListener('mouseover',pick);box.addEventListener('focusin',pick);
 })();
-/* Fotos entram com uma "cortina" ao aparecer na tela */
+/* Fotos: uma "cortina" na cor da marca recolhe quando a foto aparece na tela */
 (function(){
   var ph=document.querySelectorAll('.photo.has-img');if(!ph.length||!('IntersectionObserver' in window))return;
   document.documentElement.classList.add('js-photos');
-  var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('shown');io.unobserve(e.target);}});},{threshold:.2});
+  var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('shown');io.unobserve(e.target);}});},{threshold:.15});
   ph.forEach(function(p){io.observe(p);});
 })();
