@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Catálogo de modelos de sites — KOLP</title>
+<meta name="description" content="Escolha um modelo de site ou landing page por nicho, estilo e objetivo. A KOLP monta com as cores e o conteúdo da sua marca.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/catalogo.css">
+</head>
+<body>
+
+<header class="topo">
+  <div class="largura">
+    <a class="marca" href="./">KOLP<span>modelos</span></a>
+    <a class="topo-contato" id="falar" href="#">Falar com a KOLP</a>
+  </div>
+</header>
+
+<section class="intro">
+  <div class="largura intro-grade">
+    <h1>Escolha o modelo. <mark>A gente monta</mark> com as cores e o conteúdo da sua marca.</h1>
+    <ol>
+      <li><b>Filtre</b> por nicho, estilo ou objetivo.</li>
+      <li><b>Abra a demonstração</b> e teste as suas cores.</li>
+      <li><b>Envie o código</b> do modelo pelo WhatsApp.</li>
+    </ol>
+  </div>
+</section>
+
+<main class="largura catalogo">
+  <aside class="filtros" id="filtros" aria-label="Filtros">
+    <div class="filtros-topo">
+      <h2>Filtros</h2>
+      <button type="button" class="limpar" id="limpar" hidden>Limpar tudo</button>
+      <button type="button" class="fechar" id="fechar" aria-label="Fechar filtros">×</button>
+    </div>
+    <div id="grupos"></div>
+    <button type="button" class="aplicar" id="aplicar">Ver modelos</button>
+  </aside>
+
+  <div class="resultado">
+    <div class="barra">
+      <label class="busca">
+        <span class="oculto">Buscar</span>
+        <input type="search" id="busca" placeholder="Buscar por nome, nicho ou código">
+      </label>
+      <button type="button" class="abrir-filtros" id="abrir">Filtros<span id="qtd-filtros"></span></button>
+      <label class="ordem">
+        <span>Ordenar</span>
+        <select id="ordem">
+          <option value="codigo">Código</option>
+          <option value="recentes">Mais recentes</option>
+          <option value="nome">Nome</option>
+          <option value="nicho">Nicho</option>
+        </select>
+      </label>
+    </div>
+    <div class="status">
+      <p id="contagem" aria-live="polite"></p>
+      <ul class="ativos" id="ativos"></ul>
+    </div>
+    <ul class="grade" id="grade"></ul>
+    <div class="vazio" id="vazio" hidden>
+      <p><b>Nenhum modelo com essa combinação.</b></p>
+      <p>Remova algum filtro ou peça um modelo sob medida para o seu nicho.</p>
+      <button type="button" id="limpar2">Limpar filtros</button>
+    </div>
+  </div>
+</main>
+
+<footer class="pe">
+  <div class="largura">
+    <p>Os nomes, textos e fotos das demonstrações são fictícios e servem apenas de exemplo. No seu site entram a sua marca, os seus textos e as suas imagens.</p>
+    <p>© KOLP</p>
+  </div>
+</footer>
+
+<script src="dados/modelos.js"></script>
+<script src="assets/catalogo.js"></script>
+</body>
+</html>
