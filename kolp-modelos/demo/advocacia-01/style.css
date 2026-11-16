@@ -1,4 +1,5 @@
-/* KOLP-001 · Advocacia tradicional
+/* KOLP-001 · Advocacia · layout Clássico */
+/* Advocacia tradicional
    Para adaptar ao cliente, troque apenas as cores abaixo. */
 :root {
   --cor-primaria: #1f3a34;
@@ -59,7 +60,7 @@ h1 { font-size: clamp(2.5rem, 4.6vw, 3.9rem); font-weight: 500; }
 .numeros-grade { display: grid; grid-template-columns: repeat(3, auto) 1.6fr; gap: 56px; align-items: center; }
 .numeros strong { display: block; font: 500 3.4rem/1 var(--titulo); }
 .numeros span { display: block; margin-top: 8px; font-size: 14px; opacity: .8; max-width: 11em; }
-.numeros blockquote { margin: 0; padding-left: 40px; border-left: 1px solid color-mix(in srgb, var(--cor-sobre-primaria) 30%, transparent); font: italic 500 1.55rem/1.35 var(--titulo); }
+.numeros blockquote { margin: 0; max-width: 22em; padding-left: 40px; border-left: 1px solid color-mix(in srgb, var(--cor-sobre-primaria) 30%, transparent); font: italic 500 1.55rem/1.35 var(--titulo); }
 .numeros cite { display: block; margin-top: 12px; font: normal 400 13px var(--corpo); letter-spacing: .08em; opacity: .75; }
 
 /* Áreas */

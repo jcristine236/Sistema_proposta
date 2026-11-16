@@ -23,7 +23,7 @@
   <div class="largura intro-grade">
     <h1>Escolha o modelo. <mark>A gente monta</mark> com as cores e o conteúdo da sua marca.</h1>
     <ol>
-      <li><b>Filtre</b> por nicho, estilo ou objetivo.</li>
+      <li><b>Filtre</b> por nicho, layout, estilo ou cor.</li>
       <li><b>Abra a demonstração</b> e teste as suas cores.</li>
       <li><b>Envie o código</b> do modelo pelo WhatsApp.</li>
     </ol>
@@ -52,9 +52,8 @@
         <span>Ordenar</span>
         <select id="ordem">
           <option value="codigo">Código</option>
-          <option value="recentes">Mais recentes</option>
           <option value="nome">Nome</option>
-          <option value="nicho">Nicho</option>
+          <option value="layout">Layout</option>
         </select>
       </label>
     </div>
@@ -63,6 +62,7 @@
       <ul class="ativos" id="ativos"></ul>
     </div>
     <ul class="grade" id="grade"></ul>
+    <button type="button" class="mais" id="mais" hidden>Mostrar mais modelos</button>
     <div class="vazio" id="vazio" hidden>
       <p><b>Nenhum modelo com essa combinação.</b></p>
       <p>Remova algum filtro ou peça um modelo sob medida para o seu nicho.</p>
@@ -78,6 +78,7 @@
   </div>
 </footer>
 
+<script src="dados/config.js"></script>
 <script src="dados/modelos.js"></script>
 <script src="assets/catalogo.js"></script>
 </body>

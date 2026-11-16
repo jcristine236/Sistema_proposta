@@ -3,50 +3,69 @@
 Vitrine de modelos de sites e landing pages, feita para ficar em `kolp.com.br/modelos`.
 É tudo estático (HTML, CSS e JS): não precisa de banco de dados nem de instalação.
 
+Hoje são **130 modelos**: 13 nichos, cada um em 10 layouts diferentes, com 4 paletas prontas por modelo.
+
 ## Estrutura
 
 | Caminho | O que é |
 |---|---|
 | `index.html` | Página do catálogo, com busca e filtros |
-| `dados/modelos.js` | Lista de modelos, opções de filtro, WhatsApp da KOLP |
+| `dados/config.js` | WhatsApp e mensagem padrão da KOLP (**edite aqui**) |
+| `dados/modelos.js` | Lista de modelos e filtros (arquivo gerado, não edite à mão) |
 | `assets/` | Estilo e script do catálogo, e a barra de demonstração (`demo.js`) |
-| `demo/<pasta>/` | Um modelo por pasta: `index.html`, `style.css` e `img/` |
-| `miniaturas/` | Imagens dos cartões do catálogo (geradas automaticamente) |
-| `ferramentas/miniaturas.js` | Gera as miniaturas |
+| `demo/<nicho>-NN/` | Um modelo por pasta: `index.html` e `style.css` (gerados) |
+| `fotos/` | Fotos de exemplo por nicho e retratos, compartilhadas entre os modelos |
+| `miniaturas/` | Imagens dos cartões do catálogo (geradas) |
+| `ferramentas/familias/` | Os 10 layouts: um `.js` (estrutura) e um `.css` (visual) para cada |
+| `ferramentas/conteudo/` | Textos de exemplo de cada nicho |
+| `ferramentas/gerar.js` | Monta todos os modelos a partir dos layouts e dos conteúdos |
+| `ferramentas/miniaturas.js` | Fotografa os modelos para o catálogo |
 
 ## Antes de publicar
 
-Em `dados/modelos.js`, troque `whatsapp` pelo número da KOLP (DDI + DDD + número, só dígitos).
+Em `dados/config.js`, troque `whatsapp` pelo número da KOLP (DDI + DDD + número, só dígitos).
 
 ## Publicar na HostGator
 
-Envie **o conteúdo desta pasta** para `public_html/modelos/` pelo Gerenciador de Arquivos do cPanel ou por FTP,
-incluindo o arquivo `.htaccess`. O catálogo abre em `kolp.com.br/modelos`.
+Envie para `public_html/modelos/`, pelo Gerenciador de Arquivos do cPanel ou por FTP:
+`index.html`, `.htaccess`, `assets/`, `dados/`, `demo/`, `fotos/` e `miniaturas/`.
+A pasta `ferramentas/` não precisa ir. O catálogo abre em `kolp.com.br/modelos`.
 
-## Adicionar um modelo
+## Alterar ou ampliar o catálogo
 
-1. Copie uma pasta de `demo/` e renomeie (ex.: `imobiliaria-01`).
-2. Edite o `index.html` e o `style.css`. As cores ficam no bloco `:root`, no topo do CSS, sempre com os mesmos nomes
-   (`--cor-primaria`, `--cor-destaque`, `--cor-fundo`, `--cor-superficie`, `--cor-texto`).
-3. Acrescente o modelo em `dados/modelos.js`, com código, nicho, tipo, estilo e de três a quatro paletas.
-4. Gere a miniatura: `node ferramentas/miniaturas.js imobiliaria-01`.
+Depois de qualquer alteração abaixo, rode na raiz do projeto:
 
-Um nicho novo aparece nos filtros sozinho. Para fixar a ordem, inclua-o em `KOLP_FILTROS`.
+```bash
+node ferramentas/gerar.js
+```
+
+```bash
+node ferramentas/miniaturas.js
+```
+
+- **Novo nicho:** copie um arquivo de `ferramentas/conteudo/`, troque os textos, crie `fotos/<nicho>/` com cinco ou mais fotos
+  (`1.jpg`, `2.jpg`…, 1400 × 930) e inclua o nome na lista `NICHOS` de `gerar.js`. Isso cria 10 modelos de uma vez.
+- **Novo layout:** crie um par `.js` + `.css` em `ferramentas/familias/` e inclua o nome na lista `FAMILIAS`. Isso cria um modelo novo em cada nicho.
+- **Nova paleta:** acrescente em `paletas`, no `.js` do layout.
+- **Texto de um nicho:** edite o arquivo em `ferramentas/conteudo/`.
+
+As miniaturas exigem Node e Playwright (`npm i -D playwright` e `npx playwright install chromium`).
 
 ## Entregar um modelo a um cliente
 
-1. Copie a pasta do modelo.
+1. Copie a pasta do modelo em `demo/` e as fotos que ele usa em `fotos/`.
 2. No `:root` do `style.css`, coloque as cores do cliente (use a barra de demonstração para testar antes).
 3. Troque textos, fotos e o número em `data-whatsapp` e nos links `wa.me`.
-4. Apague as duas linhas de `<script>` marcadas como "Demonstração KOLP" no fim do HTML e a tag `<meta name="robots" content="noindex">`.
+4. Apague as três linhas de `<script>` marcadas como "Demonstração KOLP" no fim do HTML e a tag `<meta name="robots" content="noindex">`.
 
 ## Links úteis para vendas
 
 - Catálogo já filtrado: `kolp.com.br/modelos/?nicho=Advocacia` (os filtros ficam na URL; é só copiar o endereço).
-- Demonstração já com a cor do cliente: `.../demo/clinica-01/?cor=1b5e20`.
-- Demonstração em uma paleta pronta: `.../demo/clinica-01/?paleta=3`.
+- Todos os nichos em um mesmo layout: `kolp.com.br/modelos/?layout=Noturno`.
+- Demonstração já com a cor do cliente: `.../demo/saude-02/?cor=1b5e20`.
+- Demonstração em uma paleta pronta: `.../demo/saude-02/?paleta=3`.
 
 ## Fotos
 
-As fotos das demonstrações vêm do Unsplash (uso livre, inclusive comercial) e servem de exemplo.
+As fotos vêm do Unsplash (uso livre, inclusive comercial) e servem de exemplo.
 No site do cliente, prefira fotos reais do negócio.

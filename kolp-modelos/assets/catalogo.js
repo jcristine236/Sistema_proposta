@@ -5,8 +5,9 @@
   var CFG = window.KOLP_CONFIG || {};
   var GRUPOS = [
     { id: "nicho", titulo: "Nicho", aberto: true },
-    { id: "tipo", titulo: "Tipo de site", aberto: true },
+    { id: "layout", titulo: "Layout", aberto: false },
     { id: "estilo", titulo: "Estilo", aberto: true },
+    { id: "tipo", titulo: "Tipo de site", aberto: false },
     { id: "tom", titulo: "Cores", aberto: false },
     { id: "efeitos", titulo: "Efeitos", aberto: false },
     { id: "objetivo", titulo: "Objetivo", aberto: false }
@@ -18,6 +19,7 @@
   var zap = function (texto) { return "https://wa.me/" + (CFG.whatsapp || "") + "?text=" + encodeURIComponent(texto); };
 
   /* Estado: lido da URL para que um link filtrado possa ser enviado ao cliente */
+  var PAGINA = 24, limite = PAGINA;
   var estado = { busca: "", ordem: "codigo" };
   GRUPOS.forEach(function (g) { estado[g.id] = []; });
   var q = new URLSearchParams(location.search);
@@ -43,7 +45,7 @@
     });
     if (!okGrupos) return false;
     if (!estado.busca) return true;
-    var texto = sem([m.codigo, m.nome, m.resumo, m.nicho, m.tipo].concat(lista(m.estilo), lista(m.secoes), lista(m.objetivo)).join(" "));
+    var texto = sem([m.codigo, m.nome, m.resumo, m.nicho, m.tipo, m.layout].concat(lista(m.estilo), lista(m.objetivo)).join(" "));
     return sem(estado.busca).split(/\s+/).every(function (t) { return texto.indexOf(t) > -1; });
   }
 
@@ -71,24 +73,26 @@
       '<div class="cartao-topo"><span class="codigo">' + m.codigo + '</span><span class="paletas" title="Paletas prontas">' +
         m.paletas.map(function (p) { return '<i style="background:' + p.primaria + '" title="' + esc(p.nome) + '"></i>'; }).join("") + "</span></div>" +
       '<h3><a href="' + link + '">' + esc(m.nome) + "</a></h3>" +
-      '<p class="meta">' + esc(m.nicho) + " · " + esc(m.tipo) + "</p>" +
+      '<p class="meta">' + esc(m.nicho) + " · layout " + esc(m.layout) + "</p>" +
       '<p class="resumo">' + esc(m.resumo) + "</p>" +
-      '<ul class="tags">' + lista(m.estilo).concat(lista(m.efeitos)).map(function (t) { return "<li>" + esc(t) + "</li>"; }).join("") + "</ul>" +
+      '<ul class="tags">' + [m.tipo].concat(lista(m.estilo), lista(m.efeitos)).map(function (t) { return "<li>" + esc(t) + "</li>"; }).join("") + "</ul>" +
       '<div class="acoes"><a href="' + link + '">Ver demonstração</a><a class="quero" target="_blank" rel="noopener" href="' + zap(msg) + '">Quero este</a></div>' +
       "</li>";
   }
 
+  function mudou() { limite = PAGINA; desenhar(); }
   function desenhar() {
     var visiveis = MODELOS.filter(function (m) { return passa(m); });
     var ordenar = {
       codigo: function (a, b) { return a.codigo.localeCompare(b.codigo); },
-      recentes: function (a, b) { return b.codigo.localeCompare(a.codigo); },
       nome: function (a, b) { return a.nome.localeCompare(b.nome, "pt"); },
-      nicho: function (a, b) { return a.nicho.localeCompare(b.nicho, "pt") || a.codigo.localeCompare(b.codigo); }
+      layout: function (a, b) { return a.layout.localeCompare(b.layout, "pt") || a.codigo.localeCompare(b.codigo); }
     }[estado.ordem] || null;
     if (ordenar) visiveis.sort(ordenar);
 
-    $("grade").innerHTML = visiveis.map(cartao).join("");
+    $("grade").innerHTML = visiveis.slice(0, limite).map(cartao).join("");
+    $("mais").hidden = visiveis.length <= limite;
+    $("mais").textContent = "Mostrar mais modelos (" + (visiveis.length - limite) + " restantes)";
     $("vazio").hidden = visiveis.length > 0;
     $("contagem").innerHTML = "<b>" + visiveis.length + "</b> de " + MODELOS.length + (MODELOS.length === 1 ? " modelo" : " modelos");
 
@@ -118,7 +122,7 @@
     GRUPOS.forEach(function (g) { estado[g.id] = []; });
     estado.busca = ""; $("busca").value = "";
     document.querySelectorAll("#grupos input").forEach(function (c) { c.checked = false; });
-    desenhar();
+    mudou();
   }
 
   montarFiltros();
@@ -132,17 +136,18 @@
     if (!g) return;
     estado[g] = estado[g].filter(function (o) { return o !== c.value; });
     if (c.checked) estado[g].push(c.value);
-    desenhar();
+    mudou();
   });
   $("ativos").addEventListener("click", function (e) {
     var b = e.target.closest("button");
     if (!b) return;
     estado[b.dataset.grupo] = estado[b.dataset.grupo].filter(function (o) { return o !== b.dataset.valor; });
     document.querySelectorAll('#grupos input[data-grupo="' + b.dataset.grupo + '"]').forEach(function (c) { if (c.value === b.dataset.valor) c.checked = false; });
-    desenhar();
+    mudou();
   });
-  $("busca").addEventListener("input", function (e) { estado.busca = e.target.value.trim(); desenhar(); });
-  $("ordem").addEventListener("change", function (e) { estado.ordem = e.target.value; desenhar(); });
+  $("busca").addEventListener("input", function (e) { estado.busca = e.target.value.trim(); mudou(); });
+  $("ordem").addEventListener("change", function (e) { estado.ordem = e.target.value; mudou(); });
+  $("mais").addEventListener("click", function () { limite += PAGINA; desenhar(); });
   $("limpar").addEventListener("click", limpar);
   $("limpar2").addEventListener("click", limpar);
 
