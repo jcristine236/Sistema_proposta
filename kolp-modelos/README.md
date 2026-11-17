@@ -60,7 +60,7 @@ As miniaturas exigem Node e Playwright (`npm i -D playwright` e `npx playwright 
 1. Copie a pasta do modelo em `demo/` e as fotos que ele usa em `fotos/`.
 2. No `:root` do `style.css`, coloque as cores do cliente (use a barra de demonstração para testar antes).
 3. Troque textos, fotos e o número em `data-whatsapp` e nos links `wa.me`.
-4. Apague as três linhas de `<script>` marcadas como "Demonstração KOLP" no fim do HTML , a tag `<meta name="robots" content="noindex">` e o bloco de etiquetas `og:` marcado como "Demonstração KOLP" no `<head>`.
+4. Apague as três linhas de `<script>` marcadas como "Demonstração KOLP" no fim do HTML, a tag `<meta name="robots" content="noindex">` e o bloco de etiquetas `og:` marcado como "Demonstração KOLP" no `<head>`.
 
 ## Links úteis para vendas
 
