@@ -12,7 +12,7 @@ Hoje são **130 modelos**: 13 nichos, cada um em 10 layouts diferentes, com 4 pa
 | `index.html` | Página do catálogo, com busca e filtros |
 | `dados/config.js` | WhatsApp e mensagem padrão da KOLP (**edite aqui**) |
 | `dados/modelos.js` | Lista de modelos e filtros (arquivo gerado, não edite à mão) |
-| `assets/` | Estilo e script do catálogo, e a barra de demonstração (`demo.js`) |
+| `assets/` | Estilo e script do catálogo, barra de demonstração (`demo.js`), logo e favicon da KOLP |
 | `demo/<nicho>-NN/` | Um modelo por pasta: `index.html` e `style.css` (gerados) |
 | `fotos/` | Fotos de exemplo por nicho e retratos, compartilhadas entre os modelos |
 | `miniaturas/` | Imagens dos cartões do catálogo (geradas) |
@@ -23,7 +23,9 @@ Hoje são **130 modelos**: 13 nichos, cada um em 10 layouts diferentes, com 4 pa
 
 ## Antes de publicar
 
-Em `dados/config.js`, troque `whatsapp` pelo número da KOLP (DDI + DDD + número, só dígitos).
+O WhatsApp da KOLP (o mesmo do kolp.com.br) já está em `dados/config.js`; para trocar, use DDI + DDD + número, só dígitos.
+
+A identidade visual segue o kolp.com.br: roxo `#511268`, laranja `#FF7300`, texto `#260F3D`, fonte Inter e cantos de 12 px. As cores ficam no `:root` de `assets/catalogo.css`; as logos são `assets/kolp-logo.png` (fundo claro) e `assets/kolp-logo-branca.png` (fundo escuro).
 
 ## Publicar na HostGator
 

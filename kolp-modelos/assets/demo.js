@@ -1,7 +1,7 @@
 /*
   Barra de demonstração KOLP.
   Aparece só no catálogo: mostra o código do modelo, troca a paleta ao vivo e leva ao WhatsApp.
-  Na entrega ao cliente, basta remover as duas tags <script> do fim do HTML.
+  Na entrega ao cliente, basta remover as três tags <script> do fim do HTML.
   Parâmetros de URL: ?paleta=2 (abre na paleta nº 2) · ?cor=1b5e20 (cor da marca) · ?limpo=1 (sem barra)
 */
 (function () {
@@ -34,22 +34,22 @@
 
   var css = document.createElement("style");
   css.textContent =
-    ".kb{position:fixed;left:0;right:0;bottom:0;z-index:9999;display:flex;align-items:center;gap:14px;padding:9px 16px;background:#111214;color:#f2f2f0;font:500 13px/1.2 system-ui,-apple-system,'Segoe UI',sans-serif;box-shadow:0 -1px 0 rgba(255,255,255,.08)}" +
-    ".kb *{box-sizing:border-box}.kb a{color:inherit;text-decoration:none}" +
-    ".kb-volta{opacity:.75;white-space:nowrap}.kb-volta:hover{opacity:1}" +
-    ".kb-id{display:flex;flex-direction:column;gap:2px;padding-left:14px;border-left:1px solid #34363b;min-width:0}" +
+    ".kb{position:fixed;left:0;right:0;bottom:0;z-index:9999;display:flex;align-items:center;gap:14px;padding:9px 16px;background:#260f3d;color:#f8fafc;font:500 13px/1.2 Inter,system-ui,-apple-system,'Segoe UI',sans-serif;box-shadow:0 -1px 0 rgba(255,255,255,.08),0 -8px 30px rgba(38,15,61,.18)}" +
+    ".kb *{box-sizing:border-box}.kb label,.kb small,.kb span,.kb b{text-transform:none;letter-spacing:normal;color:inherit;font-family:inherit}.kb-id b{white-space:nowrap}.kb a{color:inherit;text-decoration:none}" +
+    ".kb-volta{display:flex;align-items:center;gap:10px;white-space:nowrap}.kb-volta img{height:22px;width:auto;display:block}.kb-volta span{opacity:.75}.kb-volta:hover span{opacity:1}.kb-seta{margin-right:-4px}" +
+    ".kb-id{display:flex;flex-direction:column;gap:2px;padding-left:14px;border-left:1px solid rgba(255,255,255,.16);min-width:0}" +
     ".kb-id b{font-weight:600;letter-spacing:.04em}.kb-id span{opacity:.6;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}" +
     ".kb-pal{display:flex;align-items:center;gap:7px;margin-left:auto}" +
     ".kb-pal small{opacity:.6;font-size:12px;margin-right:2px}" +
-    ".kb-s{width:26px;height:26px;border-radius:50%;border:2px solid #111214;outline:1px solid #4a4d54;cursor:pointer;padding:0}" +
-    ".kb-s[aria-pressed=true]{outline:2px solid #fff}" +
-    ".kb-cor{display:flex;align-items:center;gap:6px;padding:4px 9px 4px 5px;border:1px solid #4a4d54;border-radius:20px;cursor:pointer;font-size:12px;white-space:nowrap}" +
+    ".kb-s{width:26px;height:26px;border-radius:50%;border:2px solid #260f3d;outline:1px solid rgba(255,255,255,.3);cursor:pointer;padding:0}" +
+    ".kb-s[aria-pressed=true]{outline:2px solid #ff7300}" +
+    ".kb-cor{display:flex;align-items:center;gap:6px;padding:4px 9px 4px 5px;border:1px solid rgba(255,255,255,.3);border-radius:20px;cursor:pointer;font-size:12px;white-space:nowrap}" +
     ".kb-cor input{width:20px;height:20px;border:0;padding:0;background:none;cursor:pointer}" +
-    ".kb-quero{background:#25d366;color:#06200f!important;font-weight:700;padding:9px 16px;border-radius:6px;white-space:nowrap}" +
-    ".kb-quero:hover{background:#3be07a}" +
-    "body{padding-bottom:56px!important}" +
-    "@media(max-width:760px){.kb{gap:9px;padding:8px 10px}.kb-id span,.kb-pal small,.kb-cor span{display:none}.kb-id{padding-left:9px}.kb-s{width:22px;height:22px}.kb-cor{padding:3px}.kb-quero{padding:9px 11px}}" +
-    "@media(max-width:420px){.kb-volta span{display:none}}" +
+    ".kb-quero{background:#ff7300;color:#fff!important;font-weight:600;padding:10px 18px;border-radius:12px;white-space:nowrap}" +
+    ".kb-quero:hover{background:#e66800}" +
+    "body{padding-bottom:60px!important}" +
+    "@media(max-width:760px){.kb{gap:9px;padding:8px 10px}.kb-txt{display:none}.kb-id{flex:none}.kb-id span,.kb-pal small,.kb-cor span{display:none}.kb-id{padding-left:9px}.kb-s{width:22px;height:22px}.kb-cor{padding:3px}.kb-quero{padding:9px 11px}}" +
+    "@media(max-width:440px){.kb-volta img{display:none}.kb-seta{font-size:18px}.kb-pal{gap:5px}.kb-s{width:20px;height:20px}.kb-mod{display:none}.kb{gap:8px}}" +
     "@media print{.kb{display:none}}";
   document.head.appendChild(css);
 
@@ -59,10 +59,10 @@
   barra.setAttribute("aria-label", "Demonstração KOLP");
   var msg = (cfg.mensagem || "Quero o modelo {codigo}").replace("{codigo}", modelo.codigo).replace("{nome}", modelo.nome);
   barra.innerHTML =
-    '<a class="kb-volta" href="../../">← <span>Catálogo</span></a>' +
+    '<a class="kb-volta" href="../../" title="Voltar ao catálogo de modelos"><img src="../../assets/kolp-logo-branca.png" alt="KOLP" width="82" height="22"><span class="kb-seta">←</span><span class="kb-txt">Catálogo</span></a>' +
     '<div class="kb-id"><b>' + modelo.codigo + "</b><span>" + modelo.nome + " · " + modelo.nicho + "</span></div>" +
     '<div class="kb-pal"><small>Paleta</small></div>' +
-    '<a class="kb-quero" target="_blank" rel="noopener" href="https://wa.me/' + (cfg.whatsapp || "") + "?text=" + encodeURIComponent(msg) + '">Quero este modelo</a>';
+    '<a class="kb-quero" target="_blank" rel="noopener" href="https://wa.me/' + (cfg.whatsapp || "") + "?text=" + encodeURIComponent(msg) + '">Quero este<span class="kb-mod"> modelo</span></a>';
   var pal = barra.querySelector(".kb-pal");
   var botoes = modelo.paletas.map(function (p, i) {
     var b = document.createElement("button");
