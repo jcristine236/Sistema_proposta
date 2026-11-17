@@ -65,18 +65,19 @@
   }
 
   function cartao(m) {
-    var link = "demo/" + m.pasta + "/";
+    var link = "demo/" + m.pasta + "/index.html";
+    var aba = ' target="_blank" rel="noopener"'; /* demonstração abre em nova aba */
     var msg = (CFG.mensagem || "Quero o modelo {codigo}").replace("{codigo}", m.codigo).replace("{nome}", m.nome);
     return '<li class="cartao">' +
-      '<a class="janela" href="' + link + '" aria-label="Ver demonstração do modelo ' + esc(m.nome) + '">' +
+      '<a class="janela" href="' + link + '"' + aba + ' aria-label="Ver demonstração do modelo ' + esc(m.nome) + '">' +
         '<img src="miniaturas/' + m.pasta + '.jpg" alt="" loading="lazy" width="640" height="440"></a>' +
       '<div class="cartao-topo"><span class="codigo">' + m.codigo + '</span><span class="paletas" title="Paletas prontas">' +
         m.paletas.map(function (p) { return '<i style="background:' + p.primaria + '" title="' + esc(p.nome) + '"></i>'; }).join("") + "</span></div>" +
-      '<h3><a href="' + link + '">' + esc(m.nome) + "</a></h3>" +
+      '<h3><a href="' + link + '"' + aba + '>' + esc(m.nome) + "</a></h3>" +
       '<p class="meta">' + esc(m.nicho) + " · layout " + esc(m.layout) + "</p>" +
       '<p class="resumo">' + esc(m.resumo) + "</p>" +
       '<ul class="tags">' + [m.tipo].concat(lista(m.estilo), lista(m.efeitos)).map(function (t) { return "<li>" + esc(t) + "</li>"; }).join("") + "</ul>" +
-      '<div class="acoes"><a href="' + link + '">Ver demonstração</a><a class="quero" target="_blank" rel="noopener" href="' + zap(msg) + '">Quero este</a></div>' +
+      '<div class="acoes"><a href="' + link + '"' + aba + '>Ver demonstração</a><a class="quero" target="_blank" rel="noopener" href="' + zap(msg) + '">Quero este</a></div>' +
       "</li>";
   }
 

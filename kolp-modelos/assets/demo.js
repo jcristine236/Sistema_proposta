@@ -59,7 +59,7 @@
   barra.setAttribute("aria-label", "Demonstração KOLP");
   var msg = (cfg.mensagem || "Quero o modelo {codigo}").replace("{codigo}", modelo.codigo).replace("{nome}", modelo.nome);
   barra.innerHTML =
-    '<a class="kb-volta" href="../../" title="Voltar ao catálogo de modelos"><img src="../../assets/kolp-logo-branca.png" alt="KOLP" width="82" height="22"><span class="kb-seta">←</span><span class="kb-txt">Catálogo</span></a>' +
+    '<a class="kb-volta" href="../../index.html" title="Voltar ao catálogo de modelos"><img src="../../assets/kolp-logo-branca.png" alt="KOLP" width="82" height="22"><span class="kb-seta">←</span><span class="kb-txt">Catálogo</span></a>' +
     '<div class="kb-id"><b>' + modelo.codigo + "</b><span>" + modelo.nome + " · " + modelo.nicho + "</span></div>" +
     '<div class="kb-pal"><small>Paleta</small></div>' +
     '<a class="kb-quero" target="_blank" rel="noopener" href="https://wa.me/' + (cfg.whatsapp || "") + "?text=" + encodeURIComponent(msg) + '">Quero este<span class="kb-mod"> modelo</span></a>';
