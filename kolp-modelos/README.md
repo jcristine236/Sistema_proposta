@@ -16,10 +16,12 @@ Hoje são **130 modelos**: 13 nichos, cada um em 10 layouts diferentes, com 4 pa
 | `demo/<nicho>-NN/` | Um modelo por pasta: `index.html` e `style.css` (gerados) |
 | `fotos/` | Fotos de exemplo por nicho e retratos, compartilhadas entre os modelos |
 | `miniaturas/` | Imagens dos cartões do catálogo (geradas) |
+| `compartilhar/` | Imagens de prévia do link no WhatsApp, 1200×630 (geradas) |
 | `ferramentas/familias/` | Os 10 layouts: um `.js` (estrutura) e um `.css` (visual) para cada |
 | `ferramentas/conteudo/` | Textos de exemplo de cada nicho |
 | `ferramentas/gerar.js` | Monta todos os modelos a partir dos layouts e dos conteúdos |
 | `ferramentas/miniaturas.js` | Fotografa os modelos para o catálogo |
+| `ferramentas/compartilhar.js` | Gera as imagens de prévia do link (rode depois do `gerar.js`) |
 
 ## Antes de publicar
 
@@ -58,7 +60,7 @@ As miniaturas exigem Node e Playwright (`npm i -D playwright` e `npx playwright 
 1. Copie a pasta do modelo em `demo/` e as fotos que ele usa em `fotos/`.
 2. No `:root` do `style.css`, coloque as cores do cliente (use a barra de demonstração para testar antes).
 3. Troque textos, fotos e o número em `data-whatsapp` e nos links `wa.me`.
-4. Apague as três linhas de `<script>` marcadas como "Demonstração KOLP" no fim do HTML e a tag `<meta name="robots" content="noindex">`.
+4. Apague as três linhas de `<script>` marcadas como "Demonstração KOLP" no fim do HTML , a tag `<meta name="robots" content="noindex">` e o bloco de etiquetas `og:` marcado como "Demonstração KOLP" no `<head>`.
 
 ## Links úteis para vendas
 
@@ -71,3 +73,7 @@ As miniaturas exigem Node e Playwright (`npm i -D playwright` e `npx playwright 
 
 As fotos vêm do Unsplash (uso livre, inclusive comercial) e servem de exemplo.
 No site do cliente, prefira fotos reais do negócio.
+
+## Prévia do link no WhatsApp
+
+O catálogo e cada demonstração já têm as etiquetas de prévia (`og:`), apontando para `https://kolp.com.br/modelos/`. Se o endereço mudar (por exemplo para um subdomínio), troque `ENDERECO` em `ferramentas/gerar.js` e as URLs do `<head>` do `index.html`, e rode de novo `gerar.js` e `compartilhar.js`. O WhatsApp guarda a prévia em cache: um link já enviado pode demorar a mostrar a versão nova.

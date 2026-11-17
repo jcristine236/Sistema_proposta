@@ -11,6 +11,8 @@ const FAMILIAS = ["classico", "leve", "editorial", "corporativo", "encarte", "mi
   .map((id) => Object.assign({ id, css: fs.readFileSync(path.join(__dirname, "familias", id + ".css"), "utf8") }, require("./familias/" + id)));
 const NICHOS = ["advocacia", "saude", "restaurante", "contabilidade", "comercio", "consultoria", "servicos", "imobiliaria", "estetica", "construcao", "educacao", "tecnologia", "eventos"]
   .map((id) => Object.assign({ id }, require("./conteudo/" + id)));
+/* Endereço público do catálogo: usado nas prévias de link (WhatsApp, redes sociais), que exigem URL completa */
+const ENDERECO = "https://kolp.com.br/modelos/";
 const QTD_FOTOS = (id) => fs.readdirSync(path.join(raiz, "fotos", id)).length;
 
 const e = (s) => String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -91,6 +93,16 @@ NICHOS.forEach((n, ni) => {
 <meta name="robots" content="noindex">
 <title>${e(neg[0])}${neg[1] ? " " + e(neg[1]) : ""} — ${e(n.nome)}</title>
 <meta name="description" content="${e(lide)}">
+<!-- Demonstração KOLP: prévia do link no WhatsApp (remover na entrega) -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="KOLP — Modelos de sites">
+<meta property="og:title" content="${codigo} · ${e(neg[0])} — modelo de site para ${e(n.nome)}">
+<meta property="og:description" content="Layout ${e(fam.nome)}. Abra a demonstração, teste as suas cores e peça este modelo à KOLP.">
+<meta property="og:url" content="${ENDERECO}demo/${pasta}/">
+<meta property="og:image" content="${ENDERECO}compartilhar/${pasta}.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="${fam.fontes}" rel="stylesheet">
