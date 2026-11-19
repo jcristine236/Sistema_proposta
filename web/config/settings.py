@@ -60,6 +60,7 @@ TEMPLATES = [
                 "django.template.context_processors.csrf",
                 "painel.context_processors.painel",
             ],
+            "builtins": ["painel.templatetags.painel"],
         },
     },
 ]
