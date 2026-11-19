@@ -25,7 +25,9 @@ from publico import servico
 def _int_entre(v, minimo, maximo) -> bool:
     if isinstance(v, bool) or not isinstance(v, (int, float)):
         return False
-    return float(v).is_integer() and minimo <= v <= maximo
+    if isinstance(v, float) and not v.is_integer():
+        return False
+    return minimo <= v <= maximo  # compara sem float(): inteiros gigantes não estouram
 
 
 def _str_ate(v, maximo) -> bool:
@@ -44,7 +46,7 @@ def rastreio(request):
         return JsonResponse({"erro": "corpo grande demais"}, status=413)
     try:
         corpo = json.loads(bruto)
-    except ValueError:
+    except (ValueError, RecursionError):
         return JsonResponse({"erro": "corpo inválido"}, status=400)
 
     # Equipe interna logada no painel não conta como leitura do cliente
@@ -73,7 +75,7 @@ def _abrir(request, slug, viewer_id):
     v = Visualizacao.objects.create(
         proposta=p, viewer_id=viewer_id,
         user_agent=(request.META.get("HTTP_USER_AGENT") or "")[:300] or None,
-        ip=(request.META.get("HTTP_X_FORWARDED_FOR") or "").split(",")[0].strip() or None,
+        ip=(request.META.get("HTTP_X_FORWARDED_FOR") or "").split(",")[0].strip()[:64] or None,
     )
     if not p.primeira_abertura_em:
         campos = {"primeira_abertura_em": timezone.now()}
@@ -108,10 +110,13 @@ def _tempo(slug, visualizacao_id, total, secoes):
 LIMITES = {"nome": 120, "email": 160, "motivo": 120, "texto": 2000, "razaoSocial": 200, "cnpj": 20, "nomeSocio": 120, "whatsapp": 20}
 
 
+MAX_CORPO_DECISAO = 10000
+
+
 def _ler_corpo(request) -> dict | None:
     try:
         corpo = json.loads(request.body or b"null")
-    except ValueError:
+    except (ValueError, RecursionError):
         return None
     if not isinstance(corpo, dict) or corpo.get("acao") not in ("aceitar", "recusar", "comentar"):
         return None
@@ -132,6 +137,8 @@ def _ler_corpo(request) -> dict | None:
 def decisao(request, slug):
     if not permitir(f"decisao:{ip_cliente(request)}", 20, 10 * 60):
         return JsonResponse({"erro": "Muitas tentativas. Aguarde alguns minutos."}, status=429)
+    if len(request.body) > MAX_CORPO_DECISAO:
+        return JsonResponse({"erro": "Dados inválidos."}, status=413)
     d = _ler_corpo(request)
     if d is None:
         return JsonResponse({"erro": "Dados inválidos."}, status=400)

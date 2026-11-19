@@ -22173,5 +22173,453 @@
     "R$ 0,00"
    ]
   ]
+ },
+ {
+  "nome": "sintetico-publico",
+  "empresa": "kolp",
+  "modelo": {
+   "campos": [
+    {
+     "id": "cliente",
+     "tipo": "contato",
+     "rotulo": "Cliente"
+    },
+    {
+     "id": "validade",
+     "tipo": "data",
+     "rotulo": "Validade"
+    },
+    {
+     "id": "extra",
+     "tipo": "checkbox",
+     "rotulo": "Extra"
+    }
+   ],
+   "secoes": [
+    {
+     "id": "capa",
+     "tipo": "capa",
+     "capitulo": "",
+     "titulo": "Linha 1\nLinha 2 {{cliente}}",
+     "selos": [
+      {
+       "icone": "inexistente",
+       "texto": "Selo"
+      }
+     ]
+    },
+    {
+     "id": "t1",
+     "tipo": "titulo",
+     "capitulo": "Título",
+     "eyebrow": "Olá {{cliente}}",
+     "titulo": "Centro **forte**",
+     "subtitulo": "Sub {{validade}}",
+     "alinhamento": "centro",
+     "fundo": "escuro",
+     "efeito": "zoom"
+    },
+    {
+     "id": "t2",
+     "tipo": "titulo",
+     "numero": "02",
+     "eyebrow": "Eyebrow cru {{cliente}}",
+     "titulo": "Esquerda",
+     "fundo": "tinta",
+     "efeito": "padrao"
+    },
+    {
+     "id": "tx",
+     "tipo": "texto",
+     "capitulo": "",
+     "titulo": "Texto",
+     "paragrafos": [
+      "a",
+      "",
+      "b **c**",
+      "d"
+     ],
+     "mostrarSe": "!extra"
+    },
+    {
+     "id": "tx2",
+     "tipo": "texto",
+     "titulo": "Escondido",
+     "paragrafos": [
+      "x"
+     ],
+     "mostrarSe": "extra"
+    },
+    {
+     "id": "im1",
+     "tipo": "imagem",
+     "titulo": "Imagem",
+     "imagem": "/uploads/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.png",
+     "legenda": "Legenda {{cliente}}",
+     "largura": "total"
+    },
+    {
+     "id": "im2",
+     "tipo": "imagem",
+     "imagem": "javascript:alert(1)"
+    },
+    {
+     "id": "im3",
+     "tipo": "imagem",
+     "imagem": "https://exemplo.com/a b.png",
+     "titulo": "Sem legenda"
+    },
+    {
+     "id": "it1",
+     "tipo": "imagemTexto",
+     "numero": "03",
+     "eyebrow": "Eb",
+     "titulo": "Img e texto",
+     "paragrafos": [
+      "p1",
+      "",
+      "p2"
+     ],
+     "imagem": "/empresas/kolp/logo.png",
+     "lado": "esquerda",
+     "botaoTexto": "Falar {{cliente}}",
+     "botaoUrl": "https://wa.me/5511999999999?text=oi mundo"
+    },
+    {
+     "id": "it2",
+     "tipo": "imagemTexto",
+     "titulo": "Direita",
+     "paragrafos": [],
+     "imagem": "",
+     "lado": "direita",
+     "botaoTexto": "Ruim",
+     "botaoUrl": "javascript:x"
+    },
+    {
+     "id": "it3",
+     "tipo": "imagemTexto",
+     "titulo": "Mail",
+     "paragrafos": [
+      "z"
+     ],
+     "imagem": "data:image/png;base64,AAA",
+     "botaoTexto": "Mail",
+     "botaoUrl": "mailto:a@b.com"
+    },
+    {
+     "id": "v1",
+     "tipo": "video",
+     "titulo": "Vídeo",
+     "texto": "Veja **isto**",
+     "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+    },
+    {
+     "id": "v2",
+     "tipo": "video",
+     "url": "https://vimeo.com/123456789"
+    },
+    {
+     "id": "v3",
+     "tipo": "video",
+     "url": "https://evil.com/x"
+    },
+    {
+     "id": "fim",
+     "tipo": "fechamento",
+     "capitulo": "",
+     "titulo": "Fim",
+     "botao": "Aceitar"
+    }
+   ],
+   "precificacao": {}
+  },
+  "catalogo": [],
+  "dados": {
+   "cliente": {
+    "nome": "Cliente <Sintético>"
+   },
+   "validade": "2099-12-31",
+   "extra": false
+  },
+  "decisao": "RECUSADA",
+  "modo": "publico",
+  "avisoPrevia": null,
+  "calc": {
+   "base": {
+    "rotulo": "Mensalidade",
+    "valor": 0
+   },
+   "adicionais": [],
+   "extras": [],
+   "subtotal": 0,
+   "desconto": {
+    "tipo": "nenhum",
+    "informado": 0,
+    "valor": 0,
+    "pct": 0,
+    "acimaLimite": false
+   },
+   "totalMensal": 0,
+   "unicos": [],
+   "totalUnico": 0
+  },
+  "ctx": {
+   "cliente": "Cliente <Sintético>",
+   "validade": "31/12/2099",
+   "extra": false,
+   "empresa": {
+    "nome": "KOLP",
+    "site": "kolp.com.br",
+    "rodape": "Kolp Aplicações e Datacenter · São Paulo/SP · kolp.com.br"
+   },
+   "validadeISO": "2099-12-31",
+   "expirada": false,
+   "observacoes": [],
+   "calc": {
+    "base": {
+     "rotulo": "Mensalidade",
+     "valor": 0
+    },
+    "adicionais": [],
+    "extras": [],
+    "subtotal": 0,
+    "desconto": {
+     "tipo": "nenhum",
+     "informado": 0,
+     "valor": 0,
+     "pct": 0,
+     "acimaLimite": false
+    },
+    "totalMensal": 0,
+    "unicos": [],
+    "totalUnico": 0
+   }
+  },
+  "html": "<link rel=\"preload\" as=\"image\" href=\"/empresas/kolp/logo-claro.png\"/><link rel=\"preload\" as=\"image\" href=\"/empresas/kolp/logo.png\"/><div class=\"pp \" style=\"--primary:#5C026E;--primary-2:#7605B7;--accent:#FE8010;--accent-soft:#FFF3E6;--accent-ink:#C2410C;--neutral:#CDB6DA;--tint:#F7F0FA;--font-title:&#x27;Space Grotesk&#x27;, system-ui, sans-serif;--font-text:&#x27;Inter&#x27;, system-ui, sans-serif;--font-num:&#x27;JetBrains Mono&#x27;, ui-monospace, monospace\"><div class=\"aviso-topo\">Proposta recusada. Obrigado pelo retorno.</div><div class=\"pv-progress\" data-progresso=\"true\"></div><nav class=\"dots\" aria-label=\"Capítulos\"><a href=\"#capa\" data-dot=\"capa\"><span></span></a><a href=\"#t1\" data-dot=\"t1\"><span>Título</span></a></nav><header class=\"hero lean\" id=\"capa\" data-secao=\"capa\" data-chapter=\"\"><div class=\"nav\"><img src=\"/empresas/kolp/logo-claro.png\" alt=\"KOLP\" style=\"height:78px;width:auto;max-width:100%;opacity:0;transition:opacity .25s;display:block\"/></div><div class=\"cover\"><h1>Linha 1<br/>Linha 2 Cliente &lt;Sintético&gt;</h1><div class=\"clibig cli\">Cliente &lt;Sintético&gt;</div><div class=\"pills\"><span class=\"pill \"><svg class=\"ic\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M5 12.5l4.5 4.5L19 7\"></path></svg><span>Selo</span></span></div></div></header><section class=\"ch navy bloco-titulo\" id=\"t1\" data-secao=\"t1\" data-chapter=\"Título\" data-efeito=\"zoom\"><div class=\"inner\" style=\"text-align:center\"><div class=\"rv\"><div class=\"eyebrow\">Olá Cliente &lt;Sintético&gt;</div><h2>Centro <b>forte</b></h2></div><p class=\"lead rv\" style=\"--d:0.1s;margin-left:auto;margin-right:auto\">Sub 31/12/2099</p></div></section><section class=\"ch tint bloco-titulo\" id=\"t2\" data-secao=\"t2\"><div class=\"inner\"><div class=\"chead rv\"><span class=\"chn\">02</span><div><div class=\"eyebrow\">Eyebrow cru {{cliente}}</div><h2>Esquerda</h2></div></div></div></section><section class=\"ch white\" id=\"tx\" data-secao=\"tx\" data-chapter=\"\"><div class=\"inner\"><div class=\"chead rv\"><div><h2>Texto</h2></div></div><p class=\"lead rv\" style=\"--d:0.08s;white-space:pre-line\">a</p><p class=\"lead rv\" style=\"--d:0.13s;white-space:pre-line\">b <b>c</b></p><p class=\"lead rv\" style=\"--d:0.18s;white-space:pre-line\">d</p></div></section><section class=\"ch white bloco-imagem total\" id=\"im1\" data-secao=\"im1\"><div class=\"inner\"><div class=\"chead rv\"><div><h2>Imagem</h2></div></div><figure class=\"rv zoom\"><img src=\"/uploads/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.png\" alt=\"Legenda {{cliente}}\" loading=\"lazy\"/><figcaption>Legenda Cliente &lt;Sintético&gt;</figcaption></figure></div></section><section class=\"ch white bloco-imagem\" id=\"im2\" data-secao=\"im2\"><div class=\"inner\"><figure class=\"rv zoom\"><div class=\"img-vazia\">Adicione uma imagem</div></figure></div></section><section class=\"ch white bloco-imagem\" id=\"im3\" data-secao=\"im3\"><div class=\"inner\"><div class=\"chead rv\"><div><h2>Sem legenda</h2></div></div><figure class=\"rv zoom\"><img src=\"https://exemplo.com/a%20b.png\" alt=\"Sem legenda\" loading=\"lazy\"/></figure></div></section><section class=\"ch white bloco-imgtxt\" id=\"it1\" data-secao=\"it1\"><div class=\"inner it-grid img-esq\"><div class=\"it-txt rv right\"><span class=\"chn\">03</span><div class=\"eyebrow\">Eb</div><h2>Img e texto</h2><p class=\"lead\" style=\"--d:0.08s;white-space:pre-line\">p1</p><p class=\"lead\" style=\"--d:0.13s;white-space:pre-line\">p2</p><a class=\"btn gold\" href=\"https://wa.me/5511999999999?text=oi%20mundo\" target=\"_blank\" rel=\"noopener noreferrer\" style=\"margin-top:22px\">Falar Cliente &lt;Sintético&gt;</a></div><div class=\"it-img rv left\"><img src=\"/empresas/kolp/logo.png\" alt=\"Img e texto\" loading=\"lazy\"/></div></div></section><section class=\"ch white bloco-imgtxt\" id=\"it2\" data-secao=\"it2\"><div class=\"inner it-grid img-dir\"><div class=\"it-txt rv left\"><h2>Direita</h2></div><div class=\"it-img rv right\"><div class=\"img-vazia\">Adicione uma imagem</div></div></div></section><section class=\"ch white bloco-imgtxt\" id=\"it3\" data-secao=\"it3\"><div class=\"inner it-grid img-dir\"><div class=\"it-txt rv left\"><h2>Mail</h2><p class=\"lead\" style=\"--d:0.08s;white-space:pre-line\">z</p><a class=\"btn gold\" href=\"mailto:a@b.com\" target=\"_blank\" rel=\"noopener noreferrer\" style=\"margin-top:22px\">Mail</a></div><div class=\"it-img rv right\"><div class=\"img-vazia\">Adicione uma imagem</div></div></div></section><section class=\"ch white\" id=\"v1\" data-secao=\"v1\"><div class=\"inner\"><div class=\"chead rv\"><div><h2>Vídeo</h2></div></div><p class=\"lead rv\">Veja <b>isto</b></p><div class=\"video rv zoom\"><iframe src=\"https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?rel=0\" title=\"Vídeo\" loading=\"lazy\" allow=\"accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen\" allowFullScreen=\"\" referrerPolicy=\"strict-origin-when-cross-origin\"></iframe></div></div></section><section class=\"ch white\" id=\"v2\" data-secao=\"v2\"><div class=\"inner\"><div class=\"video rv zoom\"><iframe src=\"https://player.vimeo.com/video/123456789\" title=\"Vídeo\" loading=\"lazy\" allow=\"accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen\" allowFullScreen=\"\" referrerPolicy=\"strict-origin-when-cross-origin\"></iframe></div></div></section><section class=\"ch white\" id=\"v3\" data-secao=\"v3\"><div class=\"inner\"><div class=\"video rv zoom\"><div class=\"img-vazia\">Cole um link do YouTube ou Vimeo</div></div></div></section><section class=\"ch navy cta\" id=\"fim\" data-secao=\"fim\" data-chapter=\"\"><div class=\"inner\"><h2 class=\"rv\">Fim</h2><div class=\"acoes rv\" style=\"--d:0.2s\"><button class=\"btn gold\" type=\"button\">Aceitar</button><button class=\"btn ghost\" type=\"button\">Tenho uma dúvida</button></div><div class=\"until\">Proposta válida até 31/12/2099</div><button class=\"link-recusa\" type=\"button\">Não tenho interesse no momento</button></div></section><footer class=\"pf\"><div class=\"pf-logo\"><img src=\"/empresas/kolp/logo.png\" alt=\"KOLP\" style=\"height:40px;width:auto;max-width:100%;opacity:0;transition:opacity .25s;display:block\"/></div>Kolp Aplicações e Datacenter · São Paulo/SP · kolp.com.br<div class=\"pf-codigo\">Proposta nº KLP-2026-1001</div></footer></div>",
+  "preenchidos": []
+ },
+ {
+  "nome": "sintetico-previa",
+  "empresa": "kolp",
+  "modelo": {
+   "campos": [
+    {
+     "id": "cliente",
+     "tipo": "contato",
+     "rotulo": "Cliente"
+    },
+    {
+     "id": "validade",
+     "tipo": "data",
+     "rotulo": "Validade"
+    },
+    {
+     "id": "extra",
+     "tipo": "checkbox",
+     "rotulo": "Extra"
+    }
+   ],
+   "secoes": [
+    {
+     "id": "capa",
+     "tipo": "capa",
+     "capitulo": "",
+     "titulo": "Linha 1\nLinha 2 {{cliente}}",
+     "selos": [
+      {
+       "icone": "inexistente",
+       "texto": "Selo"
+      }
+     ]
+    },
+    {
+     "id": "t1",
+     "tipo": "titulo",
+     "capitulo": "Título",
+     "eyebrow": "Olá {{cliente}}",
+     "titulo": "Centro **forte**",
+     "subtitulo": "Sub {{validade}}",
+     "alinhamento": "centro",
+     "fundo": "escuro",
+     "efeito": "zoom"
+    },
+    {
+     "id": "t2",
+     "tipo": "titulo",
+     "numero": "02",
+     "eyebrow": "Eyebrow cru {{cliente}}",
+     "titulo": "Esquerda",
+     "fundo": "tinta",
+     "efeito": "padrao"
+    },
+    {
+     "id": "tx",
+     "tipo": "texto",
+     "capitulo": "",
+     "titulo": "Texto",
+     "paragrafos": [
+      "a",
+      "",
+      "b **c**",
+      "d"
+     ],
+     "mostrarSe": "!extra"
+    },
+    {
+     "id": "tx2",
+     "tipo": "texto",
+     "titulo": "Escondido",
+     "paragrafos": [
+      "x"
+     ],
+     "mostrarSe": "extra"
+    },
+    {
+     "id": "im1",
+     "tipo": "imagem",
+     "titulo": "Imagem",
+     "imagem": "/uploads/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.png",
+     "legenda": "Legenda {{cliente}}",
+     "largura": "total"
+    },
+    {
+     "id": "im2",
+     "tipo": "imagem",
+     "imagem": "javascript:alert(1)"
+    },
+    {
+     "id": "im3",
+     "tipo": "imagem",
+     "imagem": "https://exemplo.com/a b.png",
+     "titulo": "Sem legenda"
+    },
+    {
+     "id": "it1",
+     "tipo": "imagemTexto",
+     "numero": "03",
+     "eyebrow": "Eb",
+     "titulo": "Img e texto",
+     "paragrafos": [
+      "p1",
+      "",
+      "p2"
+     ],
+     "imagem": "/empresas/kolp/logo.png",
+     "lado": "esquerda",
+     "botaoTexto": "Falar {{cliente}}",
+     "botaoUrl": "https://wa.me/5511999999999?text=oi mundo"
+    },
+    {
+     "id": "it2",
+     "tipo": "imagemTexto",
+     "titulo": "Direita",
+     "paragrafos": [],
+     "imagem": "",
+     "lado": "direita",
+     "botaoTexto": "Ruim",
+     "botaoUrl": "javascript:x"
+    },
+    {
+     "id": "it3",
+     "tipo": "imagemTexto",
+     "titulo": "Mail",
+     "paragrafos": [
+      "z"
+     ],
+     "imagem": "data:image/png;base64,AAA",
+     "botaoTexto": "Mail",
+     "botaoUrl": "mailto:a@b.com"
+    },
+    {
+     "id": "v1",
+     "tipo": "video",
+     "titulo": "Vídeo",
+     "texto": "Veja **isto**",
+     "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+    },
+    {
+     "id": "v2",
+     "tipo": "video",
+     "url": "https://vimeo.com/123456789"
+    },
+    {
+     "id": "v3",
+     "tipo": "video",
+     "url": "https://evil.com/x"
+    },
+    {
+     "id": "fim",
+     "tipo": "fechamento",
+     "capitulo": "",
+     "titulo": "Fim",
+     "botao": "Aceitar"
+    }
+   ],
+   "precificacao": {}
+  },
+  "catalogo": [],
+  "dados": {
+   "cliente": {
+    "nome": "Cliente <Sintético>"
+   },
+   "validade": "2099-12-31",
+   "extra": false
+  },
+  "decisao": null,
+  "modo": "previa",
+  "avisoPrevia": "Prévia do modelo com valores de exemplo",
+  "calc": {
+   "base": {
+    "rotulo": "Mensalidade",
+    "valor": 0
+   },
+   "adicionais": [],
+   "extras": [],
+   "subtotal": 0,
+   "desconto": {
+    "tipo": "nenhum",
+    "informado": 0,
+    "valor": 0,
+    "pct": 0,
+    "acimaLimite": false
+   },
+   "totalMensal": 0,
+   "unicos": [],
+   "totalUnico": 0
+  },
+  "ctx": {
+   "cliente": "Cliente <Sintético>",
+   "validade": "31/12/2099",
+   "extra": false,
+   "empresa": {
+    "nome": "KOLP",
+    "site": "kolp.com.br",
+    "rodape": "Kolp Aplicações e Datacenter · São Paulo/SP · kolp.com.br"
+   },
+   "validadeISO": "2099-12-31",
+   "expirada": false,
+   "observacoes": [],
+   "calc": {
+    "base": {
+     "rotulo": "Mensalidade",
+     "valor": 0
+    },
+    "adicionais": [],
+    "extras": [],
+    "subtotal": 0,
+    "desconto": {
+     "tipo": "nenhum",
+     "informado": 0,
+     "valor": 0,
+     "pct": 0,
+     "acimaLimite": false
+    },
+    "totalMensal": 0,
+    "unicos": [],
+    "totalUnico": 0
+   }
+  },
+  "html": "<link rel=\"preload\" as=\"image\" href=\"/empresas/kolp/logo-claro.png\"/><link rel=\"preload\" as=\"image\" href=\"/empresas/kolp/logo.png\"/><div class=\"pp previa\" style=\"--primary:#5C026E;--primary-2:#7605B7;--accent:#FE8010;--accent-soft:#FFF3E6;--accent-ink:#C2410C;--neutral:#CDB6DA;--tint:#F7F0FA;--font-title:&#x27;Space Grotesk&#x27;, system-ui, sans-serif;--font-text:&#x27;Inter&#x27;, system-ui, sans-serif;--font-num:&#x27;JetBrains Mono&#x27;, ui-monospace, monospace\"><div class=\"aviso-topo\">Prévia do modelo com valores de exemplo</div><div class=\"pv-progress\" data-progresso=\"true\"></div><nav class=\"dots\" aria-label=\"Capítulos\"><a href=\"#capa\" data-dot=\"capa\"><span></span></a><a href=\"#t1\" data-dot=\"t1\"><span>Título</span></a></nav><header class=\"hero lean\" id=\"capa\" data-secao=\"capa\" data-chapter=\"\"><div class=\"nav\"><img src=\"/empresas/kolp/logo-claro.png\" alt=\"KOLP\" style=\"height:78px;width:auto;max-width:100%;opacity:0;transition:opacity .25s;display:block\"/></div><div class=\"cover\"><h1>Linha 1<br/>Linha 2 Cliente &lt;Sintético&gt;</h1><div class=\"clibig cli\">Cliente &lt;Sintético&gt;</div><div class=\"pills\"><span class=\"pill \"><svg class=\"ic\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M5 12.5l4.5 4.5L19 7\"></path></svg><span>Selo</span></span></div></div></header><section class=\"ch navy bloco-titulo\" id=\"t1\" data-secao=\"t1\" data-chapter=\"Título\" data-efeito=\"zoom\"><div class=\"inner\" style=\"text-align:center\"><div class=\"rv\"><div class=\"eyebrow\">Olá Cliente &lt;Sintético&gt;</div><h2>Centro <b>forte</b></h2></div><p class=\"lead rv\" style=\"--d:0.1s;margin-left:auto;margin-right:auto\">Sub 31/12/2099</p></div></section><section class=\"ch tint bloco-titulo\" id=\"t2\" data-secao=\"t2\"><div class=\"inner\"><div class=\"chead rv\"><span class=\"chn\">02</span><div><div class=\"eyebrow\">Eyebrow cru {{cliente}}</div><h2>Esquerda</h2></div></div></div></section><section class=\"ch white\" id=\"tx\" data-secao=\"tx\" data-chapter=\"\"><div class=\"inner\"><div class=\"chead rv\"><div><h2>Texto</h2></div></div><p class=\"lead rv\" style=\"--d:0.08s;white-space:pre-line\">a</p><p class=\"lead rv\" style=\"--d:0.13s;white-space:pre-line\">b <b>c</b></p><p class=\"lead rv\" style=\"--d:0.18s;white-space:pre-line\">d</p></div></section><section class=\"ch white bloco-imagem total\" id=\"im1\" data-secao=\"im1\"><div class=\"inner\"><div class=\"chead rv\"><div><h2>Imagem</h2></div></div><figure class=\"rv zoom\"><img src=\"/uploads/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.png\" alt=\"Legenda {{cliente}}\" loading=\"lazy\"/><figcaption>Legenda Cliente &lt;Sintético&gt;</figcaption></figure></div></section><section class=\"ch white bloco-imagem\" id=\"im2\" data-secao=\"im2\"><div class=\"inner\"><figure class=\"rv zoom\"><div class=\"img-vazia\">Adicione uma imagem</div></figure></div></section><section class=\"ch white bloco-imagem\" id=\"im3\" data-secao=\"im3\"><div class=\"inner\"><div class=\"chead rv\"><div><h2>Sem legenda</h2></div></div><figure class=\"rv zoom\"><img src=\"https://exemplo.com/a%20b.png\" alt=\"Sem legenda\" loading=\"lazy\"/></figure></div></section><section class=\"ch white bloco-imgtxt\" id=\"it1\" data-secao=\"it1\"><div class=\"inner it-grid img-esq\"><div class=\"it-txt rv right\"><span class=\"chn\">03</span><div class=\"eyebrow\">Eb</div><h2>Img e texto</h2><p class=\"lead\" style=\"--d:0.08s;white-space:pre-line\">p1</p><p class=\"lead\" style=\"--d:0.13s;white-space:pre-line\">p2</p><a class=\"btn gold\" href=\"https://wa.me/5511999999999?text=oi%20mundo\" target=\"_blank\" rel=\"noopener noreferrer\" style=\"margin-top:22px\">Falar Cliente &lt;Sintético&gt;</a></div><div class=\"it-img rv left\"><img src=\"/empresas/kolp/logo.png\" alt=\"Img e texto\" loading=\"lazy\"/></div></div></section><section class=\"ch white bloco-imgtxt\" id=\"it2\" data-secao=\"it2\"><div class=\"inner it-grid img-dir\"><div class=\"it-txt rv left\"><h2>Direita</h2></div><div class=\"it-img rv right\"><div class=\"img-vazia\">Adicione uma imagem</div></div></div></section><section class=\"ch white bloco-imgtxt\" id=\"it3\" data-secao=\"it3\"><div class=\"inner it-grid img-dir\"><div class=\"it-txt rv left\"><h2>Mail</h2><p class=\"lead\" style=\"--d:0.08s;white-space:pre-line\">z</p><a class=\"btn gold\" href=\"mailto:a@b.com\" target=\"_blank\" rel=\"noopener noreferrer\" style=\"margin-top:22px\">Mail</a></div><div class=\"it-img rv right\"><div class=\"img-vazia\">Adicione uma imagem</div></div></div></section><section class=\"ch white\" id=\"v1\" data-secao=\"v1\"><div class=\"inner\"><div class=\"chead rv\"><div><h2>Vídeo</h2></div></div><p class=\"lead rv\">Veja <b>isto</b></p><div class=\"video rv zoom\"><iframe src=\"https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?rel=0\" title=\"Vídeo\" loading=\"lazy\" allow=\"accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen\" allowFullScreen=\"\" referrerPolicy=\"strict-origin-when-cross-origin\"></iframe></div></div></section><section class=\"ch white\" id=\"v2\" data-secao=\"v2\"><div class=\"inner\"><div class=\"video rv zoom\"><iframe src=\"https://player.vimeo.com/video/123456789\" title=\"Vídeo\" loading=\"lazy\" allow=\"accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen\" allowFullScreen=\"\" referrerPolicy=\"strict-origin-when-cross-origin\"></iframe></div></div></section><section class=\"ch white\" id=\"v3\" data-secao=\"v3\"><div class=\"inner\"><div class=\"video rv zoom\"><div class=\"img-vazia\">Cole um link do YouTube ou Vimeo</div></div></div></section><section class=\"ch navy cta\" id=\"fim\" data-secao=\"fim\" data-chapter=\"\"><div class=\"inner\"><h2 class=\"rv\">Fim</h2><div class=\"acoes rv\" style=\"--d:0.2s\"><button class=\"btn gold\" type=\"button\">Aceitar</button><button class=\"btn ghost\" type=\"button\">Tenho uma dúvida</button></div><div class=\"until\">Proposta válida até 31/12/2099</div><button class=\"link-recusa\" type=\"button\">Não tenho interesse no momento</button></div></section><footer class=\"pf\"><div class=\"pf-logo\"><img src=\"/empresas/kolp/logo.png\" alt=\"KOLP\" style=\"height:40px;width:auto;max-width:100%;opacity:0;transition:opacity .25s;display:block\"/></div>Kolp Aplicações e Datacenter · São Paulo/SP · kolp.com.br<div class=\"pf-codigo\">Proposta nº KLP-2026-1001</div></footer><div class=\"barra-acoes \"><button class=\"btn gold\" type=\"button\">Aceitar proposta</button><button class=\"btn ghost\" type=\"button\">Comentar</button></div></div>",
+  "preenchidos": []
  }
 ]

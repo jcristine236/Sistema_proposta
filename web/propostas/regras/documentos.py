@@ -4,7 +4,7 @@ import re
 
 
 def so_digitos(s) -> str:
-    return re.sub(r"\D", "", s or "")
+    return re.sub(r"\D", "", s or "", flags=re.ASCII)  # só 0-9, como o \D do JS
 
 
 def cnpj_valido(v: str) -> bool:

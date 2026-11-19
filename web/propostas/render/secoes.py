@@ -44,11 +44,16 @@ def atributos_secao(s: dict, padrao: str, extra: str = "") -> str:
     fundo = FUNDOS.get(s.get("fundo") or "") or padrao
     classe = f"ch {fundo} {extra}".strip()
     attrs = format_html('class="{}" id="{}" data-secao="{}"', classe, s["id"], s["id"])
-    if s.get("capitulo"):
+    if s.get("capitulo") is not None:  # React só omite null/undefined
         attrs += format_html(' data-chapter="{}"', s["capitulo"])
     if s.get("efeito") and s["efeito"] != "padrao":
         attrs += format_html(' data-efeito="{}"', s["efeito"])
     return attrs
+
+
+def _capitulo(s: dict) -> str:
+    """`s.capitulo ?? "Início"`: só cai no padrão quando é null/ausente (texto vazio fica)."""
+    return "Início" if s.get("capitulo") is None else s["capitulo"]
 
 
 def _preparar(s: dict, ctx: dict) -> dict:
@@ -59,7 +64,7 @@ def _preparar(s: dict, ctx: dict) -> dict:
         padrao, extra = PADROES[t]
         base = s
         if t == "fechamento":
-            base = {**s, "capitulo": s.get("capitulo") or "Fechamento"}
+            base = {**s, "capitulo": "Fechamento" if s.get("capitulo") is None else s["capitulo"]}
         if t == "imagem":
             extra = f"bloco-imagem {'total' if s.get('largura') == 'total' else ''}"
         p["attrs"] = atributos_secao(base, padrao, extra)
@@ -115,6 +120,10 @@ def _preparar(s: dict, ctx: dict) -> dict:
         p["src"] = url_video(s.get("url"))
     elif t == "capa":
         p["linhas_titulo"] = preencher(s.get("titulo"), ctx).split("\n")
+        p["capitulo"] = _capitulo(s)
+    if t in ("texto", "imagemTexto"):
+        # React filtra os parágrafos vazios antes de numerar o atraso da animação
+        p["paragrafos"] = [x for x in s.get("paragrafos") or [] if x]
     return p
 
 
@@ -141,7 +150,7 @@ def renderizar_proposta(secoes, ctx, tema, modo="publico", slug=None, decisao=No
         "decisao": decisao,
         "codigo": codigo,
         "aviso_previa": aviso_previa,
-        "dots": [s for s in visiveis if s.get("capitulo") or s["tipo"] == "capa"],
+        "dots": [{"id": s["id"], "rotulo": _capitulo(s)} for s in visiveis if s.get("capitulo") or s["tipo"] == "capa"],
         "blocos": blocos,
         "extras": extras or {},
     })

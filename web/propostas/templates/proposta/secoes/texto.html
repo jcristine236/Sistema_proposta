@@ -1,1 +1,1 @@
-{% load proposta %}<section {{ p.attrs }}><div class="inner">{% include "proposta/_cabecalho.html" with numero=s.numero titulo=s.titulo eyebrow=s.eyebrow %}{% include "proposta/_paragrafos.html" with lista=s.paragrafos classe=None %}</div></section>
+{% load proposta %}<section {{ p.attrs }}><div class="inner">{% include "proposta/_cabecalho.html" with numero=s.numero titulo=s.titulo eyebrow=s.eyebrow %}{% include "proposta/_paragrafos.html" with lista=p.paragrafos classe=None %}</div></section>

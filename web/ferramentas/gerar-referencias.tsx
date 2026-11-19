@@ -92,5 +92,47 @@ for (const arq of arquivos) {
     });
   }
 }
+// --- caso sintético: tipos e ramos que os modelos do seed não usam --------------
+{
+  const e = empresas.find((x) => x.slug === "kolp")!;
+  const tema = temaDe(e.tema);
+  const campos = [
+    { id: "cliente", tipo: "contato", rotulo: "Cliente" },
+    { id: "validade", tipo: "data", rotulo: "Validade" },
+    { id: "extra", tipo: "checkbox", rotulo: "Extra" },
+  ] as Campo[];
+  const secoes = [
+    { id: "capa", tipo: "capa", capitulo: "", titulo: "Linha 1\nLinha 2 {{cliente}}", selos: [{ icone: "inexistente", texto: "Selo" }] },
+    { id: "t1", tipo: "titulo", capitulo: "Título", eyebrow: "Olá {{cliente}}", titulo: "Centro **forte**", subtitulo: "Sub {{validade}}", alinhamento: "centro", fundo: "escuro", efeito: "zoom" },
+    { id: "t2", tipo: "titulo", numero: "02", eyebrow: "Eyebrow cru {{cliente}}", titulo: "Esquerda", fundo: "tinta", efeito: "padrao" },
+    { id: "tx", tipo: "texto", capitulo: "", titulo: "Texto", paragrafos: ["a", "", "b **c**", "d"], mostrarSe: "!extra" },
+    { id: "tx2", tipo: "texto", titulo: "Escondido", paragrafos: ["x"], mostrarSe: "extra" },
+    { id: "im1", tipo: "imagem", titulo: "Imagem", imagem: "/uploads/" + "a".repeat(32) + ".png", legenda: "Legenda {{cliente}}", largura: "total" },
+    { id: "im2", tipo: "imagem", imagem: "javascript:alert(1)" },
+    { id: "im3", tipo: "imagem", imagem: "https://exemplo.com/a b.png", titulo: "Sem legenda" },
+    { id: "it1", tipo: "imagemTexto", numero: "03", eyebrow: "Eb", titulo: "Img e texto", paragrafos: ["p1", "", "p2"], imagem: "/empresas/kolp/logo.png", lado: "esquerda", botaoTexto: "Falar {{cliente}}", botaoUrl: "https://wa.me/5511999999999?text=oi mundo" },
+    { id: "it2", tipo: "imagemTexto", titulo: "Direita", paragrafos: [], imagem: "", lado: "direita", botaoTexto: "Ruim", botaoUrl: "javascript:x" },
+    { id: "it3", tipo: "imagemTexto", titulo: "Mail", paragrafos: ["z"], imagem: "data:image/png;base64,AAA", botaoTexto: "Mail", botaoUrl: "mailto:a@b.com" },
+    { id: "v1", tipo: "video", titulo: "Vídeo", texto: "Veja **isto**", url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ" },
+    { id: "v2", tipo: "video", url: "https://vimeo.com/123456789" },
+    { id: "v3", tipo: "video", url: "https://evil.com/x" },
+    { id: "fim", tipo: "fechamento", capitulo: "", titulo: "Fim", botao: "Aceitar" },
+  ];
+  const dados = { cliente: { nome: "Cliente <Sintético>" }, validade: "2099-12-31", extra: false };
+  const empresaCtx = { nome: e.razao_social ?? e.nome, site: e.site, rodape: e.rodape };
+  const modelo = { campos, secoes, precificacao: {} };
+  for (const v of [
+    { nome: "sintetico-publico", modo: "publico" as const, decisao: "RECUSADA" as const, aviso: undefined },
+    { nome: "sintetico-previa", modo: "previa" as const, decisao: null, aviso: "Prévia do modelo com valores de exemplo" },
+  ]) {
+    const ctx = montarContexto({ campos, precificacao: {}, dados, catalogo: [], empresa: empresaCtx });
+    const html = renderToStaticMarkup(
+      <PropostaView secoes={secoes as never} ctx={ctx} tema={tema} modo={v.modo} slug="exemplo" decisao={v.decisao} codigo="KLP-2026-1001" motivosRecusa={[]} avisoPrevia={v.aviso} />,
+    );
+    casos.push({ nome: v.nome, empresa: "kolp", modelo, catalogo: [], dados, decisao: v.decisao, modo: v.modo, avisoPrevia: v.aviso ?? null,
+      calc: ctx.calc, ctx: JSON.parse(JSON.stringify(ctx)), html, preenchidos: [] });
+  }
+}
+
 writeFileSync(join(WEB, "propostas/tests/referencias/casos.json"), JSON.stringify(casos, null, 1) + "\n", "utf8");
 console.log(`${Object.keys(icones).length} ícones, ${casos.length} casos de referência gerados.`);

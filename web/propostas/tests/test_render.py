@@ -17,7 +17,9 @@ class RenderTest(SimpleTestCase):
                 ctx = contexto_do_caso(c)
                 html = renderizar_proposta(
                     c["modelo"]["secoes"], ctx, tema_de(EMPRESAS[c["empresa"]]["tema"]),
-                    modo="publico", slug="exemplo", decisao=c["decisao"], codigo="CAD-2026-1001",
+                    modo=c.get("modo", "publico"), slug="exemplo", decisao=c["decisao"],
+                    codigo="KLP-2026-1001" if c["nome"].startswith("sintetico") else "CAD-2026-1001",
+                    aviso_previa=c.get("avisoPrevia"),
                 )
                 self.assertIsNone(primeira_diferenca(canonico(html), canonico(c["html"])))
 

@@ -145,3 +145,32 @@ class DecisaoTest(Base):
             self.decidir(acao="outra")
         r = self.decidir(acao="outra")
         self.assertEqual((r.status_code, r.json()), (429, {"erro": "Muitas tentativas. Aguarde alguns minutos."}))
+
+
+class EndurecimentoTest(Base):
+    """Entradas maliciosas nas APIs públicas respondem 4xx, nunca 500."""
+
+    def test_inteiro_gigante(self):
+        vid = self.abrir().json()["visualizacaoId"]
+        corpo = '{"acao":"tempo","slug":"%s","visualizacaoId":"%s","total":%s,"secoes":{}}' % (self.p.slug, vid, "9" * 400)
+        self.assertEqual(post(self.client, "/api/rastreio", corpo).status_code, 400)
+
+    def test_aninhamento_profundo(self):
+        corpo = "[" * 3000 + "]" * 3000
+        self.assertEqual(post(self.client, "/api/rastreio", corpo[:7990]).status_code, 400)
+        self.assertEqual(post(self.client, f"/api/propostas/{self.p.slug}/decisao", corpo).status_code, 400)
+
+    def test_decisao_corpo_grande(self):
+        r = post(self.client, f"/api/propostas/{self.p.slug}/decisao", {"acao": "comentar", "nome": "a", "texto": "b", "x": "y" * 20000})
+        self.assertEqual(r.status_code, 413)
+
+    def test_ip_longo(self):
+        r = self.abrir(HTTP_X_FORWARDED_FOR="9" * 200 + ", 2.2.2.2")
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(len(Visualizacao.objects.get().ip), 64)
+
+    def test_digitos_nao_ascii_recusados(self):
+        from propostas.regras.documentos import cnpj_valido, telefone_valido
+        arabe = "".join(chr(0x0660 + int(d)) for d in "11222333000181")
+        self.assertFalse(cnpj_valido(arabe))
+        self.assertFalse(telefone_valido("".join(chr(0x0660 + int(d)) for d in "11912345678")))

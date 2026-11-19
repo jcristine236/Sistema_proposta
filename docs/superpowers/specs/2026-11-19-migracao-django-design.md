@@ -110,8 +110,9 @@ As regras de `campos.ts`, `precificacao.ts`, `contexto.ts`, `validacao.ts`, `num
 `formato.ts`, `documentos.ts`, `urls.ts`, `permissoes.ts` e `tema.ts` são portadas com o
 mesmo comportamento, que está detalhado na análise (ver Anexo). Pontos de atenção:
 
-- **Precificação:** cálculo com `Decimal` e `ROUND_HALF_UP`, gravado no JSON como float.
-  Os testes comparam o resultado com valores de referência gerados pelo TS atual.
+- **Precificação:** mesma aritmética do JS (float e `Math.round`), para os centavos baterem com o
+  Next. Testes comparam com valores de referência gerados pelo TS. **Não trocar por Decimal**: isso
+  quebraria a paridade.
 - **Interpolação:** `{{caminho|filtro}}` com os filtros brl, data, maiusculas e inteiro, e o
   mesmo formato padrão de números pt-BR. A ordem é interpolar, escapar o HTML e, por
   último, transformar `**x**` em `<b>`.
