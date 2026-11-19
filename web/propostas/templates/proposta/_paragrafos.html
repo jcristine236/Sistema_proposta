@@ -1,0 +1,1 @@
+{% load proposta %}{% for t in lista %}{% if t %}<p class="{{ classe|default:'lead rv' }}" style="--d:{% atraso 0.08 0.05 forloop.counter0 %}s;white-space:pre-line">{% rico t %}</p>{% endif %}{% endfor %}
