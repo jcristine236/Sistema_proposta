@@ -195,6 +195,12 @@ Cada etapa termina rodando e com testes.
 - O webhook do D4Sign também reconhece os códigos numéricos de `type_post`.
 - A ação CONTRATO aparece no filtro da auditoria.
 - O "hoje" usa o fuso de Brasília.
+- **Usuários com escopo por empresa:** quem não é superadmin só vê e gerencia usuários que
+  compartilham empresa com ele (os de "todas as empresas" só para quem também tem esse acesso).
+  Para editar, redefinir a senha ou excluir, o alvo não pode ter permissões que o editor não tem.
+  No Next, o admin de uma empresa conseguia assumir a conta de usuários de outras empresas.
+- Criar empresa audita `CRIAR` (o Next gravava `EDITAR`); editar um usuário só derruba as
+  sessões dele quando ativo, senha ou permissões mudam de fato.
 
 Fora isso, o comportamento continua o mesmo, inclusive o que é questionável (ex.: o KPI
 "Aguardando abertura" limitado a 6, os botões do fechamento visíveis depois da decisão).

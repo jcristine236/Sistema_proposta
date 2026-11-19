@@ -105,7 +105,8 @@ def _definicao(request, chave: dict):
 
 
 def _contexto(request, corpo):
-    d = _definicao(request, corpo.get("chave") or {})
+    chave = corpo.get("chave")
+    d = _definicao(request, chave if isinstance(chave, dict) else {})
     if d is None:
         return None, None
     campos, secoes, precificacao = d

@@ -29,16 +29,52 @@ from propostas.regras.documentos import email_valido
 ACOES_MATRIZ = ["ver", "criar", "editar", "excluir"]
 
 
+# ---- Escopo (quem pode ver e gerenciar quem) ---------------------------------------
+# Correção em relação ao Next: lá o admin de uma empresa conseguia ver, editar, redefinir
+# a senha e excluir usuários de qualquer empresa (busca só pelo id).
+
+def _visiveis(request):
+    """Usuários que eu enxergo: superadmin vê todos; os demais, quem compartilha empresa comigo.
+    Usuários de "todas as empresas" só aparecem para quem também tem esse acesso."""
+    eu = request.usuario
+    if eu.super_admin:
+        return Usuario.objects.all()
+    minhas = [e.id for e in request.empresas]
+    q = Q(id__in=Membro.objects.filter(empresa_id__in=minhas).values("usuario_id"), todas_empresas=False, super_admin=False)
+    if eu.todas_empresas:
+        q |= Q(todas_empresas=True, super_admin=False)
+    return Usuario.objects.filter(q | Q(id=eu.id))
+
+
+def _permissoes_contidas(alvo, eu) -> bool:
+    """Permissões do alvo ⊆ minhas (não posso assumir a conta de quem tem mais poder)."""
+    dele, meu = ler_permissoes(alvo.permissoes), ler_permissoes(eu.permissoes)
+    for m, acoes in dele["modulos"].items():
+        for a, v in (acoes or {}).items():
+            if v and not (meu["modulos"].get(m) or {}).get(a):
+                return False
+    return not (dele["propostasDeTodos"] and not meu["propostasDeTodos"])
+
+
+def _alvo_gerenciavel(request, uid):
+    """O usuário-alvo, se eu posso gerenciá-lo; senão None."""
+    eu = request.usuario
+    alvo = _visiveis(request).filter(id=uid).first()
+    if alvo is None:
+        return None
+    if eu.super_admin or alvo.id == eu.id:
+        return alvo
+    if alvo.super_admin or not _permissoes_contidas(alvo, eu):
+        return None
+    return alvo
+
+
 # ---- Lista ------------------------------------------------------------------------
 
 @exige_sessao("usuarios")
 def usuarios(request):
     eu = request.usuario
-    qs = Usuario.objects.all()
-    if not eu.super_admin:
-        minhas = [e.id for e in request.empresas]
-        qs = qs.filter(Q(todas_empresas=True) | Q(id__in=Membro.objects.filter(empresa_id__in=minhas).values("usuario_id")))
-    lista = list(qs.order_by("-ativo", "nome"))
+    lista = list(_visiveis(request).order_by("-ativo", "nome"))
     nomes = {}
     for m in Membro.objects.filter(usuario__in=lista).select_related("empresa").order_by("id"):
         nomes.setdefault(m.usuario_id, []).append(m.empresa.nome)
@@ -77,7 +113,7 @@ def usuario(request, uid):
 def _tela_usuario(request, uid):
     eu = request.usuario
     novo = uid == "novo"
-    alvo = None if novo else Usuario.objects.filter(id=uid).first()
+    alvo = None if novo else _visiveis(request).filter(id=uid).first()
     if not novo and alvo is None:
         raise Http404
     todas = list(Empresa.objects.order_by("nome").values("id", "nome"))
@@ -169,11 +205,14 @@ def _salvar(request, d: dict):
         return JsonResponse({"erro": "E-mail inválido."})
 
     uid = _texto(d.get("id")) or None
-    alvo = Usuario.objects.filter(id=uid).first() if uid else None
-    if uid and alvo is None:
+    existente = Usuario.objects.filter(id=uid).first() if uid else None
+    if uid and existente is None:
         return JsonResponse({"erro": "Usuário não encontrado."})
-    if alvo and alvo.super_admin and not eu.super_admin:
+    if existente and existente.super_admin and not eu.super_admin:
         return JsonResponse({"erro": "Apenas um superadministrador pode alterar outro superadministrador."})
+    alvo = _alvo_gerenciavel(request, uid) if uid else None
+    if uid and alvo is None:
+        return JsonResponse({"erro": "Sem permissão para este usuário."})
     if alvo and alvo.id == eu.id and (not d.get("ativo") or (eu.super_admin and not d.get("superAdmin"))):
         return JsonResponse({"erro": "Você não pode desativar nem rebaixar o próprio acesso."})
     if Usuario.objects.filter(email=email).exclude(id=uid).exists():
@@ -253,9 +292,9 @@ _salvar_editar = exige_acao("usuarios", "editar")(_salvar)
 @require_POST
 @exige_acao("usuarios", "editar")
 def redefinir_senha(request, uid):
-    alvo = Usuario.objects.filter(id=uid).first()
+    alvo = _alvo_gerenciavel(request, uid)
     if alvo is None:
-        return JsonResponse({"erro": "Usuário não encontrado."})
+        return JsonResponse({"erro": "Sem permissão para este usuário."})
     if alvo.super_admin and not request.usuario.super_admin:
         return JsonResponse({"erro": "Sem permissão para este usuário."})
     senha = _senha_provisoria("7b")
@@ -274,7 +313,7 @@ def redefinir_senha(request, uid):
 @exige_sessao("usuarios", "excluir")
 def excluir(request, uid):
     eu = request.usuario
-    alvo = Usuario.objects.filter(id=uid).first()
+    alvo = _alvo_gerenciavel(request, uid)
     if alvo is None or alvo.id == eu.id or (alvo.super_admin and not eu.super_admin):
         return redirect("/admin/usuarios")
     if alvo.propostas.exists():
