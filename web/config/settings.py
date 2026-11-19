@@ -41,6 +41,7 @@ MIDDLEWARE = [
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
+    "nucleo.auth.SessaoMiddleware",
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -55,6 +56,7 @@ TEMPLATES = [
             "context_processors": [
                 "django.template.context_processors.request",
                 "django.template.context_processors.csrf",
+                "painel.context_processors.painel",
             ],
         },
     },
