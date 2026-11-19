@@ -8,3 +8,8 @@ node_modules/
 out/
 web/.env
 web/criar-banco.sql
+.superpowers/
+web/.venv/
+web/uploads/
+web/staticfiles/
+__pycache__/
