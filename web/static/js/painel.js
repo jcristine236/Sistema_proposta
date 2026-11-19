@@ -62,4 +62,30 @@
     el.textContent = "Copiado!";
     setTimeout(function () { el.textContent = texto; }, 2000);
   });
+
+  // Contrato no D4Sign: <button data-contrato="/admin/propostas/<id>/contrato"> (BotaoContrato.tsx)
+  document.addEventListener("click", function (e) {
+    var btn = e.target.closest("[data-contrato]");
+    if (!btn) return;
+    e.preventDefault();
+    var antigo = btn.parentNode.querySelector(".alerta");
+    if (antigo) antigo.remove();
+    if (!window.confirm("Gerar o contrato no D4Sign e enviar para assinatura (cliente + empresa)?")) return;
+    var texto = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = "Gerando contrato…";
+    var m = document.cookie.match(/(?:^|; )csrftoken=([^;]+)/);
+    fetch(btn.dataset.contrato, { method: "POST", credentials: "same-origin", headers: { "X-CSRFToken": m ? decodeURIComponent(m[1]) : "" } })
+      .then(function (r) { return r.json().catch(function () { return { erro: "Falha ao gerar o contrato no D4Sign." }; }); },
+            function () { return { erro: "Falha ao gerar o contrato no D4Sign." }; })
+      .then(function (r) {
+        btn.disabled = false;
+        btn.textContent = texto;
+        var msg = document.createElement("div");
+        msg.className = "alerta " + (r.erro ? "erro" : "ok");
+        msg.style.marginTop = "10px";
+        msg.textContent = r.erro || "Contrato criado no D4Sign e enviado para assinatura.";
+        btn.parentNode.appendChild(msg);
+      });
+  });
 })();

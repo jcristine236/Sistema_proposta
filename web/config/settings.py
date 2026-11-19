@@ -26,6 +26,13 @@ PUBLIC_PROTOCOL = env("PUBLIC_PROTOCOL", default="https")
 ADMIN_BASE_URL = env("ADMIN_BASE_URL", default="")
 UPLOAD_DIR = (BASE_DIR / env("UPLOAD_DIR", default="./uploads")).resolve()
 
+# D4Sign: credenciais da conta (o cofre, o modelo e o signatário ficam por empresa)
+D4SIGN_AMBIENTE = env("D4SIGN_AMBIENTE", default="sandbox").lower()
+D4SIGN_TOKEN_API = env("D4SIGN_TOKEN_API", default="")
+D4SIGN_CRYPT_KEY = env("D4SIGN_CRYPT_KEY", default="")
+D4SIGN_WEBHOOK_TOKEN = env("D4SIGN_WEBHOOK_TOKEN", default="")
+D4SIGN_BASE_URL = env("D4SIGN_BASE_URL", default="")
+
 INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.auth",

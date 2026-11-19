@@ -86,7 +86,7 @@ def baixar(base: str, caminho: str, sessao: str, empresa: str) -> str:
 
 def _mascarar(no):
     if isinstance(no, str):
-        return _TEMPO.sub("T", _DATA.sub("DATA", _ID.sub("ID", no)))
+        return _TEMPO.sub("T", _DATA.sub("DATA", _ID.sub("ID", re.sub(r"localhost:\d+", "localhost", no))))
     tag, attrs, filhos = no
     attrs = tuple((k, _mascarar(v)) for k, v in attrs
                   if not (k == "name" and (v.startswith("$ACTION") or v == "csrfmiddlewaretoken"))
@@ -124,8 +124,9 @@ def main(argv):
     cn, cd = cookie_next(), cookie_django()
     falhas = 0
     for caminho in argv:
-        a = conteudo(baixar(DJANGO, caminho, cd, empresa))
-        b = conteudo(baixar(NEXT, caminho, cn, empresa))
+        cam_django, _, cam_next = caminho.partition("|")  # "caminho_django|caminho_next" quando os ids diferem
+        a = conteudo(baixar(DJANGO, cam_django, cd, empresa))
+        b = conteudo(baixar(NEXT, cam_next or cam_django, cn, empresa))
         d = primeira_diferenca(a, b)
         print(f"{'OK ' if d is None else 'DIF'} {caminho}" + ("" if d is None else f"\n    {d[:600]}"))
         falhas += d is not None
