@@ -1,6 +1,6 @@
-from django.urls import include, path, re_path
+from django.urls import include, path
 
-from painel.views import auth, conta, inicio, proposta_detalhe, proposta_form, propostas
+from painel.views import auth, conta, inicio, modelos, proposta_detalhe, proposta_form, propostas
 
 urlpatterns = [
     path("", auth.raiz),
@@ -22,6 +22,14 @@ urlpatterns = [
     path("admin/sem-permissao", inicio.sem_permissao),
     # Cadastros (clientes, catálogo, empresa, empresas, usuários, auditoria, uploads)
     path("", include("painel.urls_cadastros")),
-    # Rotas do menu que entram nas etapas 3 e 4
-    re_path(r"^admin/modelos(/.*)?$", inicio.em_construcao("modelos", "Modelos")),
+    # Modelos e seções modelo
+    path("admin/modelos", modelos.lista),
+    path("admin/modelos/novo", modelos.criar_em_branco),
+    path("admin/modelos/secoes/nova/<str:tipo>", modelos.criar_secao),
+    path("admin/modelos/secoes/<str:secao_id>/renomear", modelos.renomear_secao),
+    path("admin/modelos/secoes/<str:secao_id>/excluir", modelos.excluir_secao),
+    path("admin/modelos/<str:modelo_id>", modelos.abrir),
+    path("admin/modelos/<str:modelo_id>/duplicar", modelos.duplicar),
+    path("admin/modelos/<str:modelo_id>/alternar", modelos.alternar),
+    path("admin/modelos/<str:modelo_id>/excluir", modelos.excluir),
 ]
