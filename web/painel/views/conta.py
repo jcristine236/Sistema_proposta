@@ -28,7 +28,6 @@ def conta(request):
         return _tela(request)
 
     u = request.usuario
-    era_obrigatorio = u.trocar_senha
     campos = {k: request.POST.get(k, "") for k in ("nome", "whatsapp", "senhaAtual", "novaSenha", "confirmar")}
     nome = campos["nome"].strip()
     if not nome or len(nome) > 120 or len(campos["whatsapp"]) > 20 or any(
@@ -61,9 +60,6 @@ def conta(request):
         entrar(request, u)
         auditar(request, usuario=u, acao="TROCAR_SENHA")
     request.usuario = u
-    return _tela(
-        request,
-        ok="Dados e senha atualizados." if trocou else "Dados atualizados.",
-        ir_painel=era_obrigatorio,
-        obrigatorio=era_obrigatorio,
-    )
+    # Como no Next, a tela recarrega com o estado novo: sem o aviso de troca
+    # obrigatória (e, por isso, sem o link "Ir para o painel").
+    return _tela(request, ok="Dados e senha atualizados." if trocou else "Dados atualizados.")
