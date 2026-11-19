@@ -125,3 +125,90 @@ class AcoesTest(Comum):
         self.client.post(f"/admin/modelos/secoes/{sec.pk}/excluir")
         self.assertEqual(SecaoModelo.objects.get(pk=sec.pk).nome, "Alheia")
         self.assertEqual(self.client.get(f"/admin/modelos/secoes/{sec.pk}").status_code, 404)
+
+
+class EditorTest(Comum):
+    def setUp(self):
+        super().setUp()
+        self.login()
+        self.m = Modelo.objects.filter(empresa=self.caddi).first()
+
+    def post(self, url, corpo, client=None):
+        return (client or self.client).post(url, json.dumps(corpo) if not isinstance(corpo, str) else corpo,
+                                            content_type="application/json")
+
+    def dados(self, **kw):
+        return {"nome": self.m.nome, "descricao": "", "tipoSolucao": self.m.tipo_solucao, "validadeDias": 15,
+                "campos": self.m.campos, "secoes": self.m.secoes, "precificacao": self.m.precificacao, **kw}
+
+    def test_tela(self):
+        r = self.client.get(f"/admin/modelos/{self.m.pk}/editar")
+        self.assertContains(r, 'id="config-editor"')
+        self.assertContains(r, "js/editor-modelo.js")
+        self.assertContains(r, "css/proposta.css")
+        self.assertEqual(self.client.get("/admin/modelos/nao-existe/editar").status_code, 404)
+
+    def test_salvar(self):
+        r = self.post(f"/admin/modelos/{self.m.pk}/editar", {"modelo": self.dados(nome="  Novo nome  ", validadeDias="400")})
+        self.assertEqual(r.json(), {"id": self.m.pk})
+        m = Modelo.objects.get(pk=self.m.pk)
+        self.assertEqual((m.nome, m.validade_dias, m.descricao), ("Novo nome", 365, None))
+        self.assertTrue(LogAuditoria.objects.filter(acao="EDITAR", entidade="Modelo", entidade_id=m.pk).exists())
+
+    def test_erros(self):
+        url = f"/admin/modelos/{self.m.pk}/editar"
+        self.assertEqual(self.post(url, {"modelo": self.dados(nome=" ")}).json(), {"erro": "Dê um nome ao modelo."})
+        campos = [{"id": "a", "tipo": "texto", "rotulo": "x"}, {"id": "a", "tipo": "texto", "rotulo": "y"}]
+        self.assertEqual(self.post(url, {"modelo": self.dados(campos=campos)}).json(), {"erro": "Variável repetida: a"})
+        self.assertEqual(self.post(url, {"modelo": self.dados(secoes=[{"id": "a", "tipo": "texto", "capitulo": None}])}).json(),
+                         {"erro": "Seção inválida: Expected string, received null"})
+        self.assertEqual(self.post(url, {"modelo": self.dados(secoes=[{"id": "a", "tipo": "texto", "t": "x" * 7000, "u": "y" * 7000}] * 60)}).json(),
+                         {"erro": "Modelo grande demais."})
+        self.assertEqual(self.post(url, "{quebrado").json(), {"erro": "Dê um nome ao modelo."})
+        alheio = Modelo.objects.exclude(empresa=self.caddi).first()
+        self.assertEqual(self.post(f"/admin/modelos/{alheio.pk}/editar", {"modelo": self.dados()}).json(),
+                         {"erro": "Modelo não encontrado."})
+
+    def test_somente_ver(self):
+        self.vendedor()
+        self.login(email="vend@x.com")
+        self.assertEqual(self.client.get(f"/admin/modelos/{self.m.pk}/editar").status_code, 200)
+        r = self.post(f"/admin/modelos/{self.m.pk}/editar", {"modelo": self.dados(nome="X")})
+        self.assertEqual((r.status_code, r.json()), (403, {"erro": SEM}))
+        r = self.post("/admin/modelos/secoes/favorita", {"nome": "X", "secao": {"id": "a", "tipo": "texto"}})
+        self.assertEqual(r.status_code, 403)
+
+    def test_secao(self):
+        sec = SecaoModelo.objects.create(empresa=self.caddi, nome="FAQ", secao={"id": "faq-1", "tipo": "faq"})
+        self.assertContains(self.client.get(f"/admin/modelos/secoes/{sec.pk}"), 'id="config-editor"')
+        r = self.post(f"/admin/modelos/secoes/{sec.pk}", {"nome": "FAQ 2", "secao": {"id": "faq-1", "tipo": "faq", "titulo": "T"}})
+        self.assertEqual(r.json(), {"id": sec.pk})
+        sec.refresh_from_db()
+        self.assertEqual((sec.nome, sec.secao["titulo"]), ("FAQ 2", "T"))
+        self.assertEqual(self.post(f"/admin/modelos/secoes/{sec.pk}", {"nome": "", "secao": {}}).json(), {"erro": "Dê um nome à seção."})
+
+    def test_favorita(self):
+        r = self.post("/admin/modelos/secoes/favorita", {"nome": "Capa padrão", "secao": {"id": "capa-1", "tipo": "capa"}})
+        sec = SecaoModelo.objects.get(nome="Capa padrão")
+        self.assertEqual(r.json(), {"id": sec.pk})
+        self.assertTrue(LogAuditoria.objects.filter(acao="CRIAR", entidade="SecaoModelo").exists())
+
+    def test_render(self):
+        secoes = [{"id": "texto-1", "tipo": "texto", "titulo": "Olá {{cliente}}", "paragrafos": ["P"]},
+                  {"id": "x", "tipo": "inexistente"}, "lixo",
+                  {"id": "cl", "tipo": "campoLista", "campo": "nada"}]
+        r = self.post("/admin/modelos/render", {"campos": self.m.campos, "precificacao": self.m.precificacao, "secoes": secoes})
+        blocos = r.json()["blocos"]
+        self.assertEqual(len(blocos), 4)
+        self.assertTrue(blocos[0].startswith('<div class="pp previa" style="'))
+        self.assertIn("Olá Cliente Exemplo", blocos[0])
+        self.assertEqual(blocos[1:], ["", "", ""])
+        r = self.post("/admin/modelos/render", {"campos": self.m.campos, "precificacao": self.m.precificacao,
+                                                "secoes": self.m.secoes, "completa": True})
+        self.assertIn("Prévia do modelo com valores de exemplo", r.json()["html"])
+
+    def test_render_entrada_ruim(self):
+        for corpo in ("{x", "[]", {"campos": "x", "precificacao": [], "secoes": {}},
+                      {"campos": [{"id": 1}], "secoes": [{"id": "a", "tipo": "capa", "selos": "x"}]}):
+            r = self.post("/admin/modelos/render", corpo)
+            self.assertEqual(r.status_code, 200, corpo)

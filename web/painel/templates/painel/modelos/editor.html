@@ -1,0 +1,4 @@
+{% extends "painel/app.html" %}{% load static %}
+{% block head_pagina %}<link rel="stylesheet" href="{{ fontes }}">{% endblock %}
+{% block conteudo %}<div class="editor" data-editor></div>{% endblock %}
+{% block scripts %}{{ config|json_script:"config-editor" }}<script nonce="{{ request.csp_nonce }}" src="{% static 'js/proposta.js' %}" defer></script><script nonce="{{ request.csp_nonce }}" src="{% static 'js/editor-modelo.js' %}" defer></script>{% endblock %}
