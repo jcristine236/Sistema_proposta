@@ -6,3 +6,5 @@
 next-env.d.ts
 node_modules/
 out/
+web/.env
+web/criar-banco.sql
