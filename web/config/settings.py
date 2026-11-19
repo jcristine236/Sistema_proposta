@@ -65,6 +65,9 @@ TEMPLATES = [
 ]
 
 DATABASES = {"default": env.db("DATABASE_URL")}
+# Nome do banco de testes configurável (permite rodar duas suítes ao mesmo tempo)
+if env("TEST_DB_NAME", default=""):
+    DATABASES["default"]["TEST"] = {"NAME": env("TEST_DB_NAME")}
 DATABASES["default"]["CONN_MAX_AGE"] = 60
 
 LANGUAGE_CODE = "pt-br"

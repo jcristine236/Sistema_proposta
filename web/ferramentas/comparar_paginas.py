@@ -36,7 +36,8 @@ from nucleo.models import Usuario  # noqa: E402
 from propostas.tests.html_canonico import _Arvore, _limpar, primeira_diferenca  # noqa: E402
 
 EMAIL = "admin@propostas.local"
-NEXT, DJANGO = "http://localhost:3000", "http://localhost:8000"
+NEXT = "http://localhost:3000"
+DJANGO = os.environ.get("COMPARAR_DJANGO_URL", "http://localhost:8000")
 
 _ID = re.compile(r"\b(c[a-z0-9]{24}|[a-f0-9]{32})\b")
 _DATA = re.compile(r"\d{2}/\d{2}/\d{4}(, \d{2}:\d{2})?")
