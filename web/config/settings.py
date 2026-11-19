@@ -28,6 +28,7 @@ UPLOAD_DIR = (BASE_DIR / env("UPLOAD_DIR", default="./uploads")).resolve()
 
 INSTALLED_APPS = [
     "django.contrib.contenttypes",
+    "django.contrib.auth",
     "django.contrib.sessions",
     "django.contrib.staticfiles",
     "nucleo",
@@ -90,3 +91,6 @@ CSRF_COOKIE_SECURE = not MODO_HTTP
 CSRF_COOKIE_SAMESITE = "Lax"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+AUTH_USER_MODEL = "nucleo.Usuario"
+PASSWORD_HASHERS = ["django.contrib.auth.hashers.PBKDF2PasswordHasher"]
