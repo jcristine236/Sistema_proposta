@@ -68,7 +68,7 @@ web/
   integracoes/       e-mail, WhatsApp, D4Sign (etapa 5)
   static/            css/globals.css, css/proposta.css, js/*.js
   publico_raiz/empresas/...   logos (servidos em /empresas/)
-  seed/modelos/*.json         os 17 modelos + catálogos, exportados do TS
+  seed/modelos/*.json         os 18 modelos + catálogos, exportados do TS
 ```
 
 ## 5. Dados
@@ -98,7 +98,7 @@ Os modelos Django espelham o `schema.prisma` campo a campo (nomes em snake_case)
 - O admin vindo de `SEED_ADMIN_EMAIL`/`SEED_ADMIN_PASSWORD`, com `trocar_senha` e vínculo
   a todas as empresas. Se o admin já existe, não é alterado.
 - Os produtos dos catálogos, casados por (empresa, categoria, código).
-- Os 17 modelos, casados por (empresa, tipo_solucao).
+- Os 18 modelos, casados por (empresa, tipo_solucao).
 - **Sem proposta de exemplo.**
 - Os modelos vêm de `web/seed/modelos/*.json`, gerados **uma vez** por um script `tsx`
   que importa os arquivos de `prisma/modelos/`. Os JSON são versionados; depois disso o
