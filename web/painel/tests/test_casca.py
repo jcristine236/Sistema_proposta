@@ -39,7 +39,9 @@ class CascaTest(Base):
 
     def test_item_ativo(self):
         self.login()
-        html = self.client.get("/admin/propostas/x").content.decode()
+        from publico.tests.fabrica import criar_proposta
+        p = criar_proposta()
+        html = self.client.get(f"/admin/propostas/{p.pk}").content.decode()
         self.assertIn('href="/admin/propostas" class="on"', html)
         html = self.client.get("/admin/propostas/nova").content.decode()
         self.assertIn('href="/admin/propostas" class=""', html)
