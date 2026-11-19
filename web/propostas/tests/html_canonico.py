@@ -10,7 +10,8 @@ from html.parser import HTMLParser
 VAZIOS = {"area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "source", "track", "wbr"}
 GANCHOS_JS = {"data-logo", "data-altura", "data-largura-max", "data-acao", "data-aba", "data-selos",
               "data-proposta", "data-slug", "data-modo", "data-motivos", "data-mensal", "data-unico",
-              "data-enviando", "data-confirmar", "data-copiar", "data-empresa-ativa"}
+              "data-enviando", "data-confirmar", "data-copiar", "data-empresa-ativa",
+              "data-abas", "data-aba-form", "data-aba-previa", "data-gerar", "data-form-proposta", "data-resumo"}
 _NUM = re.compile(r"-?\d+\.\d+")
 
 

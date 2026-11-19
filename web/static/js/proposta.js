@@ -5,8 +5,17 @@
 (function () {
   "use strict";
 
-  var raiz = document.querySelector("[data-proposta]");
-  if (!raiz) return;
+  // Também usado pela aba "Prévia" do painel sobre o HTML que o servidor devolve.
+  window.iniciarProposta = iniciar;
+  var inicial = document.querySelector("[data-proposta]");
+  if (inicial) iniciar(inicial);
+
+  function iniciar(raiz) {
+  var fins = [];
+  function ouvir(alvo, evento, fn, opcoes) {
+    alvo.addEventListener(evento, fn, opcoes);
+    fins.push(function () { alvo.removeEventListener(evento, fn, opcoes); });
+  }
   var modo = raiz.dataset.modo || "publico";
   var slug = raiz.dataset.slug || "";
   var reduzido = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -85,6 +94,7 @@
       });
     }, { threshold: 0.12, rootMargin: "0px 0px -5% 0px" });
     raiz.querySelectorAll(".rv").forEach(function (x) { io.observe(x); });
+    fins.push(function () { io.disconnect(); });
   } else {
     raiz.querySelectorAll(".rv").forEach(function (x) { x.classList.add("in"); });
   }
@@ -117,8 +127,8 @@
       if (alvo) alvo.scrollIntoView({ behavior: reduzido ? "auto" : "smooth" });
     });
   });
-  window.addEventListener("scroll", aoRolar, { passive: true });
-  window.addEventListener("resize", aoRolar);
+  ouvir(window, "scroll", aoRolar, { passive: true });
+  ouvir(window, "resize", aoRolar);
   aoRolar();
 
   // --------------------------------------------- abas de selos (seção confiança)
@@ -324,4 +334,8 @@
     var btn = e.target.closest("[data-acao]");
     if (btn && raiz.contains(btn)) abrirModal(btn.dataset.acao);
   });
+
+  // Devolve a função que desliga os ouvintes globais (a prévia é recriada várias vezes)
+  return function () { fins.forEach(function (f) { f(); }); };
+  }
 })();
