@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     "nucleo",
     "propostas",
     "painel",
+    "publico",
 ]
 
 MIDDLEWARE = [

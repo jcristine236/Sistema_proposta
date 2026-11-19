@@ -9,7 +9,7 @@ from html.parser import HTMLParser
 
 VAZIOS = {"area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "source", "track", "wbr"}
 GANCHOS_JS = {"data-logo", "data-altura", "data-largura-max", "data-acao", "data-aba", "data-selos",
-              "data-proposta", "data-slug", "data-modo"}
+              "data-proposta", "data-slug", "data-modo", "data-motivos", "data-mensal", "data-unico"}
 _NUM = re.compile(r"-?\d+\.\d+")
 
 

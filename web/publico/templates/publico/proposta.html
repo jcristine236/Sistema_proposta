@@ -1,0 +1,19 @@
+{% load static %}<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ titulo }}</title>
+<meta name="robots" content="noindex, nofollow">
+{% if icone %}<link rel="icon" href="{{ icone }}">{% endif %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="{{ fontes_painel }}">
+<link rel="stylesheet" href="{{ fontes }}">
+<link rel="stylesheet" href="{% static 'css/globals.css' %}">
+<link rel="stylesheet" href="{% static 'css/proposta.css' %}">
+</head>
+<body>{{ html }}
+<script nonce="{{ request.csp_nonce }}" src="{% static 'js/proposta.js' %}" defer></script>
+<script nonce="{{ request.csp_nonce }}" src="{% static 'js/rastreio.js' %}" defer></script>
+</body>
+</html>

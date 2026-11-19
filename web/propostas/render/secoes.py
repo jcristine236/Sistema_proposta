@@ -118,8 +118,13 @@ def _preparar(s: dict, ctx: dict) -> dict:
     return p
 
 
-def renderizar_proposta(secoes, ctx, tema, modo="publico", slug=None, decisao=None, codigo=None, aviso_previa=None) -> str:
-    """HTML do div.pp inteiro (o que o PropostaView gera no servidor)."""
+def renderizar_proposta(secoes, ctx, tema, modo="publico", slug=None, decisao=None, codigo=None, aviso_previa=None,
+                        extras: dict | None = None) -> str:
+    """HTML do div.pp inteiro (o que o PropostaView gera no servidor).
+
+    `extras` vira atributos data-* do div.pp para o JS (motivos de recusa e valores
+    formatados que aparecem no modal de aceite).
+    """
     visiveis = [s for s in secoes if condicao(s.get("mostrarSe"), ctx)]
     blocos = []
     for s in visiveis:
@@ -138,4 +143,5 @@ def renderizar_proposta(secoes, ctx, tema, modo="publico", slug=None, decisao=No
         "aviso_previa": aviso_previa,
         "dots": [s for s in visiveis if s.get("capitulo") or s["tipo"] == "capa"],
         "blocos": blocos,
+        "extras": extras or {},
     })
