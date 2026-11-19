@@ -66,14 +66,6 @@ TEMPLATES = [
 DATABASES = {"default": env.db("DATABASE_URL")}
 DATABASES["default"]["CONN_MAX_AGE"] = 60
 
-# Limite de taxa compartilhado entre processos (ver nucleo/limite.py).
-CACHES = {
-    "default": {
-        "BACKEND": "django.core.cache.backends.db.DatabaseCache",
-        "LOCATION": "cache_limite",
-    }
-}
-
 LANGUAGE_CODE = "pt-br"
 TIME_ZONE = "America/Sao_Paulo"
 USE_I18N = True

@@ -63,7 +63,7 @@ class Usuario(AbstractBaseUser):
     id = _pk()
     nome = models.CharField(max_length=120)
     email = models.EmailField(max_length=160, unique=True)
-    whatsapp = models.CharField(max_length=16, null=True, blank=True)
+    whatsapp = models.CharField(max_length=20, null=True, blank=True)
     # Administrador da plataforma inteira
     super_admin = models.BooleanField(default=False)
     # True = acessa todas as empresas; False = só as vinculadas em Membro
@@ -143,3 +143,11 @@ class LogAuditoria(models.Model):
             models.Index(fields=["criado_em"]),
             models.Index(fields=["empresa_id", "criado_em"]),
         ]
+
+
+class LimiteTaxa(models.Model):
+    """Tentativas recentes por chave (IP, e-mail...). Ver nucleo/limite.py."""
+
+    chave = models.CharField(primary_key=True, max_length=200)
+    tentativas = models.JSONField(default=list)
+    atualizado_em = models.DateTimeField(auto_now=True)

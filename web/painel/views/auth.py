@@ -4,6 +4,7 @@ import re
 from datetime import timedelta
 
 from django.contrib.auth.hashers import check_password, make_password
+from django.db import transaction
 from django.shortcuts import redirect, render
 from django.utils import timezone
 from django.views.decorators.http import require_POST
@@ -55,14 +56,19 @@ def login(request):
     ok = check_password(senha, u.password if u else HASH_FALSO)
     if not u or not ok or not u.ativo:
         if u:
-            falhas = u.falhas_login + 1
+            # Linha travada: tentativas em paralelo contam todas
+            with transaction.atomic():
+                atual = Usuario.objects.select_for_update().only("falhas_login").get(pk=u.pk)
+                falhas = atual.falhas_login + 1
+                if falhas >= MAX_FALHAS:
+                    Usuario.objects.filter(pk=u.pk).update(
+                        falhas_login=0, bloqueado_ate=agora + timedelta(minutes=BLOQUEIO_MIN)
+                    )
+                else:
+                    Usuario.objects.filter(pk=u.pk).update(falhas_login=falhas)
             if falhas >= MAX_FALHAS:
-                Usuario.objects.filter(pk=u.pk).update(
-                    falhas_login=0, bloqueado_ate=agora + timedelta(minutes=BLOQUEIO_MIN)
-                )
                 auditar(request, usuario=u, acao="LOGIN_BLOQUEADO", descricao=email)
                 return _tela(request, voltar, BLOQUEIO)
-            Usuario.objects.filter(pk=u.pk).update(falhas_login=falhas)
             auditar(request, usuario=u, acao="LOGIN_FALHOU", descricao=email)
         else:
             auditar(request, acao="LOGIN_FALHOU", descricao=f"e-mail inexistente: {email}")
