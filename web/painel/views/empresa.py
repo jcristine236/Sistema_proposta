@@ -229,8 +229,9 @@ def empresas(request):
     dados = {"nome": d["nome"], "slug": d["slug"], "prefixo": d["prefixo"], "dominio_propostas": d["dominioPropostas"],
              "razao_social": d["razaoSocial"], "site": d["site"]}
     if d["id"]:
-        # No Next, um id inexistente estoura no update (erro 500); aqui só não altera nada
-        Empresa.objects.filter(id=d["id"]).update(**dados)
+        # No Next, um id inexistente estoura no update (erro 500); aqui vira mensagem
+        if not Empresa.objects.filter(id=d["id"]).update(**dados):
+            return _tela_empresas(request, erro="Empresa não encontrada.")
         eid = d["id"]
     else:
         eid = Empresa.objects.create(**dados, tema=tema_de({}), motivos_recusa=list(MOTIVOS_PADRAO)).id

@@ -302,6 +302,8 @@ class EmpresasTest(Comum):
                            ({"slug": "caddi"}, "Identificador, prefixo ou domínio já usado por outra empresa.")]:
             self.assertContains(self.client.post("/admin/empresas", self.form(**extra)), msg)
         self.assertFalse(Empresa.objects.filter(slug="nova").exists())
+        self.assertContains(self.client.post("/admin/empresas", self.form(id="naoexiste")), "Empresa não encontrada.")
+        self.assertFalse(LogAuditoria.objects.filter(entidade="Empresa").exists())
 
 
 PNG = b"\x89PNG\r\n\x1a\n" + b"0" * 100
