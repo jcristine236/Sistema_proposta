@@ -33,6 +33,29 @@ D4SIGN_CRYPT_KEY = env("D4SIGN_CRYPT_KEY", default="")
 D4SIGN_WEBHOOK_TOKEN = env("D4SIGN_WEBHOOK_TOKEN", default="")
 D4SIGN_BASE_URL = env("D4SIGN_BASE_URL", default="")
 
+# Avisos por e-mail (sem SMTP_HOST, o aviso só vai para o log) — src/lib/email.ts
+SMTP_HOST = env("SMTP_HOST", default="")
+EMAIL_HOST = SMTP_HOST
+EMAIL_PORT = env.int("SMTP_PORT", default=587)
+EMAIL_USE_SSL = env.bool("SMTP_SECURE", default=False)
+EMAIL_USE_TLS = not EMAIL_USE_SSL and EMAIL_PORT == 587
+EMAIL_HOST_USER = env("SMTP_USER", default="")
+EMAIL_HOST_PASSWORD = env("SMTP_PASS", default="")
+EMAIL_TIMEOUT = 10
+DEFAULT_FROM_EMAIL = env("SMTP_FROM", default="") or EMAIL_HOST_USER or "webmaster@localhost"
+
+# Avisos por WhatsApp: "evolution", "meta" ou "webhook" (vazio = só log) — src/lib/whatsapp.ts
+WHATSAPP_PROVIDER = env("WHATSAPP_PROVIDER", default="")
+EVOLUTION_URL = env("EVOLUTION_URL", default="")
+EVOLUTION_INSTANCE = env("EVOLUTION_INSTANCE", default="")
+EVOLUTION_APIKEY = env("EVOLUTION_APIKEY", default="")
+META_TOKEN = env("META_TOKEN", default="")
+META_PHONE_ID = env("META_PHONE_ID", default="")
+META_TEMPLATE = env("META_TEMPLATE", default="")
+META_TEMPLATE_LANG = env("META_TEMPLATE_LANG", default="pt_BR")
+WHATSAPP_WEBHOOK_URL = env("WHATSAPP_WEBHOOK_URL", default="")
+WHATSAPP_WEBHOOK_SECRET = env("WHATSAPP_WEBHOOK_SECRET", default="")
+
 INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.auth",
