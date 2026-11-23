@@ -18,7 +18,7 @@ from django.utils import timezone
 from django.views.decorators.http import require_POST
 
 from nucleo.auditoria import auditar
-from nucleo.auth import exige_acao, exige_sessao
+from nucleo.auth import SEM_PERMISSAO, exige_acao, exige_sessao
 from nucleo.models import Empresa, Membro, Usuario
 from nucleo.permissoes import (
     MODULOS, NOMES_ACOES, PERFIS, ler_permissoes, perfil_de, pode, sanitizar_permissoes,
@@ -186,6 +186,8 @@ def _senha_provisoria(sufixo: str) -> str:
 
 @require_POST
 def salvar(request):
+    if request.usuario is None:
+        return JsonResponse({"erro": SEM_PERMISSAO}, status=403)
     try:
         d = json.loads(request.body or b"{}")
     except (ValueError, UnicodeDecodeError):

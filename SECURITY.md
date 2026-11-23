@@ -51,6 +51,8 @@ checklist da infraestrutura (servidor Windows); a terceira lista os riscos conhe
 
 ### Servidor
 - O Django (waitress) escuta só em `127.0.0.1:8000`; o PostgreSQL só em `localhost`.
+- `DEBUG` é a chave de ambiente: com `DEBUG=false`, `ALLOW_ANY_HOST` e `MODO_HTTP` são ignorados, a `SECRET_KEY` precisa ter 32+ caracteres e o webhook do D4Sign exige token. O `servir.py` se recusa a subir com `DEBUG=true`.
+- Não existe o `/admin` padrão do Django (`django.contrib.admin` não está instalado). Todo o `/admin/...` é o painel próprio e exige login; só ficam abertos a proposta pública (`/p/...`), suas imagens, o rastreio, o aceite/recusa do cliente, o webhook do D4Sign e a tela de login (teste `painel/tests/test_rotas_anonimas.py`).
 - Apenas o Caddy publica as portas 80/443; HTTPS automático; cabeçalho `Server` removido; corpo de requisição limitado a 10 MB.
 - Segredos só no `web/.env` (fora do Git), com acesso restrito a administradores.
 

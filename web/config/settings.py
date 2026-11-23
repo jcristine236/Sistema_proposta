@@ -13,14 +13,20 @@ env = environ.Env()
 environ.Env.read_env(BASE_DIR / ".env")
 
 SECRET_KEY = env("SECRET_KEY")
+# Chave única de ambiente: DEBUG=true é teste local; DEBUG=false é produção e desliga
+# tudo que é de teste (páginas de erro detalhadas, ALLOW_ANY_HOST, MODO_HTTP, webhook sem token).
 DEBUG = env.bool("DEBUG", default=False)
+if not DEBUG and (len(SECRET_KEY) < 32 or SECRET_KEY.startswith("gere-uma")):
+    from django.core.exceptions import ImproperlyConfigured
+
+    raise ImproperlyConfigured("Com DEBUG=false, defina SECRET_KEY no web/.env com 32+ caracteres aleatórios.")
 
 # O host de cada proposta é validado contra o domínio da empresa (ver publico/),
 # por isso aqui todos os hosts são aceitos.
 ALLOWED_HOSTS = ["*"]
 
-ALLOW_ANY_HOST = env.bool("ALLOW_ANY_HOST", default=False)
-MODO_HTTP = env.bool("MODO_HTTP", default=False)
+ALLOW_ANY_HOST = DEBUG and env.bool("ALLOW_ANY_HOST", default=False)
+MODO_HTTP = DEBUG and env.bool("MODO_HTTP", default=False)
 PUBLIC_BASE_URL = env("PUBLIC_BASE_URL", default="")
 PUBLIC_PROTOCOL = env("PUBLIC_PROTOCOL", default="https")
 ADMIN_BASE_URL = env("ADMIN_BASE_URL", default="")

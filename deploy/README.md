@@ -108,7 +108,7 @@ Valores de produção no `web/.env`:
 |---|---|
 | `DATABASE_URL` | `postgres://propostas:SENHA_FORTE_DO_BANCO@localhost:5432/propostas` |
 | `SECRET_KEY` | a chave gerada acima |
-| `DEBUG` | `false` |
+| `DEBUG` | `false` (obrigatório: o `servir.py` não sobe com `true`; desliga `ALLOW_ANY_HOST`/`MODO_HTTP` e exige `SECRET_KEY` com 32+ caracteres) |
 | `MODO_HTTP` | `false` (HTTPS: cookies `Secure` e HSTS) |
 | `ALLOW_ANY_HOST` | `false` (cada proposta só abre no domínio da empresa) |
 | `PUBLIC_BASE_URL` | vazio (o link usa o domínio da empresa) |
