@@ -201,6 +201,12 @@ Cada etapa termina rodando e com testes.
   No Next, o admin de uma empresa conseguia assumir a conta de usuários de outras empresas.
 - Criar empresa audita `CRIAR` (o Next gravava `EDITAR`); editar um usuário só derruba as
   sessões dele quando ativo, senha ou permissões mudam de fato.
+- Etapa 4/5: o Cálculo do editor preserva `recorrente.extras`; o canvas não recarrega vídeos a
+  cada tecla; a prévia do editor limpa links perigosos como o salvamento já fazia.
+- WhatsApp: números normalizados antes de deduplicar (o Next mandava duas vezes ao mesmo celular).
+- Aceite/recusa só gravam se a proposta ainda estiver em aberto, e a edição trava a linha e confere
+  o status: o vendedor não sobrescreve mais um aceite feito enquanto editava.
+- Datas impossíveis (31/02, texto) viram erro de validação em vez de erro 500.
 
 Fora isso, o comportamento continua o mesmo, inclusive o que é questionável (ex.: o KPI
 "Aguardando abertura" limitado a 6, os botões do fechamento visíveis depois da decisão).
