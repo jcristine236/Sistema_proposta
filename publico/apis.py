@@ -150,9 +150,16 @@ def decisao(request, slug):
     d = _ler_corpo(request)
     if d is None:
         return JsonResponse({"erro": "Dados inválidos."}, status=400)
-    p = servico.buscar(request, slug, exigir_empresa_ativa=False)
+    # Como a página: empresa desativada é 404, e respondida/expirada não aceita mais nada
+    p = servico.buscar(request, slug)
     if p is None:
         return JsonResponse({"erro": "Proposta não encontrada."}, status=404)
+
+    agora = timezone.now()
+    if p.status == StatusProposta.EXPIRADA or (p.valida_ate and p.valida_ate < agora):
+        return JsonResponse({"erro": "Esta proposta expirou. Fale com quem a enviou."}, status=409)
+    if p.status in (StatusProposta.ACEITA, StatusProposta.RECUSADA):
+        return JsonResponse({"erro": "Esta proposta já foi respondida."}, status=409)
 
     if d["acao"] == "comentar":
         if not d["nome"] or not d["texto"]:
@@ -161,12 +168,6 @@ def decisao(request, slug):
         quem = f"{d['nome']} ({d['email']})" if d["email"] else d["nome"]
         avisar(p, f"Novo comentário de {d['nome']}", f'{quem} comentou na proposta de {p.cliente_nome}:\n\n"{d["texto"]}"')
         return JsonResponse({"ok": True})
-
-    agora = timezone.now()
-    if p.status == StatusProposta.EXPIRADA or (p.valida_ate and p.valida_ate < agora):
-        return JsonResponse({"erro": "Esta proposta expirou. Fale com quem a enviou."}, status=409)
-    if p.status in (StatusProposta.ACEITA, StatusProposta.RECUSADA):
-        return JsonResponse({"erro": "Esta proposta já foi respondida."}, status=409)
 
     if d["acao"] == "recusar":
         if not d["nome"]:

@@ -57,6 +57,8 @@ def _chamar(caminho: str, corpo: dict) -> dict:
         raise D4SignErro(f"D4Sign ({caminho}): {msg or texto or f'HTTP {e.code}'}") from None
     except OSError as e:
         raise D4SignErro(f"D4Sign ({caminho}): {e}") from None
+    except Exception as e:  # noqa: BLE001 — ex.: InvalidURL, cuja mensagem traz a URL com o token
+        raise D4SignErro(f"D4Sign ({caminho}): requisição inválida ({type(e).__name__}).") from None
     try:
         dados = json.loads(texto) if texto else {}
     except ValueError:

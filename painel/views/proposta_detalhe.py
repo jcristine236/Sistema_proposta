@@ -1,5 +1,6 @@
 """Acompanhamento de uma proposta, exclusão e contrato (src/app/admin/propostas/[id]/page.tsx)."""
 
+import logging
 import re
 
 from django.http import Http404, JsonResponse
@@ -121,8 +122,11 @@ def gerar_contrato(request, proposta_id):
         return JsonResponse({"erro": "Esta proposta já tem contrato no D4Sign."})
     try:
         contrato = d4sign.gerar_contrato(p.empresa, p)
-    except Exception as e:  # noqa: BLE001 — a mensagem vai para a tela, como no Next
+    except d4sign.D4SignErro as e:
         return JsonResponse({"erro": str(e) or "Falha ao gerar o contrato no D4Sign."})
+    except Exception:  # noqa: BLE001 — detalhe só no log: a mensagem pode trazer dados internos
+        logging.getLogger(__name__).exception("Falha ao gerar contrato D4Sign (%s)", p.codigo)
+        return JsonResponse({"erro": "Falha ao gerar o contrato no D4Sign."})
     Proposta.objects.filter(pk=p.pk).update(contrato=contrato)
     Evento.objects.create(proposta=p, tipo="CONTRATO_ENVIADO", dados={"nome": request.usuario.nome, "uuid": contrato["uuid"]})
     auditar(request, usuario=request.usuario, empresa_id=request.empresa.pk, acao="CONTRATO", entidade="Proposta",

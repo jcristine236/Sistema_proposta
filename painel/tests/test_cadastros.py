@@ -250,7 +250,9 @@ class EmpresaTest(Comum):
     def test_validacoes(self):
         for extra, msg in [({"logo": "javascript:alert(1)"}, "Endereço de logo inválido."),
                            ({"emailNotificacao": "x"}, "E-mail de avisos inválido."),
-                           ({"d4signSignatarioEmail": "x"}, "E-mail do signatário da empresa (D4Sign) inválido.")]:
+                           ({"d4signSignatarioEmail": "x"}, "E-mail do signatário da empresa (D4Sign) inválido."),
+                           ({"d4signCofre": "a b"}, "Identificador do cofre (D4Sign) inválido"),
+                           ({"d4signTemplate": "x/../y"}, "Identificador do modelo (D4Sign) inválido")]:
             self.assertContains(self.client.post("/admin/empresa", self.form(**extra)), msg)
 
     def test_sem_editar(self):

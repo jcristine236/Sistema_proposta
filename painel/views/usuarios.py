@@ -66,6 +66,11 @@ def _alvo_gerenciavel(request, uid):
         return alvo
     if alvo.super_admin or not _permissoes_contidas(alvo, eu):
         return None
+    # Quem também está em empresa que eu não administro fica só para ver: trocar senha, e-mail ou
+    # permissões daria acesso às propostas daquela empresa.
+    minhas = {e.id for e in request.empresas}
+    if not eu.todas_empresas and alvo.membros.exclude(empresa_id__in=minhas).exists():
+        return None
     return alvo
 
 
@@ -217,6 +222,8 @@ def _salvar(request, d: dict):
         return JsonResponse({"erro": "Sem permissão para este usuário."})
     if alvo and alvo.id == eu.id and (not d.get("ativo") or (eu.super_admin and not d.get("superAdmin"))):
         return JsonResponse({"erro": "Você não pode desativar nem rebaixar o próprio acesso."})
+    if alvo and alvo.id == eu.id and d.get("senha"):
+        return JsonResponse({"erro": "Para trocar a própria senha, use Minha conta (pede a senha atual)."})
     if Usuario.objects.filter(email=email).exclude(id=uid).exists():
         return JsonResponse({"erro": "Já existe um usuário com este e-mail."})
 

@@ -105,6 +105,10 @@ class RegrasTest(SimpleTestCase):
         self.assertEqual(d["validade"], "2026-12-04")
         self.assertEqual(d["sel"], "a")
         self.assertEqual(validar(campos, d), ['Preencha o campo "Cliente".', 'Preencha o campo "Plano".'])
+        pers = {"cliente": {"nome": "A"}, "plano": {"codigo": "personalizado", "personalizado": {"nome": "X", "preco": 1}}}
+        self.assertEqual(validar(campos, pers), ['Plano personalizado não disponível no campo "Plano".'])
+        campos[2]["personalizado"] = {"rotulo": "Sob medida"}
+        self.assertEqual(validar(campos, pers), [])
 
     def test_condicao_e_js_num(self):
         ctx = {"lista": [], "x": 1, "obj": {"a": ""}}

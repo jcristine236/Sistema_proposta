@@ -95,12 +95,18 @@ class DecisaoTest(Base):
         return post(self.client, f"/api/propostas/{self.p.slug}/decisao", corpo)
 
     def test_comentar(self):
-        Proposta.objects.filter(pk=self.p.pk).update(status="EXPIRADA")
         self.assertEqual(self.decidir(acao="comentar", nome="Ana").status_code, 400)
         r = self.decidir(acao="comentar", nome=" Ana ", email="a@b.com", texto="Dúvida?")
         self.assertEqual(r.json(), {"ok": True})
         e = Evento.objects.get(proposta=self.p, tipo="COMENTARIO")
         self.assertEqual(e.dados, {"nome": "Ana", "email": "a@b.com", "texto": "Dúvida?"})
+        # Como na página: expirada ou de empresa desativada não recebe mais comentários (nem avisos)
+        Proposta.objects.filter(pk=self.p.pk).update(status="EXPIRADA")
+        self.assertEqual(self.decidir(acao="comentar", nome="Ana", texto="x").status_code, 409)
+        Proposta.objects.filter(pk=self.p.pk).update(status="ABERTA")
+        type(self.p.empresa).objects.filter(pk=self.p.empresa_id).update(ativo=False)
+        self.assertEqual(self.decidir(acao="comentar", nome="Ana", texto="x").status_code, 404)
+        self.assertEqual(Evento.objects.filter(proposta=self.p, tipo="COMENTARIO").count(), 1)
 
     def test_recusar(self):
         self.assertEqual(self.decidir(acao="recusar", nome="Ana").json(), {"erro": "Selecione um motivo."})

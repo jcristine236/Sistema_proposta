@@ -70,6 +70,11 @@ def validar(campos: list[dict], dados: dict) -> list[str]:
         if c["tipo"] == "data" and v not in (None, "") and not data_valida(v):
             erros.append(f'Data inválida no campo "{c["rotulo"]}".')
             continue
+        if (c["tipo"] == "produto" and isinstance(v, dict) and v.get("codigo") == "personalizado"
+                and not (c.get("personalizado") or {}).get("rotulo")):
+            # O formulário só mostra "personalizado" quando o modelo oferece; o servidor confere igual
+            erros.append(f'Plano personalizado não disponível no campo "{c["rotulo"]}".')
+            continue
         if not c.get("obrigatorio"):
             continue
         vazio = v is None or v == ""

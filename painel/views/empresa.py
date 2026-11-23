@@ -26,6 +26,7 @@ CORES = [
 ]
 _COR = re.compile(r"#[0-9a-f]{6}", re.I)
 # ([\w.]+) e \s como no JS: \w só ASCII
+_ID_D4 = re.compile(r"^[A-Za-z0-9-]{1,80}$")
 _CAMPO_D4 = re.compile(r"^\s*([A-Za-z0-9_.]+)\s*[:=]\s*(.+?)\s*$")
 
 
@@ -118,6 +119,9 @@ def empresa(request):
         m = _CAMPO_D4.match(linha)
         if m:
             campos[m.group(1)] = m.group(2)[:80]
+    for chave, nome in (("d4signCofre", "cofre"), ("d4signTemplate", "modelo")):
+        if txt(f, chave, 80) and not _ID_D4.match(txt(f, chave, 80)):
+            return erro(f"Identificador do {nome} (D4Sign) inválido: use só letras, números e hífen.")
     d4 = {
         "cofre": txt(f, "d4signCofre", 80),
         "template": txt(f, "d4signTemplate", 80),

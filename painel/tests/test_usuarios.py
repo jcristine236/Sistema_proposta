@@ -112,10 +112,18 @@ class UsuariosTest(Base):
         self.assertFalse(u.super_admin or u.todas_empresas)
         self.assertEqual(list(u.membros.values_list("empresa_id", flat=True)), [self.caddi.id])
         self.assertEqual(u.permissoes, {"modulos": {"usuarios": {"ver": True, "excluir": True}}, "propostasDeTodos": True})
-        # Preserva vínculos com empresas que o editor não enxerga
+        # Quem também está em empresa que o editor não administra: só leitura (senão vira tomada de conta)
         Membro.objects.create(usuario=u, empresa=self.kolp)
-        self.salvar(id=u.id, empresas=[self.caddi.id])
+        self.assertEqual(self.salvar(id=u.id, empresas=[self.caddi.id], senha="NovaSenha123")[1],
+                         {"erro": "Sem permissão para este usuário."})
+        r = self.client.post(f"/admin/usuarios/{u.id}/redefinir-senha")
+        self.assertEqual(r.json(), {"erro": "Sem permissão para este usuário."})
+        self.client.post(f"/admin/usuarios/{u.id}/excluir")
+        self.assertTrue(Usuario.objects.filter(id=u.id, ativo=True).exists())
         self.assertEqual(set(u.membros.values_list("empresa_id", flat=True)), {self.caddi.id, self.kolp.id})
+        # A própria senha só pela Minha conta
+        eu = Usuario.objects.get(email="adm@x.com")
+        self.assertIn("Minha conta", self.salvar(id=eu.id, email=eu.email, senha="NovaSenha123")[1]["erro"])
         # Não mexe em superadmin
         self.assertEqual(self.salvar(id=self.admin.id, email=self.admin.email)[1],
                          {"erro": "Apenas um superadministrador pode alterar outro superadministrador."})

@@ -49,6 +49,14 @@ class D4SignTest(TestCase):
             with self.assertRaisesMessage(d4sign.D4SignErro, "D4Sign (/documents/cofre-1/makedocumentbytemplate): cofre inexistente"):
                 d4sign.gerar_contrato(self.p.empresa, self.p)
 
+    def test_erro_nao_vaza_token(self):
+        # Espaço no id do cofre: o http.client recusa a URL e a mensagem dele traz a query com o token
+        self.p.empresa.d4sign = {**CFG, "cofre": "a b"}
+        with self.assertRaises(d4sign.D4SignErro) as c:
+            d4sign.gerar_contrato(self.p.empresa, self.p)
+        self.assertNotIn("tok", str(c.exception).replace("/documents", ""))
+        self.assertNotIn("ck", str(c.exception))
+
     def test_status(self):
         self.assertEqual(d4sign.status_do_webhook({"type_post": "1"}), "ASSINADO")
         self.assertEqual(d4sign.status_do_webhook({"type_post": 3}), "CANCELADO")
