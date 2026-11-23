@@ -18,7 +18,7 @@ na tela da proposta.
 
 ## O que configurar
 
-### 1. Credenciais da conta (no servidor, `web/.env`)
+### 1. Credenciais da conta (no servidor, `.env`)
 ```
 # troque para producao quando for valer juridicamente
 D4SIGN_AMBIENTE=sandbox

@@ -1,7 +1,9 @@
 .env
+.env.*
+!.env.example
 .superpowers/
-web/.env
-web/.venv/
-web/uploads/
-web/staticfiles/
+.venv/
+uploads/
+staticfiles/
 __pycache__/
+logs/

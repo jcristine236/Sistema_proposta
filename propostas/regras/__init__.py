@@ -2,5 +2,5 @@
 
 Os valores seguem a semântica do JavaScript (números de ponto flutuante, parseFloat,
 Math.round, String()) para que cálculo, contexto e textos fiquem idênticos ao Next.
-Ver js.py e os testes contra web/propostas/tests/referencias/casos.json.
+Ver js.py e os testes contra propostas/tests/referencias/casos.json.
 """

@@ -1,6 +1,6 @@
 """Configuração do sistema de propostas (Django).
 
-Tudo que muda entre máquinas vem de web/.env (veja .env.example).
+Tudo que muda entre máquinas vem de .env (veja .env.example).
 """
 
 from pathlib import Path
@@ -19,7 +19,7 @@ DEBUG = env.bool("DEBUG", default=False)
 if not DEBUG and (len(SECRET_KEY) < 32 or SECRET_KEY.startswith("gere-uma")):
     from django.core.exceptions import ImproperlyConfigured
 
-    raise ImproperlyConfigured("Com DEBUG=false, defina SECRET_KEY no web/.env com 32+ caracteres aleatórios.")
+    raise ImproperlyConfigured("Com DEBUG=false, defina SECRET_KEY no .env com 32+ caracteres aleatórios.")
 
 # O host de cada proposta é validado contra o domínio da empresa (ver publico/),
 # por isso aqui todos os hosts são aceitos.

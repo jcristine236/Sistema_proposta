@@ -1,6 +1,6 @@
 # Segurança — relatório de auditoria e checklist de produção
 
-A primeira parte descreve as proteções da aplicação (Django, em `web/`); a segunda é o
+A primeira parte descreve as proteções da aplicação (Django); a segunda é o
 checklist da infraestrutura (servidor Windows); a terceira lista os riscos conhecidos e aceitos.
 
 > **Pontos conferidos na versão Django:**
@@ -12,10 +12,10 @@ checklist da infraestrutura (servidor Windows); a terceira lista os riscos conhe
 >   o JS monta os elementos sem injetar texto do usuário como HTML.
 > - **Âncora dos planos:** o link do botão é saneado para `#` + apenas letras, números e hífen.
 > - **Cabeçalhos:** CSP com *nonce* novo a cada requisição, `X-Frame-Options: DENY`, `nosniff`,
->   `Referrer-Policy`, `Permissions-Policy`, `COOP` e HSTS (`web/nucleo/seguranca.py`).
+>   `Referrer-Policy`, `Permissions-Policy`, `COOP` e HSTS (`nucleo/seguranca.py`).
 > - **Aceite:** validação no servidor com limites de tamanho, limite de 20 envios por IP a cada
 >   10 min, e validação de CNPJ, e-mail e WhatsApp.
-> - **Testes automáticos** de segurança em `web/nucleo/tests/test_seguranca.py`
+> - **Testes automáticos** de segurança em `nucleo/tests/test_seguranca.py`
 >   (`python manage.py test`).
 
 ## 1. Proteções na aplicação
@@ -54,11 +54,11 @@ checklist da infraestrutura (servidor Windows); a terceira lista os riscos conhe
 - `DEBUG` é a chave de ambiente: com `DEBUG=false`, `ALLOW_ANY_HOST` e `MODO_HTTP` são ignorados, a `SECRET_KEY` precisa ter 32+ caracteres e o webhook do D4Sign exige token. O `servir.py` se recusa a subir com `DEBUG=true`.
 - Não existe o `/admin` padrão do Django (`django.contrib.admin` não está instalado). Todo o `/admin/...` é o painel próprio e exige login; só ficam abertos a proposta pública (`/p/...`), suas imagens, o rastreio, o aceite/recusa do cliente, o webhook do D4Sign e a tela de login (teste `painel/tests/test_rotas_anonimas.py`).
 - Apenas o Caddy publica as portas 80/443; HTTPS automático; cabeçalho `Server` removido; corpo de requisição limitado a 10 MB.
-- Segredos só no `web/.env` (fora do Git), com acesso restrito a administradores.
+- Segredos só no `.env` (fora do Git), com acesso restrito a administradores.
 
 ## 2. Checklist da infraestrutura (antes de ir ao ar)
 
-- [ ] `web/.env` com `SECRET_KEY` e senha do banco **gerados aleatoriamente**; permissão restrita (`icacls`, ver deploy/README.md)
+- [ ] `.env` com `SECRET_KEY` e senha do banco **gerados aleatoriamente**; permissão restrita (`icacls`, ver deploy/README.md)
 - [ ] `DEBUG=false`, `MODO_HTTP=false`, `ALLOW_ANY_HOST=false`, `PUBLIC_BASE_URL` vazio, `ATRAS_DE_PROXY=true`
 - [ ] `SEED_ADMIN_PASSWORD` forte (o `semear` recusa senha fraca em produção); trocar no primeiro login
 - [ ] Firewall do Windows: liberar só 80/443 (e RDP restrito por IP/VPN); nada de 5432 ou 8000 expostos
@@ -66,7 +66,7 @@ checklist da infraestrutura (servidor Windows); a terceira lista os riscos conhe
 - [ ] Painel (`painel.caddi.com.br`) preferencialmente restrito por VPN ou lista de IPs do escritório (no Caddy: `@fora not remote_ip 1.2.3.4/32` → `respond @fora 403`)
 - [ ] Backup diário do banco (`pg_dump`) **e** da pasta `UPLOAD_DIR`, guardado fora do servidor, com teste de restauração
 - [ ] SMTP com usuário próprio e senha de aplicativo; registros SPF/DKIM do domínio remetente
-- [ ] WhatsApp e D4Sign: tokens/chaves apenas no `web/.env`
+- [ ] WhatsApp e D4Sign: tokens/chaves apenas no `.env`
 - [ ] Monitorar os logs dos serviços (`C:\propostas\logs\app.log` do waitress e `caddy.log`); revisar a tela Auditoria periodicamente
 - [ ] Atualizar a plataforma regularmente (deploy/README.md, seção 7) e conferir dependências com
       `pip list --outdated` e `pip-audit` (`pip install pip-audit`, rodar dentro do `.venv`)
@@ -77,5 +77,5 @@ checklist da infraestrutura (servidor Windows); a terceira lista os riscos conhe
 |---|---|---|
 | Imagens externas (`https://`) nos modelos | O navegador do cliente busca a imagem no servidor externo | Preferir enviar as imagens para o sistema (`/uploads`) |
 | Avisos sem SMTP/WhatsApp configurados | Conteúdo do aviso vai para o log do serviço (contém dados do cliente) | Configurar SMTP e WhatsApp em produção; proteger acesso aos logs |
-| Logo em SVG por upload | Não aceito (SVG pode conter script) | Logos SVG oficiais ficam em `web/publico_raiz/empresas/` (arquivos revisados) |
+| Logo em SVG por upload | Não aceito (SVG pode conter script) | Logos SVG oficiais ficam em `publico_raiz/empresas/` (arquivos revisados) |
 | `style-src 'unsafe-inline'` na CSP | Necessário para cores do tema e estilos dos blocos | Scripts continuam exigindo *nonce*; conteúdo dos modelos não aceita HTML |

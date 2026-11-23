@@ -18,7 +18,7 @@ Equipe  ─► painel.caddi.com.br ───────────────
 - **Painel interno** (login, criação de propostas) fica num domínio próprio, ex.: `painel.caddi.com.br`.
   Nos domínios `propostas.*` o painel é bloqueado pelo Caddy.
 - **HTTPS** é emitido automaticamente (Let's Encrypt) pelo Caddy assim que o DNS aponta para o servidor.
-- O Django (`web/servir.py`) e o Caddy rodam como **serviços do Windows** (via NSSM): sobem
+- O Django (`servir.py`) e o Caddy rodam como **serviços do Windows** (via NSSM): sobem
   sozinhos quando o servidor liga.
 
 Nos exemplos o sistema fica em `C:\propostas`. Use o **PowerShell como administrador**.
@@ -88,8 +88,8 @@ CREATE DATABASE propostas OWNER propostas;
 ## 4. Baixar o sistema e configurar
 
 ```powershell
-git clone -b claude/inspiring-archimedes-3stbow https://github.com/jcristine236/Sistema_proposta.git C:\propostas
-cd C:\propostas\web
+git clone -b migracao-django https://github.com/jcristine236/Sistema_proposta.git C:\propostas
+cd C:\propostas
 python -m venv .venv
 .venv\Scripts\pip install -r requirements.txt
 copy .env.example .env
@@ -102,7 +102,7 @@ Gere a `SECRET_KEY` com:
 .venv\Scripts\python -c "import secrets; print(secrets.token_urlsafe(50))"
 ```
 
-Valores de produção no `web/.env`:
+Valores de produção no `.env`:
 
 | Variável | O que colocar |
 |---|---|
@@ -116,7 +116,7 @@ Valores de produção no `web/.env`:
 | `ADMIN_BASE_URL` | `https://painel.caddi.com.br` (usado nos links dos avisos) |
 | `ATRAS_DE_PROXY` | `true` (confia no `X-Forwarded-Proto` do Caddy) |
 | `CSRF_TRUSTED_ORIGINS` | `https://painel.caddi.com.br,https://propostas.caddi.com.br,https://propostas.kolp.com.br,https://propostas.fasesistemas.com.br` |
-| `UPLOAD_DIR` | pasta das imagens enviadas; padrão `./uploads` (= `C:\propostas\web\uploads`) |
+| `UPLOAD_DIR` | pasta das imagens enviadas; padrão `./uploads` (= `C:\propostas\uploads`) |
 | `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` | primeiro administrador; a senha precisa de 12+ caracteres, letras e números (o `semear` recusa senha fraca com `ALLOW_ANY_HOST=false`) |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM` | e-mail dos avisos de abertura/aceite (recomendado). Porta 587 usa STARTTLS; `SMTP_SECURE=true` para SSL direto (465) |
 | `WHATSAPP_PROVIDER` e variáveis do provedor | `evolution` (`EVOLUTION_URL`, `EVOLUTION_INSTANCE`, `EVOLUTION_APIKEY`), `meta` (`META_TOKEN`, `META_PHONE_ID`, `META_TEMPLATE`, `META_TEMPLATE_LANG`) ou `webhook` (`WHATSAPP_WEBHOOK_URL`, `WHATSAPP_WEBHOOK_SECRET`) |
@@ -126,7 +126,7 @@ Valores de produção no `web/.env`:
 Proteja o arquivo (só administradores leem):
 
 ```powershell
-icacls C:\propostas\web\.env /inheritance:r /grant:r "Administrators:F" "SYSTEM:F"
+icacls C:\propostas\.env /inheritance:r /grant:r "Administrators:F" "SYSTEM:F"
 ```
 
 Antes de ir ao ar, siga o checklist de [SECURITY.md](../SECURITY.md).
@@ -134,7 +134,7 @@ Antes de ir ao ar, siga o checklist de [SECURITY.md](../SECURITY.md).
 ## 5. Preparar e rodar o Django como serviço
 
 ```powershell
-cd C:\propostas\web
+cd C:\propostas
 .venv\Scripts\python manage.py migrate
 .venv\Scripts\python manage.py collectstatic --noinput
 .venv\Scripts\python manage.py semear
@@ -147,8 +147,8 @@ Serviço `propostas` com NSSM (troque `postgresql-x64-16` pelo nome do serviço 
 
 ```powershell
 mkdir C:\propostas\logs
-nssm install propostas C:\propostas\web\.venv\Scripts\python.exe C:\propostas\web\servir.py
-nssm set propostas AppDirectory C:\propostas\web
+nssm install propostas C:\propostas\.venv\Scripts\python.exe C:\propostas\servir.py
+nssm set propostas AppDirectory C:\propostas
 nssm set propostas AppStdout C:\propostas\logs\app.log
 nssm set propostas AppStderr C:\propostas\logs\app.log
 nssm set propostas AppRotateFiles 1
@@ -188,7 +188,6 @@ Acesse `https://painel.caddi.com.br`, entre com o usuário do `.env` (o sistema 
 ```powershell
 cd C:\propostas
 git pull
-cd web
 .venv\Scripts\pip install -r requirements.txt
 .venv\Scripts\python manage.py migrate
 .venv\Scripts\python manage.py collectstatic --noinput
@@ -201,7 +200,7 @@ do modelo e dos preços do momento em que foi gerada.
 
 ## 8. Backup
 
-Guarde **o banco e a pasta de uploads** (`UPLOAD_DIR`, padrão `C:\propostas\web\uploads`).
+Guarde **o banco e a pasta de uploads** (`UPLOAD_DIR`, padrão `C:\propostas\uploads`).
 
 Para o `pg_dump` não pedir senha, crie `C:\Windows\System32\config\systemprofile\AppData\Roaming\postgresql\pgpass.conf`
 (perfil da conta SYSTEM, que roda a tarefa) com a linha
@@ -213,7 +212,7 @@ Salve como `C:\propostas\backup.ps1` (ajuste a versão do PostgreSQL no caminho)
 $dia = Get-Date -Format yyyy-MM-dd
 New-Item -ItemType Directory -Force C:\backup | Out-Null
 & "C:\Program Files\PostgreSQL\16\bin\pg_dump.exe" -h localhost -U propostas -Fc -f "C:\backup\propostas-$dia.dump" propostas
-Compress-Archive -Path C:\propostas\web\uploads\* -DestinationPath "C:\backup\uploads-$dia.zip" -Force
+Compress-Archive -Path C:\propostas\uploads\* -DestinationPath "C:\backup\uploads-$dia.zip" -Force
 Get-ChildItem C:\backup | Where-Object LastWriteTime -lt (Get-Date).AddDays(-30) | Remove-Item
 ```
 
@@ -228,11 +227,11 @@ Copie `C:\backup` para fora do servidor (outro disco, nuvem). Restaurar:
 ```powershell
 nssm stop propostas
 & "C:\Program Files\PostgreSQL\16\bin\pg_restore.exe" -h localhost -U propostas -d propostas --clean C:\backup\propostas-AAAA-MM-DD.dump
-Expand-Archive C:\backup\uploads-AAAA-MM-DD.zip -DestinationPath C:\propostas\web\uploads -Force
+Expand-Archive C:\backup\uploads-AAAA-MM-DD.zip -DestinationPath C:\propostas\uploads -Force
 nssm start propostas
 ```
 
-Os logos padrão ficam em `web/publico_raiz/empresas/<empresa>/` (versionados no repositório).
+Os logos padrão ficam em `publico_raiz/empresas/<empresa>/` (versionados no repositório).
 
 ## 9. Usando outro proxy que a nuvem já tem
 
@@ -248,7 +247,7 @@ Sem o Caddy, configure no seu proxy:
 
 1. Cadastre a empresa em **Empresas** (superadministrador): nome, prefixo e domínio.
 2. Crie o registro DNS `propostas.<dominio>` na Hostgator.
-3. Inclua o domínio na lista de `deploy/Caddyfile` e em `CSRF_TRUSTED_ORIGINS` no `web/.env`.
+3. Inclua o domínio na lista de `deploy/Caddyfile` e em `CSRF_TRUSTED_ORIGINS` no `.env`.
 4. `nssm restart caddy` e `nssm restart propostas`.
 
 ## Problemas comuns

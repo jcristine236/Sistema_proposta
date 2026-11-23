@@ -26,11 +26,11 @@ CREATE DATABASE propostas OWNER propostas;
 
 ## 3. Baixar e configurar
 
-Baixe o repositório (branch `claude/inspiring-archimedes-3stbow`) e abra o PowerShell
-na pasta `web`:
+Baixe o repositório (branch `migracao-django`) e abra o PowerShell
+na pasta do repositório:
 
 ```powershell
-cd C:\caminho\Sistema_proposta\web
+cd C:\caminho\Sistema_proposta
 python -m venv .venv
 .venv\Scripts\Activate.ps1          # se o Windows bloquear: Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
 pip install -r requirements.txt
@@ -56,7 +56,7 @@ Abra **http://localhost:8000** e entre com o e-mail e a senha de `SEED_ADMIN_EMA
 No primeiro acesso o sistema pede para **criar uma senha nova** (mínimo 10 caracteres,
 letras e números).
 
-Para parar: `Ctrl + C`. Para subir de novo: abra o PowerShell em `web`, rode
+Para parar: `Ctrl + C`. Para subir de novo: abra o PowerShell na pasta do repositório, rode
 `.venv\Scripts\Activate.ps1` e `python manage.py runserver`.
 O `semear` pode ser rodado de novo a qualquer momento (atualiza empresas e modelos, não
 apaga propostas nem muda a senha do administrador).
@@ -112,6 +112,6 @@ Marque o que funcionou e anote o que quiser mudar.
 |---|---|
 | `python` não reconhecido | Reinstale o Python marcando "Add python.exe to PATH"; feche e abra o PowerShell |
 | `password authentication failed` | A senha em `DATABASE_URL` não é a do passo 2 |
-| `ImproperlyConfigured: Set the SECRET_KEY` | Falta o `.env` em `web/` (passo 3) |
+| `ImproperlyConfigured: Set the SECRET_KEY` | Falta o `.env` na raiz (passo 3) |
 | Porta 8000 em uso | `python manage.py runserver 8001` e acesse http://localhost:8001 |
 | Testes: `permission denied to create database` | Rode no psql: `ALTER ROLE propostas CREATEDB;` |

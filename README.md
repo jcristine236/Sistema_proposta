@@ -26,13 +26,13 @@ peça por exemplo: *“use a skill modelos-proposta e importe este mockup como m
 
 ## Tecnologia
 
-O sistema foi migrado de Next.js para Django; todo o código está em `web/`.
+O sistema foi migrado de Next.js para Django; o projeto Django fica na raiz do repositório.
 
 | Camada | Escolha | Por quê |
 |---|---|---|
 | Aplicação | Django 5.2 (Python 3.13) | Painel, páginas públicas e API num só projeto |
 | Banco | PostgreSQL (instalado no Windows) | Migrações versionadas do Django (`python manage.py migrate`) |
-| Servidor | waitress (`web/servir.py`) como serviço do Windows | Servidor WSGI estável no Windows, ouvindo só em 127.0.0.1:8000 |
+| Servidor | waitress (`servir.py`) como serviço do Windows | Servidor WSGI estável no Windows, ouvindo só em 127.0.0.1:8000 |
 | Proxy | Caddy para Windows | HTTPS automático por domínio; bloqueia o painel nos domínios públicos |
 
 Atualizar = `git pull`, `pip install -r requirements.txt`, `migrate`, `collectstatic` e
@@ -42,14 +42,14 @@ reiniciar o serviço (detalhes em [deploy/README.md](deploy/README.md)).
 
 ```
 Empresa ─┬─ Produtos (ex.: planos de servidor)
-         ├─ Modelos (tipos de solução) ─┬─ campos do formulário   web/propostas/regras/campos.py
-         │                              ├─ regras de cálculo      web/propostas/regras/precificacao.py
-         │                              └─ seções da proposta     web/propostas/templates/proposta/secoes/
+         ├─ Modelos (tipos de solução) ─┬─ campos do formulário   propostas/regras/campos.py
+         │                              ├─ regras de cálculo      propostas/regras/precificacao.py
+         │                              └─ seções da proposta     propostas/templates/proposta/secoes/
          └─ Propostas ── visualizações, tempo por seção, eventos
 ```
 
 - **Modelo**: cada tipo de solução tem seu formulário, cálculo e visual. Já vêm prontos
-  (JSON em `web/seed/modelos/`, carregados por `python manage.py semear`) — edite pelo editor
+  (JSON em `seed/modelos/`, carregados por `python manage.py semear`) — edite pelo editor
   visual ou duplique:
   - **CADDI**: Servidor em nuvem, Gestão e Suporte de TI, Consultoria de TI dedicada, Suporte e TI gerenciada, Backup e segurança de dados, Projeto (valor único, campos preenchíveis).
   - **KOLP**: Site e presença digital, Site por assinatura (SaaS, planos mensais), Plataforma SaaS, Projeto sob medida.
@@ -60,22 +60,22 @@ Empresa ─┬─ Produtos (ex.: planos de servidor)
   de propostas reais. Os planos (preços) vêm no mesmo JSON do modelo e são escolhidos na hora da
   proposta. Números de "quem somos" são exemplos — ajuste no editor.
 - **Blocos**: o catálogo do editor (nome, campos editáveis, conteúdo inicial) fica em
-  `web/propostas/blocos.json`; o visual de cada bloco em `web/propostas/templates/proposta/secoes/<tipo>.html`;
-  o editor em `web/static/js/editor-modelo.js`.
-- **Validação**: tudo que o editor salva é conferido no servidor (`web/propostas/regras/validacao.py`).
+  `propostas/blocos.json`; o visual de cada bloco em `propostas/templates/proposta/secoes/<tipo>.html`;
+  o editor em `static/js/editor-modelo.js`.
+- **Validação**: tudo que o editor salva é conferido no servidor (`propostas/regras/validacao.py`).
 - **Textos com variáveis**: `{{cliente}}`, `{{plano.nome}}`, `{{plano.vcpu}}`,
   `{{dispositivos}}`, `{{validade}}`, `{{calc.totalMensal|brl}}`, e `**negrito**`.
 - **Proposta congelada**: ao gerar o link, a proposta guarda uma cópia do modelo e
   dos preços, então mudanças futuras não alteram o que já foi enviado.
-- **Tema**: cores e logos de cada empresa viram variáveis CSS (`web/nucleo/tema.py`).
+- **Tema**: cores e logos de cada empresa viram variáveis CSS (`nucleo/tema.py`).
 - **Multiempresa**: todo dado pertence a uma empresa; usuários podem atuar em mais de
   uma; o campo `super_admin` prepara o uso futuro como produto.
 
 ## Estrutura
 
 ```
-web/
-  config/                    settings.py (lê web/.env), urls, wsgi
+Sistema_proposta/
+  config/                    settings.py (lê .env), urls, wsgi
   nucleo/                    empresas, usuários, login, permissões, segurança, auditoria
   propostas/                 modelos, propostas, cálculo, validação, blocos e templates da proposta
   painel/                    telas do painel (/admin)
