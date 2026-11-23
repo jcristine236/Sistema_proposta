@@ -1,1 +1,1 @@
-<div class="pp previa" style="{{ estilo }}">{% with s=b.s p=b.p %}{% include b.template %}{% endwith %}</div>
+<div class="pp previa" style="{{ estilo }}">{% if b %}{% with s=b.s p=b.p %}{% include b.template %}{% endwith %}{% endif %}</div>

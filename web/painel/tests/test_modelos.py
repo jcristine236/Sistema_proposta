@@ -202,7 +202,8 @@ class EditorTest(Comum):
         self.assertEqual(len(blocos), 4)
         self.assertTrue(blocos[0].startswith('<div class="pp previa" style="'))
         self.assertIn("Olá Cliente Exemplo", blocos[0])
-        self.assertEqual(blocos[1:], ["", "", ""])
+        self.assertEqual(blocos[1:3], ["", ""])
+        self.assertRegex(blocos[3], r'^<div class="pp previa" style="[^"]*"></div>$')  # lista vazia: só a moldura
         r = self.post("/admin/modelos/render", {"campos": self.m.campos, "precificacao": self.m.precificacao,
                                                 "secoes": self.m.secoes, "completa": True})
         self.assertIn("Prévia do modelo com valores de exemplo", r.json()["html"])

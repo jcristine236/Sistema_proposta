@@ -159,10 +159,11 @@ def renderizar_proposta(secoes, ctx, tema, modo="publico", slug=None, decisao=No
 def renderizar_bloco(s: dict, ctx: dict, tema: dict) -> str:
     """Um bloco sozinho, como no canvas do editor (`<div class="pp previa"><C s ctx logo/></div>`).
 
-    Ao contrário da página, ignora `mostrarSe`; a Lista preenchível vazia não desenha nada.
+    Ao contrário da página, ignora `mostrarSe`; a Lista preenchível vazia deixa a moldura vazia.
     """
     if s["tipo"] == "campoLista" and not (ctx.get(s.get("campo")) or []):
-        return ""
-    b = {"s": s, "p": _preparar(s, ctx), "template": f"proposta/secoes/{s['tipo']}.html",
-         "logo": (tema.get("logoClaro") or tema.get("logo")) if s["tipo"] == "capa" else None}
+        b = None
+    else:
+        b = {"s": s, "p": _preparar(s, ctx), "template": f"proposta/secoes/{s['tipo']}.html",
+             "logo": (tema.get("logoClaro") or tema.get("logo")) if s["tipo"] == "capa" else None}
     return render_to_string("proposta/_bloco.html", {"b": b, "ctx": ctx, "tema": tema, "estilo": variaveis_css(tema)}).strip()
