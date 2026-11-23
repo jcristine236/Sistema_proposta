@@ -140,7 +140,7 @@ def _opc_enum(d, k, opcoes):
     return _enum(v, opcoes)
 
 
-def _limpar_urls(s: dict) -> dict:
+def limpar_urls(s: dict) -> dict:
     if isinstance(s.get("imagem"), str) and s["imagem"] and not url_imagem(s["imagem"]):
         s["imagem"] = ""
     if isinstance(s.get("botaoUrl"), str) and s["botaoUrl"] and not url_link(s["botaoUrl"]):
@@ -157,7 +157,7 @@ def validar_secao(v) -> dict:
     e = conferir_valores(v)
     if e:
         return {"erro": e}
-    return {"ok": _limpar_urls(dict(v))}
+    return {"ok": limpar_urls(dict(v))}
 
 
 def validar_secoes(v) -> dict:

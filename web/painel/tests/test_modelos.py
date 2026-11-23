@@ -213,3 +213,16 @@ class EditorTest(Comum):
                       {"campos": [{"id": 1}], "secoes": [{"id": "a", "tipo": "capa", "selos": "x"}]}):
             r = self.post("/admin/modelos/render", corpo)
             self.assertEqual(r.status_code, 200, corpo)
+
+    def test_inteiro_gigante_nao_da_500(self):
+        corpo = '{"modelo": {"nome": "x", "validadeDias": 1' + "0" * 400 + ', "campos": [], "secoes": [], "precificacao": {}}}'
+        r = self.post(f"/admin/modelos/{self.m.pk}/editar", corpo)
+        self.assertEqual(r.json(), {"id": self.m.pk})
+        self.assertEqual(Modelo.objects.get(pk=self.m.pk).validade_dias, 365)
+
+    def test_render_limpa_link_perigoso(self):
+        s = {"id": "it-1", "tipo": "imagemTexto", "titulo": "T", "botaoTexto": "Ir", "botaoUrl": "javascript:alert(1)"}
+        r = self.post("/admin/modelos/render", {"campos": [], "precificacao": {}, "secoes": [s]})
+        self.assertNotIn("javascript:", r.json()["blocos"][0])
+        r = self.post("/admin/modelos/render", {"campos": [], "precificacao": {}, "secoes": [s], "completa": True})
+        self.assertNotIn("javascript:", r.json()["html"])

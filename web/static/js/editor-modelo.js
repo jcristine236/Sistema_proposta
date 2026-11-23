@@ -420,8 +420,8 @@
         acoes = h("span", { class: "ed-acoes", onclick: function (e) { e.stopPropagation(); } }, modo === "modelo" ? [
           botaoAcao("Subir", "↑", function () { if (i > 0) trocar(i, i - 1); }),
           botaoAcao("Descer", "↓", function () { if (i < m.secoes.length - 1) trocar(i, i + 1); }),
-          botaoAcao("Duplicar", "⧉", function () { inserir(Object.assign(clone(s), { id: novoId(s.tipo) }), i + 1); }),
-          botaoAcao("Salvar como seção favorita", "★", function () { favoritar(s); }),
+          botaoAcao("Duplicar", "⧉", function () { var x = m.secoes[i]; inserir(Object.assign(clone(x), { id: novoId(x.tipo) }), i + 1); }),
+          botaoAcao("Salvar como seção favorita", "★", function () { favoritar(m.secoes[i]); }),
         ] : []);
         acoes.appendChild(botaoAcao("Excluir", "🗑", function () {
           m.secoes = m.secoes.filter(function (_, j) { return j !== i; });
@@ -437,15 +437,17 @@
       }, [
         h("span", { class: "ed-alca", title: "Arraste para mover", texto: "⋮⋮" }),
         h("b", { texto: BLOCO[s.tipo] ? BLOCO[s.tipo].nome : s.tipo }),
-        s.capitulo ? h("span", { class: "muted", texto: "· " + s.capitulo }) : null,
+        h("span", { class: "muted", "data-capitulo": true }),
         acoes,
       ]);
       var bloco = h("div", {
         class: "ed-bloco " + (sel === i ? "sel" : ""),
         ondragover: function (e) { sobre(e, i); },
         ondrop: function (e) { e.stopPropagation(); soltar(alvo !== null ? alvo : i); },
-        onclick: function () { if (sel !== i) { sel = i; desenharCanvas(); desenharProps(); } },
+        // Só troca a classe: redesenhar o canvas recarregaria os vídeos (iframes)
+        onclick: function () { if (sel !== i) { sel = i; marcarSel(); desenharProps(); } },
       }, [barra, elRender(s)]);
+      atualizarCapitulo(barra, s);
       var wrap = h("div", { class: "ed-wrap" }, [bloco]);
       wraps.push(wrap);
       elCanvas.appendChild(wrap);
@@ -455,11 +457,20 @@
 
   // ------------------------------------------------------------- propriedades
   function atual() { return sel !== null ? m.secoes[sel] : null; }
+  function atualizarCapitulo(barra, s) {
+    var el = barra.querySelector("[data-capitulo]");
+    el.textContent = s.capitulo ? "· " + s.capitulo : "";
+    el.hidden = !s.capitulo;
+  }
+  function marcarSel() {
+    wraps.forEach(function (w, j) { w.querySelector(".ed-bloco").className = "ed-bloco " + (sel === j ? "sel" : ""); });
+  }
   function setAtual(s) {
     if (sel === null) return;
     m.secoes[sel] = s;
     mudou();
-    desenharCanvas();
+    // Atualiza só a barra do bloco (o HTML do bloco vem do servidor em seguida)
+    if (wraps[sel]) atualizarCapitulo(wraps[sel].querySelector(".ed-barra"), s);
   }
 
   function variaveis() {

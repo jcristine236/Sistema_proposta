@@ -24,7 +24,7 @@ from propostas.regras.campos import valores_padrao
 from propostas.regras.contexto import montar_contexto
 from propostas.regras.js import js_number, js_round, js_string
 from propostas.regras.validacao import (
-    conferir_valores, tamanho_ok, validar_campos, validar_precificacao, validar_secao, validar_secoes,
+    conferir_valores, limpar_urls, tamanho_ok, validar_campos, validar_precificacao, validar_secao, validar_secoes,
 )
 from propostas.render.secoes import renderizar_bloco, renderizar_proposta
 from propostas.servicos import catalogo_da_empresa
@@ -155,7 +155,8 @@ def excluir_secao(request, secao_id):
 
 def _corpo(request) -> dict:
     try:
-        corpo = json.loads(request.body or b"{}")
+        # Inteiros gigantes viram inf (como no JSON.parse do JS) em vez de estourar float() depois
+        corpo = json.loads(request.body or b"{}", parse_int=lambda t: int(t) if len(t) < 300 else float(t))
     except (ValueError, RecursionError):
         return {}
     return corpo if isinstance(corpo, dict) else {}
@@ -306,7 +307,7 @@ def _bloco_html(s, ctx, tema) -> str:
     if not _bloco_valido(s):
         return ""
     try:
-        return renderizar_bloco(s, ctx, tema)
+        return renderizar_bloco(limpar_urls(dict(s)), ctx, tema)
     except Exception:  # noqa: BLE001 — um bloco a meio caminho não derruba os outros
         log.info("Bloco do editor não renderizou", exc_info=True)
         return ""
@@ -327,6 +328,7 @@ def render_blocos(request):
     tema = tema_de(request.empresa.tema)
     if d.get("completa"):
         # Só os blocos que renderizam sozinhos entram na prévia inteira
+        secoes = [limpar_urls(dict(s)) if isinstance(s, dict) else s for s in secoes]
         validas = [s for s in secoes if _bloco_valido(s) and (s["tipo"] == "campoLista" or _bloco_html(s, ctx, tema))]
         try:
             html = renderizar_proposta(validas, ctx, tema, modo="previa", aviso_previa="Prévia do modelo com valores de exemplo")
