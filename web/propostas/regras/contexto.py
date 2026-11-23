@@ -7,6 +7,7 @@ from datetime import datetime
 from django.utils import timezone
 
 from nucleo.formato import brl, data_br, numero_br
+from propostas.regras.campos import data_valida
 from propostas.regras.js import js_num, js_number, js_round, js_string, truthy
 from propostas.regras.precificacao import calcular, resolver_produto
 
@@ -30,7 +31,7 @@ def montar_contexto(campos, precificacao, dados, catalogo, empresa, agora: datet
             p = resolver_produto(v, catalogo)
             ctx[c["id"]] = {"nome": p["nome"], "preco": p["preco"], **(p["atributos"] or {})} if p else {"nome": "-"}
         elif t == "data":
-            validade_iso = v or None
+            validade_iso = v if data_valida(v) else None
             ctx[c["id"]] = data_br(v)
         elif t == "lista":
             observacoes = [

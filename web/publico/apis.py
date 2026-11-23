@@ -135,6 +135,12 @@ def _ler_corpo(request) -> dict | None:
     return d
 
 
+def _em_aberto(p):
+    """Só grava a decisão se ninguém respondeu nesse meio-tempo (dois cliques, duas abas)."""
+    return Proposta.objects.filter(pk=p.pk).exclude(
+        status__in=[StatusProposta.ACEITA, StatusProposta.RECUSADA, StatusProposta.EXPIRADA])
+
+
 @csrf_exempt
 @require_POST
 def decisao(request, slug):
@@ -168,8 +174,9 @@ def decisao(request, slug):
             return JsonResponse({"erro": "Informe seu nome."}, status=400)
         if not d["motivo"]:
             return JsonResponse({"erro": "Selecione um motivo."}, status=400)
-        Proposta.objects.filter(pk=p.pk).update(status=StatusProposta.RECUSADA, decidida_em=agora, decisao_nome=d["nome"],
-                                                motivo_recusa=d["motivo"], comentario_decisao=d["texto"] or None)
+        if not _em_aberto(p).update(status=StatusProposta.RECUSADA, decidida_em=agora, decisao_nome=d["nome"],
+                                    motivo_recusa=d["motivo"], comentario_decisao=d["texto"] or None):
+            return JsonResponse({"erro": "Esta proposta já foi respondida."}, status=409)
         Evento.objects.create(proposta=p, tipo="RECUSADA",
                               dados={"nome": d["nome"], "email": d["email"], "motivo": d["motivo"], "texto": d["texto"]})
         comentario = f'\n\nComentário: "{d["texto"]}"' if d["texto"] else ""
@@ -193,8 +200,9 @@ def decisao(request, slug):
 
     dados = {"razaoSocial": d["razaoSocial"], "cnpj": formatar_cnpj(d["cnpj"]), "nomeSocio": d["nomeSocio"],
              "email": d["email"].lower(), "whatsapp": formatar_telefone(d["whatsapp"])}
-    Proposta.objects.filter(pk=p.pk).update(status=StatusProposta.ACEITA, decidida_em=agora, decisao_nome=d["nomeSocio"],
-                                            comentario_decisao=d["texto"] or None, dados_contratacao=dados)
+    if not _em_aberto(p).update(status=StatusProposta.ACEITA, decidida_em=agora, decisao_nome=d["nomeSocio"],
+                                comentario_decisao=d["texto"] or None, dados_contratacao=dados):
+        return JsonResponse({"erro": "Esta proposta já foi respondida."}, status=409)
     Evento.objects.create(proposta=p, tipo="ACEITA", dados={"nome": d["nomeSocio"], **dados, "texto": d["texto"]})
     if p.contato_id:
         try:

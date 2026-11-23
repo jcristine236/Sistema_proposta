@@ -50,7 +50,10 @@ def data_br(v) -> str:
     if isinstance(v, str) and _DATA_ISO.match(v):
         a, m, d = v.split("-")
         return f"{d}/{m}/{a}"
-    dt = _para_datetime(v)
+    try:
+        dt = _para_datetime(v)
+    except (ValueError, TypeError, OverflowError):
+        return "sem data"  # texto que não é data (veio de fora do formulário)
     if dt.tzinfo:
         dt = dt.astimezone(SP)
     return dt.strftime("%d/%m/%Y")

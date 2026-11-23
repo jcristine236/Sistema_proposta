@@ -99,3 +99,21 @@ class FormularioTest(Base):
         self.client.post("/admin/sair")
         r = jpost(self.client, "/admin/propostas/calculo", {"chave": {"modelo": self.m.pk}, "dados": {}})
         self.assertEqual(r.status_code, 403)
+
+    def test_aceite_durante_a_edicao(self):
+        """O cliente aceita enquanto o vendedor está com a tela de edição aberta."""
+        from propostas.servicos import editar_proposta
+        j = jpost(self.client, f"/admin/propostas/nova/{self.m.pk}/criar", {"dados": self.dados()}).json()
+        p = Proposta.objects.get(pk=j["id"])  # objeto lido antes do aceite
+        Proposta.objects.filter(pk=p.pk).update(status="ACEITA")
+        req = type("R", (), {"empresa": p.empresa, "usuario": p.autor})()
+        self.assertIn("erros", editar_proposta(req, p, self.dados(dispositivos=20)))
+        self.assertEqual(Proposta.objects.get(pk=p.pk).status, "ACEITA")
+
+    def test_datas_impossiveis_nao_dao_500(self):
+        for v in ("2026-02-31", "abc", "99999-01-01", 5, None):
+            for url in ("/admin/propostas/calculo", "/admin/propostas/previa"):
+                r = jpost(self.client, url, {"chave": {"modelo": self.m.pk}, "dados": self.dados(validade=v)})
+                self.assertEqual(r.status_code, 200, (v, url))
+            r = jpost(self.client, f"/admin/propostas/nova/{self.m.pk}/criar", {"dados": self.dados(validade=v)})
+            self.assertLess(r.status_code, 500, v)

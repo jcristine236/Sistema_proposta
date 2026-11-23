@@ -1,5 +1,6 @@
 """Campos do formulário de preenchimento (src/lib/campos.ts)."""
 
+import re
 from datetime import date, timedelta
 
 from django.utils import timezone
@@ -50,13 +51,27 @@ def valores_padrao(campos: list[dict], hoje: date | None = None) -> dict:
     return dados
 
 
+def data_valida(v) -> bool:
+    """AAAA-MM-DD que existe no calendário (o Next aceitava 31/02 e quebrava ao salvar)."""
+    if not isinstance(v, str) or not re.fullmatch(r"\d{4}-\d{2}-\d{2}", v, re.ASCII):
+        return False
+    try:
+        date.fromisoformat(v)
+    except ValueError:
+        return False
+    return True
+
+
 def validar(campos: list[dict], dados: dict) -> list[str]:
     """Mensagens de erro de preenchimento (vazio = válido)."""
     erros = []
     for c in campos:
+        v = dados.get(c["id"])
+        if c["tipo"] == "data" and v not in (None, "") and not data_valida(v):
+            erros.append(f'Data inválida no campo "{c["rotulo"]}".')
+            continue
         if not c.get("obrigatorio"):
             continue
-        v = dados.get(c["id"])
         vazio = v is None or v == ""
         if not vazio and c["tipo"] == "contato":
             vazio = not (isinstance(v, dict) and str(v.get("nome") or "").strip())

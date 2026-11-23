@@ -174,3 +174,22 @@ class EndurecimentoTest(Base):
         arabe = "".join(chr(0x0660 + int(d)) for d in "11222333000181")
         self.assertFalse(cnpj_valido(arabe))
         self.assertFalse(telefone_valido("".join(chr(0x0660 + int(d)) for d in "11912345678")))
+
+
+class DecisaoConcorrenteTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        semear()
+
+    def test_segunda_resposta_nao_sobrescreve(self):
+        from unittest import mock
+        p = criar_proposta()
+        aceite = {"acao": "aceitar", "nome": "", "razaoSocial": "ACME", "cnpj": "11.222.333/0001-81", "nomeSocio": "Ana",
+                  "email": "ana@acme.com", "whatsapp": "11999998888", "texto": ""}
+        # A recusa chegou entre a leitura da proposta e a gravação do aceite
+        real = Proposta.objects.filter
+        with mock.patch("publico.servico.buscar", return_value=p):
+            Proposta.objects.filter(pk=p.pk).update(status="RECUSADA")
+            r = self.client.post(f"/p/{p.slug}".replace("/p/", "/api/propostas/") + "/decisao", aceite, content_type="application/json")
+        self.assertEqual(r.status_code, 409)
+        self.assertEqual(real(pk=p.pk).get().status, "RECUSADA")

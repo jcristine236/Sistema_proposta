@@ -12,7 +12,7 @@ from nucleo.auditoria import auditar
 from nucleo.formato import slugify_br
 from propostas.models import Contato, Evento, Proposta, Produto, StatusProposta
 from propostas.numeracao import proximo_codigo
-from propostas.regras.campos import validar
+from propostas.regras.campos import data_valida, validar
 from propostas.regras.precificacao import calcular, catalogo_do_modelo
 
 
@@ -63,7 +63,7 @@ def resolver_contato(empresa, campos: list[dict], dados: dict):
 def validade(campos: list[dict], dados: dict):
     c = next((x for x in campos if x["tipo"] == "data"), None)
     v = str(dados.get(c["id"]) or "") if c else ""
-    return datetime.fromisoformat(f"{v}T23:59:59-03:00") if re.fullmatch(r"\d{4}-\d{2}-\d{2}", v) else None
+    return datetime.fromisoformat(f"{v}T23:59:59-03:00") if data_valida(v) else None
 
 
 def criar_proposta(request, modelo, dados_brutos: dict) -> dict:
@@ -104,6 +104,10 @@ def editar_proposta(request, p: Proposta, dados_brutos: dict) -> dict:
         return {"erros": erros}
     empresa, usuario = request.empresa, request.usuario
     with transaction.atomic():
+        # Trava a linha e confere de novo: o cliente pode ter aceitado enquanto o vendedor editava
+        atual = Proposta.objects.select_for_update().filter(pk=p.pk).values_list("status", flat=True).first()
+        if atual is None or atual == StatusProposta.ACEITA:
+            return {"erros": ["Proposta já aceita: não pode ser alterada. Duplique para criar uma nova versão."]}
         dados, cliente, contato = resolver_contato(empresa, campos, dados_seguros(campos, dados_brutos))
         catalogo = catalogo_do_modelo(campos, catalogo_da_empresa(empresa))
         calc = calcular(snap.get("precificacao") or {}, dados, catalogo)
