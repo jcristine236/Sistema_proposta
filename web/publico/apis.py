@@ -5,8 +5,10 @@ Sem CSRF (o sendBeacon não manda cabeçalho), como no Next: protegidas por limi
 taxa por IP e pela validação do domínio da empresa.
 """
 
+import hmac
 import json
 
+from django.conf import settings
 from django.db import transaction
 from django.db.models import F
 from django.http import JsonResponse
@@ -19,6 +21,7 @@ from nucleo.limite import ip_cliente, permitir
 from propostas.avisos import avisar
 from propostas.models import Contato, Evento, Proposta, StatusProposta, TempoSecao, Visualizacao
 from propostas.regras.documentos import cnpj_valido, email_valido, formatar_cnpj, formatar_telefone, telefone_valido
+from integracoes import d4sign
 from publico import servico
 
 
@@ -213,3 +216,51 @@ def decisao(request, slug):
     avisar(p, f"{p.cliente_nome} ACEITOU a proposta", "\n".join(linhas), whatsapp=True)
     return JsonResponse({"ok": True})
 
+
+
+# ----------------------------------------------------------------- webhook do D4Sign
+
+@csrf_exempt
+@require_POST
+def d4sign_webhook(request):
+    """Mudança de status de um documento no D4Sign (src/app/api/d4sign/webhook/route.ts).
+
+    Protegido por token na URL: /api/d4sign/webhook?token=XYZ (D4SIGN_WEBHOOK_TOKEN).
+    """
+    token = settings.D4SIGN_WEBHOOK_TOKEN
+    if token and not hmac.compare_digest(request.GET.get("token", "").encode(), token.encode()):
+        return JsonResponse({"erro": "não autorizado"}, status=401)
+    if len(request.body) > 100_000:
+        return JsonResponse({"erro": "corpo inválido"}, status=400)
+    if "application/json" in request.content_type:
+        try:
+            payload = json.loads(request.body or b"{}")
+        except (ValueError, RecursionError):
+            return JsonResponse({"erro": "corpo inválido"}, status=400)
+        if not isinstance(payload, dict):
+            return JsonResponse({"erro": "corpo inválido"}, status=400)
+    else:
+        payload = {k: request.POST.get(k) for k in request.POST}
+
+    uuid = str(payload.get("uuid") or payload.get("uuidDoc") or payload.get("uuid_document") or "")
+    novo = d4sign.status_do_webhook(payload)
+    if not uuid or not novo:
+        return JsonResponse({"ok": True, "ignorado": True})
+    with transaction.atomic():
+        p = (Proposta.objects.select_for_update().select_related("empresa", "autor")
+             .filter(contrato__uuid=uuid).first())
+        if p is None:
+            return JsonResponse({"ok": True, "naoEncontrado": True})
+        atual = p.contrato or {}
+        if atual.get("status") == novo:
+            return JsonResponse({"ok": True})
+        contrato = {**atual, "status": novo}
+        if novo == "ASSINADO":
+            contrato["assinadoEm"] = timezone.now().isoformat().replace("+00:00", "Z")
+        Proposta.objects.filter(pk=p.pk).update(contrato=contrato)
+        Evento.objects.create(proposta=p, tipo="CONTRATO_ASSINADO" if novo == "ASSINADO" else "CONTRATO_CANCELADO",
+                              dados={"uuid": uuid})
+    if novo == "ASSINADO":
+        avisar(p, f"Contrato assinado — {p.codigo}",
+               f"O contrato da proposta {p.codigo} ({p.cliente_nome}) foi assinado no D4Sign.\nDocumento: {uuid}")
+    return JsonResponse({"ok": True})

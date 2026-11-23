@@ -907,7 +907,7 @@
       onChange(p, redesenhar);
     }
     function setAd(l, redesenhar) {
-      setRec({ base: (prec().recorrente && prec().recorrente.base) || { campo: "" }, adicionais: l }, redesenhar);
+      setRec(Object.assign({}, prec().recorrente, { base: (prec().recorrente && prec().recorrente.base) || { campo: "" }, adicionais: l }), redesenhar);
     }
     function campo(rotulo, filhos) { return h("div", { class: "campo" }, [h("label", { texto: rotulo })].concat(filhos)); }
     function numero(valor, set, attrs) {
@@ -926,7 +926,8 @@
         h("h2", { texto: "Mensalidade" }),
         campo("Valor base vem do campo", [
           sel(rec && rec.base.campo, de(["produto", "moeda"]), function (v) {
-            setRec(v ? { base: { campo: v }, adicionais: adicionais() } : undefined, true);
+            // Diferente do Next, preserva recorrente.extras ao trocar o campo base
+            setRec(v ? Object.assign({}, prec().recorrente, { base: { campo: v }, adicionais: adicionais() }) : undefined, true);
           }, "Sem mensalidade"),
           h("div", { class: "ajuda", texto: "Um campo “Produto/Plano” (usa o preço do catálogo) ou “Valor (R$)”." }),
         ]),
