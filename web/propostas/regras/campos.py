@@ -56,10 +56,10 @@ def data_valida(v) -> bool:
     if not isinstance(v, str) or not re.fullmatch(r"\d{4}-\d{2}-\d{2}", v, re.ASCII):
         return False
     try:
-        date.fromisoformat(v)
+        # Ano limitado: 9999-12-31 às 23:59 de Brasília passa do ano 10000 em UTC e o banco não lê de volta
+        return 2000 <= date.fromisoformat(v).year <= 2999
     except ValueError:
         return False
-    return True
 
 
 def validar(campos: list[dict], dados: dict) -> list[str]:

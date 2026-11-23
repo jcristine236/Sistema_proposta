@@ -193,3 +193,15 @@ class DecisaoConcorrenteTest(TestCase):
             r = self.client.post(f"/p/{p.slug}".replace("/p/", "/api/propostas/") + "/decisao", aceite, content_type="application/json")
         self.assertEqual(r.status_code, 409)
         self.assertEqual(real(pk=p.pk).get().status, "RECUSADA")
+
+    def test_primeira_abertura_nao_desfaz_aceite(self):
+        from unittest import mock
+        p = criar_proposta()
+        Proposta.objects.filter(pk=p.pk).update(status="ACEITA")  # aceite chegou depois da leitura
+        with mock.patch("publico.servico.buscar", return_value=p):
+            r = self.client.post("/api/rastreio", {"acao": "abrir", "slug": p.slug, "viewerId": "v" * 20},
+                                 content_type="application/json")
+        self.assertIn("visualizacaoId", r.json())
+        p2 = Proposta.objects.get(pk=p.pk)
+        self.assertEqual(p2.status, "ACEITA")
+        self.assertIsNotNone(p2.primeira_abertura_em)

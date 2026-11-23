@@ -126,6 +126,15 @@ SESSION_COOKIE_SECURE = not MODO_HTTP
 CSRF_COOKIE_SECURE = not MODO_HTTP
 CSRF_COOKIE_SAMESITE = "Lax"
 
+# Erros e avisos no console (o NSSM grava em logspp.log); sem isso, com DEBUG=false, somem
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {"console": {"class": "logging.StreamHandler"}},
+    "root": {"handlers": ["console"], "level": env("LOG_LEVEL", default="INFO")},
+    "loggers": {"django": {"handlers": ["console"], "level": "INFO", "propagate": False}},
+}
+
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = "nucleo.Usuario"

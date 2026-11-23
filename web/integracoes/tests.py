@@ -83,3 +83,9 @@ class D4SignTest(TestCase):
             r = self.client.post(f"/admin/propostas/{self.p.pk}/contrato")
         self.assertEqual(r.json(), {"ok": True, "status": "ENVIADO"})
         self.assertEqual(Proposta.objects.get(pk=self.p.pk).contrato["uuid"], "doc-7")
+
+
+@override_settings(D4SIGN_WEBHOOK_TOKEN="", DEBUG=False)
+class WebhookSemTokenTest(TestCase):
+    def test_recusa_em_producao(self):
+        self.assertEqual(self.client.post("/api/d4sign/webhook", {"uuid": "x", "type_post": "1"}).status_code, 503)

@@ -10,7 +10,7 @@ import json
 
 from django.conf import settings
 from django.db import transaction
-from django.db.models import F
+from django.db.models import Case, F, Value, When
 from django.http import JsonResponse
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
@@ -80,15 +80,14 @@ def _abrir(request, slug, viewer_id):
         user_agent=(request.META.get("HTTP_USER_AGENT") or "")[:300] or None,
         ip=(request.META.get("HTTP_X_FORWARDED_FOR") or "").split(",")[0].strip()[:64] or None,
     )
-    if not p.primeira_abertura_em:
-        campos = {"primeira_abertura_em": timezone.now()}
-        if p.status == StatusProposta.PUBLICADA:
-            campos["status"] = StatusProposta.ABERTA
-        Proposta.objects.filter(pk=p.pk).update(**campos)
+    # Condicional no SQL: não desfaz um aceite que chegou no meio e não avisa duas vezes
+    if not p.primeira_abertura_em and Proposta.objects.filter(pk=p.pk, primeira_abertura_em__isnull=True).update(
+            primeira_abertura_em=timezone.now(),
+            status=Case(When(status=StatusProposta.PUBLICADA, then=Value(StatusProposta.ABERTA)), default=F("status"))):
         Evento.objects.create(proposta=p, tipo="ABERTA")
         avisar(p, f"{p.cliente_nome} abriu a proposta",
                f"{p.cliente_nome} acabou de abrir a proposta {p.codigo} enviada por {p.autor.nome}.")
-    elif leitor_novo:
+    elif leitor_novo and p.primeira_abertura_em:
         Evento.objects.create(proposta=p, tipo="REABERTA", dados={"nome": "novo leitor"})
     return JsonResponse({"visualizacaoId": v.pk})
 
@@ -236,6 +235,9 @@ def d4sign_webhook(request):
     Protegido por token na URL: /api/d4sign/webhook?token=XYZ (D4SIGN_WEBHOOK_TOKEN).
     """
     token = settings.D4SIGN_WEBHOOK_TOKEN
+    if not token and not settings.DEBUG:
+        # Sem token qualquer um marcaria o contrato como assinado sabendo o id do documento
+        return JsonResponse({"erro": "webhook não configurado (D4SIGN_WEBHOOK_TOKEN)"}, status=503)
     if token and not hmac.compare_digest(request.GET.get("token", "").encode(), token.encode()):
         return JsonResponse({"erro": "não autorizado"}, status=401)
     if len(request.body) > 100_000:

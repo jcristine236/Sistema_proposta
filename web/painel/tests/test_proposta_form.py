@@ -117,3 +117,7 @@ class FormularioTest(Base):
                 self.assertEqual(r.status_code, 200, (v, url))
             r = jpost(self.client, f"/admin/propostas/nova/{self.m.pk}/criar", {"dados": self.dados(validade=v)})
             self.assertLess(r.status_code, 500, v)
+
+    def test_ano_fora_do_intervalo(self):
+        r = jpost(self.client, f"/admin/propostas/nova/{self.m.pk}/criar", {"dados": self.dados(validade="9999-12-31")})
+        self.assertTrue(any("Data inválida" in e for e in r.json()["erros"]))
