@@ -1,6 +1,6 @@
 """Catálogo de blocos (tipos de seção) do editor — src/lib/blocos.ts.
 
-`blocos.json` é gerado por ferramentas/exportar-blocos.ts e traz, por bloco, nome,
+`blocos.json` (exportado uma vez do antigo src/lib/blocos.ts) traz, por bloco, nome,
 categoria, ícone, campos de propriedades e conteúdo padrão; também as opções de
 fundo/efeito, os tipos de campo do formulário e a ordem dos ícones.
 """

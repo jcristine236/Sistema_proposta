@@ -1,14 +1,6 @@
-*.tsbuildinfo
 .env
-.env.local
-.next/
-/uploads/
-next-env.d.ts
-node_modules/
-out/
-web/.env
-web/criar-banco.sql
 .superpowers/
+web/.env
 web/.venv/
 web/uploads/
 web/staticfiles/

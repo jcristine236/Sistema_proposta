@@ -6,12 +6,6 @@
       "runtimeExecutable": "web/.venv/Scripts/python.exe",
       "runtimeArgs": ["web/manage.py", "runserver", "127.0.0.1:8000", "--noreload"],
       "port": 8000
-    },
-    {
-      "name": "next-referencia",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
-      "port": 3000
     }
   ]
 }

@@ -26,6 +26,12 @@ PUBLIC_PROTOCOL = env("PUBLIC_PROTOCOL", default="https")
 ADMIN_BASE_URL = env("ADMIN_BASE_URL", default="")
 UPLOAD_DIR = (BASE_DIR / env("UPLOAD_DIR", default="./uploads")).resolve()
 
+# Atrás do Caddy (HTTPS no proxy, waitress em http://127.0.0.1): confia no X-Forwarded-Proto
+# para o Django saber que a requisição original era HTTPS (cookies seguros e checagem de CSRF).
+if env.bool("ATRAS_DE_PROXY", default=not MODO_HTTP):
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS", default=[])
+
 # D4Sign: credenciais da conta (o cofre, o modelo e o signatário ficam por empresa)
 D4SIGN_AMBIENTE = env("D4SIGN_AMBIENTE", default="sandbox").lower()
 D4SIGN_TOKEN_API = env("D4SIGN_TOKEN_API", default="")
