@@ -18,15 +18,18 @@ na tela da proposta.
 
 ## O que configurar
 
-### 1. Credenciais da conta (no servidor, `.env`)
+### 1. Credenciais da conta (no servidor, `web/.env`)
 ```
-D4SIGN_AMBIENTE="sandbox"   # troque para "producao" quando for valer juridicamente
-D4SIGN_TOKEN_API="seu-token"
-D4SIGN_CRYPT_KEY="sua-chave"   # só se estiver habilitada na sua conta
-D4SIGN_WEBHOOK_TOKEN="um-segredo-seu"
+# troque para producao quando for valer juridicamente
+D4SIGN_AMBIENTE=sandbox
+D4SIGN_TOKEN_API=seu-token
+# só se estiver habilitada na sua conta
+D4SIGN_CRYPT_KEY=sua-chave
+D4SIGN_WEBHOOK_TOKEN=um-segredo-seu
 ```
 Pegue o tokenAPI e a cryptKey no painel do D4Sign (Configurações → API).
-Comece em **sandbox** (sem valor jurídico) para testar.
+Comece em **sandbox** (sem valor jurídico) para testar. Depois de mudar o `.env`,
+reinicie o serviço (`nssm restart propostas`).
 
 ### 2. Por empresa (painel → Empresa e marca → Contrato (D4Sign))
 - **UUID do cofre**: o cofre (safe) onde os contratos ficam.
@@ -52,7 +55,8 @@ No D4Sign, cadastre o endereço de webhook apontando para:
 https://painel.caddi.com.br/api/d4sign/webhook?token=SEU_D4SIGN_WEBHOOK_TOKEN
 ```
 (use o mesmo valor de `D4SIGN_WEBHOOK_TOKEN`). É ele que marca o contrato como
-assinado automaticamente.
+assinado automaticamente. O sistema reconhece o `type_post` numérico do D4Sign:
+**1** = documento finalizado (assinado) e **3** = cancelado; os demais avisos não mudam o status.
 
 ## Observações
 - Cada empresa pode ter seu próprio cofre, modelo e signatário.

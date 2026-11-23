@@ -1,5 +1,7 @@
-# Proxy HTTPS. Os certificados de cada domínio são emitidos automaticamente
+# Proxy HTTPS na frente do Django (waitress em 127.0.0.1:8000).
+# Os certificados de cada domínio são emitidos automaticamente
 # assim que o DNS (Hostgator) aponta para este servidor.
+# ACME_EMAIL e PAINEL_DOMINIO vêm do ambiente do serviço (ver deploy/README.md).
 {
 	email {$ACME_EMAIL}
 }
@@ -12,17 +14,18 @@
 	}
 }
 
-# Painel interno (login, propostas, modelos). Ex.: painel.caddi.com.br
+# Painel interno (/admin*, /login, propostas, modelos). Ex.: painel.caddi.com.br
+# Para restringir ao escritório: @fora not remote_ip 1.2.3.4/32 → respond @fora 403
 {$PAINEL_DOMINIO} {
 	import seguranca
-	reverse_proxy app:3000
+	reverse_proxy 127.0.0.1:8000
 }
 
-# Links públicos das propostas: só a página da proposta e o que ela precisa.
+# Links públicos das propostas: só a página da proposta e o que ela precisa (/static, /uploads...).
 # O painel e o envio de imagens ficam bloqueados nestes domínios.
 propostas.caddi.com.br, propostas.kolp.com.br, propostas.fasesistemas.com.br {
 	import seguranca
 	@painel path /admin* /login* /api/uploads*
 	respond @painel 404
-	reverse_proxy app:3000
+	reverse_proxy 127.0.0.1:8000
 }

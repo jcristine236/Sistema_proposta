@@ -1,37 +1,33 @@
 # Segurança — relatório de auditoria e checklist de produção
 
-Revisão feita antes da implantação na nuvem privada. A primeira parte descreve
-as proteções da aplicação; a segunda é o checklist da infraestrutura;
-a terceira lista os riscos conhecidos e aceitos.
+A primeira parte descreve as proteções da aplicação (Django, em `web/`); a segunda é o
+checklist da infraestrutura (servidor Windows); a terceira lista os riscos conhecidos e aceitos.
 
-> **Reauditoria em 2026-10-20** (após os novos modelos, o bloco "Lista preenchível",
-> o botão de âncora nos planos e os ajustes do painel):
-> - **Sem SQL injection:** nenhuma consulta é montada à mão (zero `queryRaw`/`executeRaw`
->   no código); todo acesso ao banco passa pelo Prisma, com parâmetros. Vale para o login,
->   o aceite (`/api/propostas/[slug]/decisao`) e o resto da aplicação.
-> - **Sem HTML perigoso:** nenhum `dangerouslySetInnerHTML`/`innerHTML`/`eval`. Os textos
->   e as listas preenchidas (escopo, materiais) são renderizados como texto escapado pelo React.
-> - **Âncora dos planos:** o link do botão é saneado para `#` + apenas letras, números e hífen
->   (não aceita `javascript:` nem URL externa).
-> - **Cabeçalhos:** CSP com *nonce*, `X-Frame-Options: DENY`, `nosniff`, `Referrer-Policy`,
->   `Permissions-Policy` e HSTS conferidos nas páginas públicas.
-> - **Aceite:** validação por *schema* (zod) com limites de tamanho, limite de 20 envios por IP
->   a cada 10 min, e validação de CNPJ, e-mail e WhatsApp.
-> - **Mobile:** propostas validadas em telas de 360 px e 390 px (celular), sem rolagem
->   horizontal; o formulário de aceite também é responsivo.
-> - **`npm audit`:** 5 alertas, todos em ferramentas usadas **só na compilação** (postcss dentro
->   do Next 15 e `@prisma/config`/`deepmerge-ts`), sem contato com dados de usuário — ver item 3.
+> **Pontos conferidos na versão Django:**
+> - **Sem SQL injection:** todo acesso ao banco passa pelo ORM do Django, com parâmetros.
+>   As duas únicas consultas SQL escritas à mão (limite de tentativas e numeração das
+>   propostas) usam parâmetros, sem montar texto com dados do usuário.
+> - **Sem HTML perigoso:** os templates escapam tudo por padrão; o HTML marcado como seguro
+>   vem só de código do projeto (ícones SVG, `**negrito**` já escapado). No editor e no painel
+>   o JS monta os elementos sem injetar texto do usuário como HTML.
+> - **Âncora dos planos:** o link do botão é saneado para `#` + apenas letras, números e hífen.
+> - **Cabeçalhos:** CSP com *nonce* novo a cada requisição, `X-Frame-Options: DENY`, `nosniff`,
+>   `Referrer-Policy`, `Permissions-Policy`, `COOP` e HSTS (`web/nucleo/seguranca.py`).
+> - **Aceite:** validação no servidor com limites de tamanho, limite de 20 envios por IP a cada
+>   10 min, e validação de CNPJ, e-mail e WhatsApp.
+> - **Testes automáticos** de segurança em `web/nucleo/tests/test_seguranca.py`
+>   (`python manage.py test`).
 
 ## 1. Proteções na aplicação
 
 ### Acesso e sessão
 | Item | Como está |
 |---|---|
-| Senhas | bcrypt (custo 12); mínimo 10 caracteres, letras e números; nova senha diferente da atual |
+| Senhas | hash PBKDF2 do Django; mínimo 10 caracteres, letras e números; nova senha diferente da atual |
 | Primeiro acesso | o administrador inicial e usuários criados pelo painel **trocam a senha no primeiro login** |
-| Força bruta | 5 erros bloqueiam a conta por 15 min; limite de 20 tentativas por IP e 8 por e-mail a cada 15 min |
+| Força bruta | 5 erros bloqueiam a conta por 15 min; limite de 20 tentativas por IP e 8 por e-mail a cada 15 min (gravado no banco) |
 | Enumeração de contas | mesma mensagem e mesmo tempo de resposta para e-mail inexistente ou senha errada |
-| Sessão | cookie `HttpOnly`, `SameSite=Lax`, `Secure` (HTTPS), assinado (HS256), validade de 12 h |
+| Sessão | sessão do Django no banco, cookie `pp_sessao` `HttpOnly`, `SameSite=Lax`, `Secure` (HTTPS), validade de 12 h |
 | Revogação | trocar senha, redefinir senha, desativar usuário ou sair **invalida todas as sessões** do usuário |
 | Permissões | por módulo e ação (ver/criar/editar/excluir) e por empresa; checadas **no servidor** em cada página e ação, não só no menu |
 | Escalada de privilégio | quem não é superadmin só concede permissões e empresas que ele mesmo tem; não altera superadmins |
@@ -40,44 +36,44 @@ a terceira lista os riscos conhecidos e aceitos.
 ### Páginas e API
 | Item | Como está |
 |---|---|
-| Cabeçalhos | CSP com *nonce* (bloqueia scripts injetados), HSTS, `X-Frame-Options: DENY`, `nosniff`, `Referrer-Policy`, `Permissions-Policy`, `COOP` |
-| CSRF | ações do painel usam Server Actions (checagem de origem do Next.js) + cookie `SameSite=Lax` |
+| Cabeçalhos | CSP com *nonce* por requisição (bloqueia scripts injetados), HSTS, `X-Frame-Options: DENY`, `nosniff`, `Referrer-Policy`, `Permissions-Policy`, `COOP` |
+| CSRF | todo formulário e chamada do painel leva o token CSRF do Django; cookies `SameSite=Lax`. As rotas públicas sem login (rastreio, aceite, webhook D4Sign) dispensam o token e se protegem por limite por IP, validação e (no webhook) token secreto |
 | XSS | o conteúdo dos modelos é estruturado (sem HTML livre); textos são escapados; só `**negrito**` e `{{variáveis}}` |
 | Links e mídia | imagens só de `/uploads`, `/empresas` ou `https`; vídeos só YouTube/Vimeo (player sem cookies); botões só `http(s)`, `mailto:`, `tel:` |
 | Validação | todo dado de modelo, seção, campo, proposta e aceite é validado no servidor (formato, tamanho, profundidade) |
-| Uploads | só PNG/JPG/WebP/GIF conferidos pelos bytes (não pela extensão), até 5 MB, nome aleatório, servidos com `nosniff` e CSP `sandbox` |
-| Links públicos | identificador aleatório de 48 bits + domínio da empresa: a proposta só abre no domínio dela |
+| Uploads | só PNG/JPG/WebP/GIF conferidos pelos bytes (não pela extensão), até 5 MB, 60 por hora por usuário, nome aleatório, servidos com `nosniff` e CSP `sandbox` |
+| Links públicos | identificador aleatório + domínio da empresa: a proposta só abre no domínio dela (`ALLOW_ANY_HOST=false`) |
 | Rotas públicas | rastreio e aceite com limite por IP e tamanho máximo de corpo; aceite valida CNPJ, e-mail e WhatsApp |
-| Painel nos domínios públicos | bloqueado no proxy (`/admin`, `/login`, `/api/uploads` respondem 404 em `propostas.*`) |
-| Erros | em produção o Next.js não mostra detalhes técnicos ao usuário |
+| Webhook D4Sign | exige `?token=` igual a `D4SIGN_WEBHOOK_TOKEN` (comparação em tempo constante) |
+| Painel nos domínios públicos | bloqueado no Caddy (`/admin`, `/login`, `/api/uploads` respondem 404 em `propostas.*`) |
+| Erros | com `DEBUG=false` o Django mostra só uma página de erro genérica, sem detalhes técnicos |
 | Auditoria | logins (inclusive falhos e bloqueios), criação, edição e exclusão ficam registrados com usuário, data e IP (tela Auditoria) |
 
-### Contêineres
-- Aplicação roda como usuário **sem privilégios**, sistema de arquivos **somente leitura**, `no-new-privileges`.
-- Banco **não exposto** à rede externa (apenas a rede interna do Docker).
-- Apenas o proxy (Caddy) publica as portas 80/443; HTTPS automático; cabeçalho `Server` removido; corpo de requisição limitado a 10 MB.
-- Imagens enviadas ficam no volume `dados-uploads`; banco no volume `dados-db`.
+### Servidor
+- O Django (waitress) escuta só em `127.0.0.1:8000`; o PostgreSQL só em `localhost`.
+- Apenas o Caddy publica as portas 80/443; HTTPS automático; cabeçalho `Server` removido; corpo de requisição limitado a 10 MB.
+- Segredos só no `web/.env` (fora do Git), com acesso restrito a administradores.
 
 ## 2. Checklist da infraestrutura (antes de ir ao ar)
 
-- [ ] `.env` com `DB_PASSWORD` (`openssl rand -hex 24`) e `SESSION_SECRET` (`openssl rand -base64 48`) **gerados aleatoriamente**, permissão `chmod 600 .env`
-- [ ] `SEED_ADMIN_PASSWORD` forte (o seed recusa senha fraca em produção); trocar no primeiro login
-- [ ] `ALLOW_ANY_HOST=false`, `MODO_HTTP` **ausente**, `PUBLIC_BASE_URL` vazio
-- [ ] Firewall: liberar só 80/443 (e SSH restrito por IP/VPN); nada de 5432 ou 3000 expostos
-- [ ] SSH só com chave, sem login de root por senha; atualizações automáticas de segurança do sistema
+- [ ] `web/.env` com `SECRET_KEY` e senha do banco **gerados aleatoriamente**; permissão restrita (`icacls`, ver deploy/README.md)
+- [ ] `DEBUG=false`, `MODO_HTTP=false`, `ALLOW_ANY_HOST=false`, `PUBLIC_BASE_URL` vazio, `ATRAS_DE_PROXY=true`
+- [ ] `SEED_ADMIN_PASSWORD` forte (o `semear` recusa senha fraca em produção); trocar no primeiro login
+- [ ] Firewall do Windows: liberar só 80/443 (e RDP restrito por IP/VPN); nada de 5432 ou 8000 expostos
+- [ ] RDP com senha forte (ou só por VPN), Windows Update automático ligado
 - [ ] Painel (`painel.caddi.com.br`) preferencialmente restrito por VPN ou lista de IPs do escritório (no Caddy: `@fora not remote_ip 1.2.3.4/32` → `respond @fora 403`)
-- [ ] Backup diário do banco **e** do volume de uploads, guardado fora do servidor, com teste de restauração
+- [ ] Backup diário do banco (`pg_dump`) **e** da pasta `UPLOAD_DIR`, guardado fora do servidor, com teste de restauração
 - [ ] SMTP com usuário próprio e senha de aplicativo; registros SPF/DKIM do domínio remetente
-- [ ] WhatsApp: token/chave do provedor apenas no `.env`
-- [ ] Monitorar `docker compose logs` (ou enviar para a ferramenta de logs da nuvem); revisar a tela Auditoria periodicamente
-- [ ] Atualizar a plataforma regularmente (`git pull && docker compose up -d --build`) e rodar `npm audit`
+- [ ] WhatsApp e D4Sign: tokens/chaves apenas no `web/.env`
+- [ ] Monitorar os logs dos serviços (`C:\propostas\logs\app.log` do waitress e `caddy.log`); revisar a tela Auditoria periodicamente
+- [ ] Atualizar a plataforma regularmente (deploy/README.md, seção 7) e conferir dependências com
+      `pip list --outdated` e `pip-audit` (`pip install pip-audit`, rodar dentro do `.venv`)
 
 ## 3. Riscos conhecidos e aceitos
 
 | Risco | Situação | Mitigação |
 |---|---|---|
-| Alertas do `npm audit` em `postcss` (dentro do Next.js 15) e `@prisma/config` (`deepmerge-ts`) | Afetam ferramentas usadas **apenas na compilação**, com arquivos do próprio projeto; não rodam com dados de usuários | Planejar atualização para Next.js 16 / Prisma 7 numa próxima versão |
-| Limite de tentativas em memória | Vale por instância; com mais de um contêiner da aplicação o limite fica por instância | Bloqueio por conta é gravado no banco e vale para todas |
 | Imagens externas (`https://`) nos modelos | O navegador do cliente busca a imagem no servidor externo | Preferir enviar as imagens para o sistema (`/uploads`) |
-| Avisos sem SMTP/WhatsApp configurados | Conteúdo do aviso vai para o log do contêiner (contém dados do cliente) | Configurar SMTP e WhatsApp em produção; proteger acesso aos logs |
-| Logo em SVG por upload | Não aceito (SVG pode conter script) | Logos SVG oficiais ficam em `public/empresas/` (arquivos revisados) |
+| Avisos sem SMTP/WhatsApp configurados | Conteúdo do aviso vai para o log do serviço (contém dados do cliente) | Configurar SMTP e WhatsApp em produção; proteger acesso aos logs |
+| Logo em SVG por upload | Não aceito (SVG pode conter script) | Logos SVG oficiais ficam em `web/publico_raiz/empresas/` (arquivos revisados) |
+| `style-src 'unsafe-inline'` na CSP | Necessário para cores do tema e estilos dos blocos | Scripts continuam exigindo *nonce*; conteúdo dos modelos não aceita HTML |

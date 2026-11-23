@@ -1,47 +1,73 @@
-# Testar no seu computador
+# Testar no seu computador (Windows)
 
-Roda o sistema completo (painel, banco de dados e propostas de exemplo) na sua
-máquina, sem domínio e sem servidor. Leva uns 10 minutos na primeira vez.
+Roda o sistema completo (painel, banco de dados e modelos de exemplo) na sua
+máquina, sem domínio e sem servidor. Leva uns 15 minutos na primeira vez.
 
-## 1. Instalar o Docker Desktop (uma vez só)
+## 1. Instalar (uma vez só)
 
-1. Baixe em https://www.docker.com/products/docker-desktop/ e instale.
-   No Windows, aceite a opção **WSL 2** se o instalador perguntar e reinicie o computador.
-2. Abra o **Docker Desktop** e espere aparecer "Engine running" no canto inferior.
+1. **Python 3.13**: https://www.python.org/downloads/ — no instalador, marque
+   **"Add python.exe to PATH"**.
+2. **PostgreSQL** (16 ou mais novo): https://www.postgresql.org/download/windows/ —
+   anote a senha do usuário `postgres` que o instalador pede. O PostgreSQL fica
+   rodando como serviço do Windows.
+3. **Git** (opcional, para baixar com `git clone`): https://git-scm.com/download/win
 
-## 2. Baixar o sistema
+## 2. Criar o banco
 
-1. Baixe o arquivo:
-   https://github.com/jcristine236/Sistema_proposta/archive/refs/heads/claude/inspiring-archimedes-3stbow.zip
-   (é preciso estar logada no GitHub).
-2. Extraia o zip numa pasta, por exemplo `C:\Meus Sites\Sistema_proposta`.
+Abra o **SQL Shell (psql)** (menu Iniciar), entre com o usuário `postgres` e rode
+(troque `SUA_SENHA` por uma senha só de letras e números):
 
-> **Já testou a versão anterior?** Esta versão recria o banco. Antes de subir, rode uma vez:
-> `docker compose -f docker-compose.teste.yml down -v` (apaga só os dados de teste).
+```sql
+CREATE ROLE propostas LOGIN PASSWORD 'SUA_SENHA' CREATEDB;
+CREATE DATABASE propostas OWNER propostas;
+```
 
-## 3. Subir
+(`CREATEDB` é necessário para os testes automáticos criarem o banco de teste.)
 
-1. Abra a pasta extraída no Explorador de Arquivos.
-2. Clique na barra de endereço, digite `powershell` e aperte Enter.
-3. Na janela que abrir, cole:
+## 3. Baixar e configurar
 
-   ```
-   docker compose -f docker-compose.teste.yml up --build
-   ```
+Baixe o repositório (branch `claude/inspiring-archimedes-3stbow`) e abra o PowerShell
+na pasta `web`:
 
-4. A primeira vez demora (baixa e monta tudo). Está pronto quando aparecer
-   **"Ready"** ou **"✓ Starting..."** nas últimas linhas.
-5. Abra no navegador: **http://localhost:3000**
+```powershell
+cd C:\caminho\Sistema_proposta\web
+python -m venv .venv
+.venv\Scripts\Activate.ps1          # se o Windows bloquear: Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
+pip install -r requirements.txt
+copy .env.example .env
+notepad .env
+```
 
-   - E-mail: `admin@propostas.local`
-   - Senha: `trocar-esta-senha`
-   - No primeiro acesso o sistema pede para **criar uma senha nova** (mínimo 10 caracteres, letras e números).
+No `.env`, ajuste `DATABASE_URL` com a senha do passo 2
+(`postgres://propostas:SUA_SENHA@localhost:5432/propostas`) e troque `SECRET_KEY` por
+qualquer texto longo. O resto já vem pronto para teste local (`DEBUG=true`,
+`MODO_HTTP=true`, `ALLOW_ANY_HOST=true`).
 
-Para parar: volte ao PowerShell e aperte `Ctrl + C`.
-Para subir de novo depois: repita o comando do passo 3 (as propostas criadas continuam lá).
-Para apagar tudo e começar do zero: `docker compose -f docker-compose.teste.yml down -v`
+## 4. Subir
 
-## 4. Roteiro de teste
+```powershell
+python manage.py migrate      # cria as tabelas
+python manage.py semear       # empresas CADDI/KOLP/FASE, administrador e os 18 modelos
+python manage.py runserver    # http://localhost:8000
+```
+
+Abra **http://localhost:8000** e entre com o e-mail e a senha de `SEED_ADMIN_EMAIL` e
+`SEED_ADMIN_PASSWORD` do `.env` (padrão: `admin@propostas.local` / `trocar-esta-senha`).
+No primeiro acesso o sistema pede para **criar uma senha nova** (mínimo 10 caracteres,
+letras e números).
+
+Para parar: `Ctrl + C`. Para subir de novo: abra o PowerShell em `web`, rode
+`.venv\Scripts\Activate.ps1` e `python manage.py runserver`.
+O `semear` pode ser rodado de novo a qualquer momento (atualiza empresas e modelos, não
+apaga propostas nem muda a senha do administrador).
+
+## 5. Testes automáticos
+
+```powershell
+python manage.py test
+```
+
+## 6. Roteiro de teste manual
 
 Marque o que funcionou e anote o que quiser mudar.
 
@@ -60,7 +86,7 @@ Marque o que funcionou e anote o que quiser mudar.
 - [ ] Aba **Seções modelo**: criar/renomear/excluir seções e usá-las em "Minhas seções" do editor
 
 **Proposta**
-- [ ] Nova proposta: preencher, ver o resumo e a prévia, **gerar link** (aparece o número, ex.: CAD-2026-0002)
+- [ ] Nova proposta: preencher, ver o resumo e a prévia, **gerar link** (aparece o número, ex.: CAD-2026-0001)
 - [ ] Abrir o link em **janela anônima** (Ctrl + Shift + N) e rolar até o fim
 - [ ] **Aceitar**: preencher razão social, CNPJ, sócio, e-mail e WhatsApp (teste um CNPJ inválido)
 - [ ] No painel: proposta "Aceita", **Dados para o contrato**, tempo de leitura por seção
@@ -76,14 +102,16 @@ Marque o que funcionou e anote o que quiser mudar.
 ## O que não dá para testar localmente
 
 - **Domínios reais** (`propostas.caddi.com.br` etc.) e HTTPS: só no servidor.
-- **E-mails e WhatsApp de aviso**: sem SMTP/WhatsApp configurados, os avisos aparecem
-  apenas no PowerShell, como linhas `[aviso] ...` e `[whatsapp] ...`.
+- **E-mails e WhatsApp de aviso**: sem `SMTP_HOST` e `WHATSAPP_PROVIDER` no `.env`, os
+  avisos aparecem só no PowerShell (log).
 - **Abrir pelo celular de verdade**: o endereço `localhost` só existe no seu computador.
 
 ## Se algo der errado
 
 | Mensagem | O que fazer |
 |---|---|
-| `docker: command not found` / não reconhecido | Abra o Docker Desktop e espere "Engine running"; feche e abra o PowerShell |
-| `port is already allocated` / porta 3000 em uso | Feche outro programa usando a porta 3000, ou no `docker-compose.teste.yml` troque `"3000:3000"` por `"3001:3000"` e `http://localhost:3000` por `http://localhost:3001`; depois acesse http://localhost:3001 |
-| A página não abre | Espere a montagem terminar; veja se o PowerShell mostra erro em vermelho e me envie um print |
+| `python` não reconhecido | Reinstale o Python marcando "Add python.exe to PATH"; feche e abra o PowerShell |
+| `password authentication failed` | A senha em `DATABASE_URL` não é a do passo 2 |
+| `ImproperlyConfigured: Set the SECRET_KEY` | Falta o `.env` em `web/` (passo 3) |
+| Porta 8000 em uso | `python manage.py runserver 8001` e acesse http://localhost:8001 |
+| Testes: `permission denied to create database` | Rode no psql: `ALTER ROLE propostas CREATEDB;` |
