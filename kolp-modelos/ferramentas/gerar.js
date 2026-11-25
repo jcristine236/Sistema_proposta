@@ -69,7 +69,8 @@ NICHOS.forEach((n, ni) => {
       n, e, destacar, codigo, pessoas, zap,
       nome: neg[0], sub: neg[1], titulo, lide,
       depoFoto: `../../fotos/retratos/${n.depoimento[3] || "f"}${((ni + k) % 6) + 1}.jpg`,
-      f: [0, 1, 2, 3, 4].map((j) => `../../fotos/${n.id}/${((k + j) % nf) + 1}.jpg`),
+      /* Com 10 ou mais fotos no nicho, cada modelo começa num ponto diferente da lista e a foto de abertura não se repete */
+      f: [0, 1, 2, 3, 4].map((j) => `../../fotos/${n.id}/${(((nf >= 10 ? Math.floor(k * nf / 10) : k) + j) % nf) + 1}.jpg`),
       itens: n.catalogo.grupos.reduce((a, g) => a.concat(g.itens.map((i) => ({ grupo: g.nome, nome: i[0], desc: i[1], valor: i[2] }))), []),
       horarioTexto: n.contato.horario.map((h) => h[0] + ", " + h[1]).join(" · "),
       form(o) {
